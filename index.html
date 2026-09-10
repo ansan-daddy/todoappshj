@@ -6,13 +6,17 @@
   <title>할 일 관리</title>
   <link rel="manifest" href="manifest.json">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
   
   <!-- Firebase SDK 모듈 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, get, remove, child, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // 🔴 본인의 Firebase 설정값이 있다면 아래에 입력해 주세요. (미입력 시 로컬 저장소 모드로 작동)
     const firebaseConfig = {
       apiKey: "AIzaSyDYTzXhT0nEBFGaKy_RylkGJ28rmhsPqoc",
       authDomain: "sunhong-todo.firebaseapp.com",
@@ -25,7 +29,7 @@
     };
 
     try {
-      if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+      if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
@@ -38,108 +42,117 @@
         window.dbOnValue = onValue;
       }
     } catch (e) {
-      console.warn("Firebase Config 오류 - 로컬 모드로 작동합니다:", e);
+      console.warn("Firebase Config 오류 - 로컬 저장소 모드로 작동합니다:", e);
     }
 
     window.dispatchEvent(new Event('firebase-ready'));
   </script>
 
   <style>
-    .touch-target { min-height: 44px; min-width: 44px; }
-    .swipe-item { transition: transform 0.2s ease-out; touch-action: pan-y; }
+    .touch-target { min-height: 36px; }
+    /* 스마트 툴팁 스타일 */
+    .tooltip-box {
+      display: none;
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      z-index: 50;
+    }
+    .has-tooltip:hover .tooltip-box,
+    .has-tooltip.active-tooltip .tooltip-box {
+      display: block;
+    }
   </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 p-3 sm:p-8 pb-28 sm:pb-8">
+<body class="bg-slate-100 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-100 p-2 sm:p-5 pb-20 sm:pb-6 transition-colors duration-200">
 
   <!-- 1. 로그인 / 회원가입 / 관리자 진입 화면 -->
-  <div id="loginScreen" class="max-w-md mx-auto mt-8 sm:mt-12 bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-100">
-    <div class="text-center mb-6">
-      <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl font-bold">📝</div>
-      <h2 class="text-2xl font-bold text-slate-800">할 일 관리</h2>
-      <p class="text-xs text-slate-500 mt-1">아이디와 비밀번호로 로그인하세요.</p>
+  <div id="loginScreen" class="max-w-md mx-auto mt-6 sm:mt-10 bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 border border-slate-200 dark:border-slate-700">
+    <div class="text-center mb-4">
+      <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">할 일 관리</h2>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">아이디와 비밀번호로 로그인하세요.</p>
     </div>
 
     <!-- 탭 선택 (로그인 vs 회원가입) -->
-    <div class="flex border-b border-slate-200 mb-6">
-      <button id="tabLogin" type="button" onclick="switchAuthTab('login')" class="flex-1 py-2.5 text-center font-semibold text-indigo-600 border-b-2 border-indigo-600 text-sm">로그인</button>
-      <button id="tabRegister" type="button" onclick="switchAuthTab('register')" class="flex-1 py-2.5 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-sm">회원가입</button>
+    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-4">
+      <button id="tabLogin" type="button" onclick="switchAuthTab('login')" class="flex-1 py-1.5 text-center font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 text-xs sm:text-sm">로그인</button>
+      <button id="tabRegister" type="button" onclick="switchAuthTab('register')" class="flex-1 py-1.5 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-xs sm:text-sm">회원가입</button>
     </div>
 
     <!-- 로그인 폼 -->
-    <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4">
-      <div id="accountListContainer" class="hidden mb-4">
-        <p class="text-xs font-semibold text-slate-600 mb-2">최근 접속 계정</p>
-        <div id="accountList" class="flex flex-wrap gap-2"></div>
+    <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-2.5">
+      <div id="accountListContainer" class="hidden mb-2">
+        <p class="text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">최근 접속 계정</p>
+        <div id="accountList" class="flex flex-wrap gap-1"></div>
       </div>
 
       <div>
-        <label class="block text-xs font-semibold text-slate-600 mb-1">아이디</label>
+        <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">아이디</label>
         <input type="text" id="loginUsername" placeholder="아이디 입력" required
-               class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 text-sm">
+               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs">
       </div>
       <div>
-        <label class="block text-xs font-semibold text-slate-600 mb-1">비밀번호</label>
+        <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">비밀번호</label>
         <input type="password" id="loginPassword" placeholder="비밀번호 입력" required
-               class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 text-sm">
+               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs">
       </div>
-      <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition text-sm shadow-md shadow-indigo-100 touch-target">
+      <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition text-xs shadow-xs touch-target">
         로그인
       </button>
 
-      <div class="text-center pt-2">
-        <button type="button" onclick="openAdminPrompt()" class="text-xs text-slate-400 hover:text-indigo-600 underline">
-          ⚙️ 관리자 모드
+      <div class="text-center pt-1">
+        <button type="button" onclick="openAdminPrompt()" class="text-[11px] text-slate-400 hover:text-indigo-600 underline">
+          관리자 모드
         </button>
       </div>
     </form>
 
     <!-- 회원가입 폼 -->
-    <form id="registerForm" onsubmit="handleRegisterSubmit(event)" class="space-y-4 hidden">
+    <form id="registerForm" onsubmit="handleRegisterSubmit(event)" class="space-y-2.5 hidden">
       <div>
-        <label class="block text-xs font-semibold text-slate-600 mb-1">새 아이디</label>
-        <input type="text" id="regUsername" placeholder="사용할 아이디 (예: 선홍)" required
-               class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 text-sm">
+        <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">새 아이디</label>
+        <input type="text" id="regUsername" placeholder="사용할 아이디" required
+               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs">
       </div>
       <div>
-        <label class="block text-xs font-semibold text-slate-600 mb-1">비밀번호</label>
+        <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">비밀번호</label>
         <input type="password" id="regPassword" placeholder="비밀번호 설정" required
-               class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 text-sm">
+               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs">
       </div>
       <div>
-        <label class="block text-xs font-semibold text-slate-600 mb-1">비밀번호 확인</label>
+        <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">비밀번호 확인</label>
         <input type="password" id="regPasswordConfirm" placeholder="비밀번호 재입력" required
-               class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 text-sm">
+               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs">
       </div>
-      <button type="submit" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition text-sm shadow-md shadow-emerald-100 touch-target">
+      <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition text-xs shadow-xs touch-target">
         가입하기
       </button>
     </form>
   </div>
 
-  <!-- 🛠️ 관리자 전용 화면 -->
-  <div id="adminScreen" class="hidden max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-4 sm:p-6 border border-slate-200 mt-6">
-    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
-      <div class="flex items-center gap-2">
-        <span class="text-2xl">⚙️</span>
-        <h2 class="text-xl font-bold text-slate-800">계정 관리자 모드</h2>
-      </div>
-      <button onclick="closeAdminScreen()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg font-semibold transition">
-        ✕ 관리자 나가기
+  <!-- 관리자 전용 화면 -->
+  <div id="adminScreen" class="hidden max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 border border-slate-200 dark:border-slate-700 mt-4">
+    <div class="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-700 mb-3">
+      <h2 class="text-base font-bold text-slate-800 dark:text-slate-100">계정 관리자 모드</h2>
+      <button onclick="closeAdminScreen()" class="text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-md font-semibold transition">
+        ✕ 나가기
       </button>
     </div>
 
-    <p class="text-xs text-slate-500 mb-4">등록된 회원들의 아이디 및 비밀번호를 수정하거나 삭제할 수 있습니다.</p>
+    <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-2.5">등록된 회원들의 아이디 및 비밀번호를 수정하거나 삭제할 수 있습니다.</p>
 
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
-          <tr class="bg-slate-50 text-xs text-slate-500 border-b border-slate-200">
-            <th class="p-3">아이디</th>
-            <th class="p-3">비밀번호</th>
-            <th class="p-3 text-right">관리</th>
+          <tr class="bg-slate-50 dark:bg-slate-700/50 text-[11px] text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
+            <th class="p-1.5">아이디</th>
+            <th class="p-1.5">비밀번호</th>
+            <th class="p-1.5 text-right">관리</th>
           </tr>
         </thead>
-        <tbody id="adminUserList" class="text-sm divide-y divide-slate-100">
+        <tbody id="adminUserList" class="text-xs divide-y divide-slate-100 dark:divide-slate-700">
           <!-- 관리자 목록 렌더링 -->
         </tbody>
       </table>
@@ -147,112 +160,172 @@
   </div>
 
   <!-- 2. 메인 서비스 화면 -->
-  <div id="mainScreen" class="hidden max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-4 sm:p-6">
+  <div id="mainScreen" class="hidden max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-3 sm:p-4 border border-slate-200/80 dark:border-slate-700/80">
     <!-- 헤더 영역 -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 mb-4 sm:mb-6 gap-3">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-700 mb-3 gap-2">
       <div>
-        <div class="flex items-center gap-2">
-          <h1 class="text-xl sm:text-2xl font-bold text-indigo-600"><span id="displayName"></span>님의 할 일</h1>
-          <button onclick="handleLogout()" class="text-xs text-slate-400 hover:text-slate-600 underline">로그아웃</button>
+        <div class="flex items-center gap-1.5">
+          <h1 class="text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400"><span id="displayName"></span>님의 할 일</h1>
+          <button onclick="handleLogout()" class="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 underline">로그아웃</button>
         </div>
-        <p id="clock" class="text-xs font-medium text-slate-500 mt-1"></p>
+        <p id="clock" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5"></p>
       </div>
 
-      <div class="flex items-center gap-2 self-start sm:self-auto flex-wrap">
-        <button onclick="exportData()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1.5 rounded-lg font-medium transition">💾 백업</button>
-        <label class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1.5 rounded-lg font-medium transition cursor-pointer">
-          📂 복원 <input type="file" accept=".json" onchange="importData(event)" class="hidden">
+      <div class="flex items-center gap-1.5 self-start sm:self-auto flex-wrap">
+        <button id="darkModeBtn" onclick="toggleDarkMode()" class="text-[11px] bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded font-medium transition">
+          🌙 야간
+        </button>
+        <button onclick="exportData()" class="text-[11px] bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded font-medium transition">백업</button>
+        <label class="text-[11px] bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded font-medium transition cursor-pointer">
+          복원 <input type="file" accept=".json" onchange="importData(event)" class="hidden">
         </label>
-        <button id="notifyBtn" onclick="handleNotificationClick()" class="text-xs px-3 py-1.5 rounded-full font-medium transition flex items-center gap-1 shadow-sm">
-          🔔 알림 확인 중...
+        <button id="notifyBtn" onclick="handleNotificationClick()" class="text-[11px] px-2 py-0.5 rounded-full font-medium transition flex items-center gap-1 shadow-2xs">
+          알림 확인 중...
         </button>
       </div>
     </div>
 
-    <!-- PC/대화면 전용 입력 폼 -->
-    <div class="hidden sm:block mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
-      <div class="flex items-center gap-1.5 mb-3 text-xs overflow-x-auto pb-1">
-        <span class="text-xs font-semibold text-slate-500 flex-shrink-0">⚡ 빠른 마감:</span>
-        <button type="button" id="btnPc_today11" onclick="setQuickTime('today11', 'pc')" class="quick-chip-pc px-3 py-1.5 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">오늘 11시</button>
-        <button type="button" id="btnPc_today17" onclick="setQuickTime('today17', 'pc')" class="quick-chip-pc px-3 py-1.5 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">오늘 17시</button>
-        <button type="button" id="btnPc_tomorrow11" onclick="setQuickTime('tomorrow11', 'pc')" class="quick-chip-pc px-3 py-1.5 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">내일 11시</button>
-        <button type="button" id="btnPc_tomorrow17" onclick="setQuickTime('tomorrow17', 'pc')" class="quick-chip-pc px-3 py-1.5 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">내일 17시</button>
-        <button type="button" id="btnPc_1h" onclick="setQuickTime(1, 'pc')" class="quick-chip-pc px-3 py-1.5 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">+1시간</button>
+    <!-- 통합 스마트 입력 폼 (PC/대화면 전용) -->
+    <div id="pcAddTodoContainer" class="hidden sm:block mb-3 bg-slate-50 dark:bg-slate-900/60 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700">
+      <div id="pcQuickChipsContainer" class="flex items-center gap-1 mb-1.5 text-xs overflow-x-auto pb-0.5">
+        <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex-shrink-0">빠른 마감:</span>
+        <button type="button" id="btnPc_today11" onclick="setQuickTime('today11', 'pc')" class="quick-chip-pc px-2 py-0.5 rounded-full font-medium text-[11px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">오늘 11시</button>
+        <button type="button" id="btnPc_today17" onclick="setQuickTime('today17', 'pc')" class="quick-chip-pc px-2 py-0.5 rounded-full font-medium text-[11px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">오늘 17시</button>
+        <button type="button" id="btnPc_tomorrow11" onclick="setQuickTime('tomorrow11', 'pc')" class="quick-chip-pc px-2 py-0.5 rounded-full font-medium text-[11px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">내일 11시</button>
+        <button type="button" id="btnPc_tomorrow17" onclick="setQuickTime('tomorrow17', 'pc')" class="quick-chip-pc px-2 py-0.5 rounded-full font-medium text-[11px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">내일 17시</button>
+        <button type="button" id="btnPc_1h" onclick="setQuickTime('1h', 'pc')" class="quick-chip-pc px-2 py-0.5 rounded-full font-medium text-[11px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">+1시간</button>
       </div>
 
-      <form id="todoFormPc" onsubmit="addTodo(event, 'pc')" class="space-y-3">
-        <input type="text" id="taskInputPc" placeholder="새 할 일을 입력하세요..." required
-               class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm">
+      <form id="todoFormPc" onsubmit="addUnifiedItem(event, 'pc')" class="space-y-1.5">
+        <input type="text" id="taskInputPc" placeholder="할 일 또는 반복 루틴 입력 (예: '내일 오후 3시 보고서')..." required oninput="handleNaturalLanguageInput('pc')"
+               class="w-full px-2.5 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-xs">
         
-        <div class="flex flex-wrap gap-2 items-center">
-          <input type="datetime-local" id="timeInputPc" step="600"
-                 class="flex-1 min-w-[180px] px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
-          
-          <select id="categoryInputPc" class="px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
-            <option value="업무">🏢 업무</option>
-            <option value="개인">👤 개인</option>
-            <option value="기타">📌 기타</option>
+        <div class="flex flex-wrap gap-1.5 items-center">
+          <!-- 카테고리 / 루틴 선택 -->
+          <select id="categoryInputPc" onchange="handleCategoryChange(this.value, 'pc')" class="px-2 py-1 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 font-bold text-indigo-600 dark:text-indigo-400">
+            <option value="업무">업무</option>
+            <option value="개인">개인</option>
+            <option value="기타">기타</option>
+            <option value="routine">🔄 루틴 (반복)</option>
           </select>
 
-          <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-xl transition text-sm shadow-md shadow-indigo-100">추가</button>
+          <!-- 일반 마감 일시 -->
+          <input type="datetime-local" id="timeInputPc" step="600"
+                 class="flex-1 min-w-[150px] px-2 py-1 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800">
+
+          <!-- 루틴 동적 옵션 영역 (기본 숨김) -->
+          <div id="pcRoutineOptions" class="hidden flex items-center gap-1.5">
+            <select id="pcRoutineFreq" onchange="handleRoutineFreqChange(this.value, 'pc')" class="px-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 font-medium">
+              <option value="매일">매일</option>
+              <option value="매주">매주</option>
+              <option value="매월">매월</option>
+            </select>
+            <select id="pcRoutineDay" class="hidden px-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
+              <option value="all">전체 요일(선택 안함)</option>
+              <option value="1">월요일</option>
+              <option value="2">화요일</option>
+              <option value="3">수요일</option>
+              <option value="4">목요일</option>
+              <option value="5">금요일</option>
+              <option value="6">토요일</option>
+              <option value="0">일요일</option>
+            </select>
+            <select id="pcRoutineMonth" class="hidden px-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
+              <!-- 1일 ~ 31일 -->
+            </select>
+            <span class="text-[11px] text-slate-400">마감:</span>
+            <input type="time" id="pcRoutineTime" step="600" class="px-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
+          </div>
+
+          <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-3.5 py-1 rounded-lg transition text-xs shadow-2xs">등록</button>
         </div>
       </form>
     </div>
 
-    <!-- 탭 메뉴 (All / Today) & 컨트롤 바 -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 mb-4 sm:mb-6 gap-2">
+    <!-- 탭 메뉴 (All / Today / Routine) & 컨트롤 바 -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 dark:border-slate-700 mb-2.5 gap-1">
       <div class="flex flex-1">
-        <button id="tabAll" onclick="switchTab('all')" class="flex-1 sm:flex-initial sm:px-8 py-2.5 text-center font-semibold text-indigo-600 border-b-2 border-indigo-600 transition text-sm sm:text-base">📋 All</button>
-        <button id="tabToday" onclick="switchTab('today')" class="flex-1 sm:flex-initial sm:px-8 py-2.5 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">📅 Today</button>
+        <button id="tabAll" onclick="switchTab('all')" class="flex-1 sm:flex-initial sm:px-4 py-1 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 transition text-xs sm:text-sm">All</button>
+        <button id="tabToday" onclick="switchTab('today')" class="flex-1 sm:flex-initial sm:px-4 py-1 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-xs sm:text-sm">Today</button>
+        <button id="tabRoutine" onclick="switchTab('routine')" class="flex-1 sm:flex-initial sm:px-4 py-1 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-xs sm:text-sm">Routine 🔄</button>
       </div>
 
-      <div class="flex items-center justify-between sm:justify-end gap-3 pb-2 sm:pb-0">
-        <button id="hideCompletedBtn" onclick="toggleHideCompleted()" class="text-xs text-slate-600 bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-lg font-medium transition">
-          👁️ 완료 숨기기
+      <div class="flex items-center justify-between sm:justify-end gap-1.5 pb-1 sm:pb-0">
+        <button id="hideCompletedBtn" onclick="toggleHideCompleted()" class="text-[11px] text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 px-2 py-0.5 rounded font-medium transition">
+          완료 숨기기
         </button>
 
         <div id="sortContainer" class="flex items-center gap-1">
-          <span class="text-xs text-slate-400">정렬:</span>
-          <select id="sortInput" onchange="changeSortOrder(this.value)" class="text-xs bg-slate-50 border border-slate-200 rounded-lg px-2 py-1.5 text-slate-600 font-medium focus:outline-none">
-            <option value="createdAt">🆕 최신순</option>
-            <option value="dueDate">⏰ 마감순</option>
+          <span class="text-[11px] text-slate-400">정렬:</span>
+          <select id="sortInput" onchange="changeSortOrder(this.value)" class="text-[11px] bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-1 py-0.5 text-slate-600 dark:text-slate-200 font-medium focus:outline-none">
+            <option value="createdAt">최신순</option>
+            <option value="dueDate">마감순</option>
           </select>
         </div>
       </div>
     </div>
 
-    <!-- 할 일 목록 렌더링 영역 -->
+    <!-- 할 일 / 루틴 목록 렌더링 영역 -->
     <div id="todoContainer">
-      <ul id="todoList" class="space-y-3"></ul>
+      <ul id="todoList" class="space-y-1.5"></ul>
     </div>
   </div>
 
-  <!-- 모바일 전용 하단 고정 스티키 입력바 -->
-  <div class="block sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-2xl p-3 z-40">
-    <div class="flex items-center gap-1.5 mb-2 overflow-x-auto pb-1 text-xs">
-      <span class="text-[11px] font-semibold text-slate-400 flex-shrink-0">빠른 마감:</span>
-      <button type="button" id="btnMobile_today11" onclick="setQuickTime('today11', 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">오늘 11시</button>
-      <button type="button" id="btnMobile_today17" onclick="setQuickTime('today17', 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">오늘 17시</button>
-      <button type="button" id="btnMobile_tomorrow11" onclick="setQuickTime('tomorrow11', 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">내일 11시</button>
-      <button type="button" id="btnMobile_tomorrow17" onclick="setQuickTime('tomorrow17', 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">내일 17시</button>
-      <button type="button" id="btnMobile_1h" onclick="setQuickTime(1, 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">+1시간</button>
-    </div>
+  <!-- 모바일 전용 통합 하단 고정 바 -->
+  <div id="mobileAddTodoContainer" class="block sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-2xl p-2 z-40">
+    <form id="todoFormMobile" onsubmit="addUnifiedItem(event, 'mobile')" class="space-y-1.5">
+      <!-- 접힘/펼침 세부 옵션 -->
+      <div id="mobileMoreOptions" class="hidden space-y-1.5 pt-0.5 border-b border-slate-100 dark:border-slate-700 pb-1.5">
+        <div id="mobileQuickChipsContainer" class="flex items-center gap-1 overflow-x-auto pb-0.5 text-[10px]">
+          <span class="text-slate-400 flex-shrink-0 font-medium">빠른 마감:</span>
+          <button type="button" id="btnMobile_today11" onclick="setQuickTime('today11', 'mobile')" class="quick-chip-mobile px-1.5 py-0.5 rounded-full font-medium text-[10px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">오늘 11시</button>
+          <button type="button" id="btnMobile_today17" onclick="setQuickTime('today17', 'mobile')" class="quick-chip-mobile px-1.5 py-0.5 rounded-full font-medium text-[10px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">오늘 17시</button>
+          <button type="button" id="btnMobile_tomorrow11" onclick="setQuickTime('tomorrow11', 'mobile')" class="quick-chip-mobile px-1.5 py-0.5 rounded-full font-medium text-[10px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">내일 11시</button>
+          <button type="button" id="btnMobile_tomorrow17" onclick="setQuickTime('tomorrow17', 'mobile')" class="quick-chip-mobile px-1.5 py-0.5 rounded-full font-medium text-[10px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">내일 17시</button>
+          <button type="button" id="btnMobile_1h" onclick="setQuickTime('1h', 'mobile')" class="quick-chip-mobile px-1.5 py-0.5 rounded-full font-medium text-[10px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">+1시간</button>
+        </div>
 
-    <form id="todoFormMobile" onsubmit="addTodo(event, 'mobile')" class="flex items-center gap-2">
-      <input type="text" id="taskInputMobile" placeholder="할 일 입력..." required
-             class="flex-1 px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50">
-      
-      <select id="categoryInputMobile" class="px-2 py-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 font-medium">
-        <option value="업무">🏢</option>
-        <option value="개인">👤</option>
-        <option value="기타">📌</option>
-      </select>
+        <div class="flex flex-wrap items-center gap-1">
+          <select id="categoryInputMobile" onchange="handleCategoryChange(this.value, 'mobile')" class="px-1.5 py-1 border border-slate-200 dark:border-slate-700 rounded text-[11px] bg-slate-50 dark:bg-slate-700 font-bold text-indigo-600 dark:text-indigo-400">
+            <option value="업무">업무</option>
+            <option value="개인">개인</option>
+            <option value="기타">기타</option>
+            <option value="routine">🔄 루틴 (반복)</option>
+          </select>
 
-      <input type="datetime-local" id="timeInputMobile" step="600" class="hidden">
+          <input type="datetime-local" id="timeInputMobile" step="600" class="flex-1 px-2 py-1 border border-slate-200 dark:border-slate-700 rounded text-[11px] bg-slate-50 dark:bg-slate-700">
 
-      <button type="submit" class="bg-indigo-600 text-white font-semibold px-4 py-2.5 rounded-xl text-sm shadow-md shadow-indigo-100 touch-target flex-shrink-0">
-        등록
-      </button>
+          <div id="mobileRoutineOptions" class="hidden flex items-center gap-1 flex-1">
+            <select id="mobileRoutineFreq" onchange="handleRoutineFreqChange(this.value, 'mobile')" class="px-1.5 py-1 text-[11px] border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-700">
+              <option value="매일">매일</option>
+              <option value="매주">매주</option>
+              <option value="매월">매월</option>
+            </select>
+            <select id="mobileRoutineDay" class="hidden px-1.5 py-1 text-[11px] border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-700">
+              <option value="all">전체 요일</option>
+              <option value="1">월</option><option value="2">화</option><option value="3">수</option><option value="4">목</option><option value="5">금</option><option value="6">토</option><option value="0">일</option>
+            </select>
+            <select id="mobileRoutineMonth" class="hidden px-1.5 py-1 text-[11px] border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-700">
+              <!-- 1 ~ 31 -->
+            </select>
+            <input type="time" id="mobileRoutineTime" step="600" class="px-1 py-1 text-[11px] border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-700">
+          </div>
+        </div>
+      </div>
+
+      <!-- 메인 한 줄 입력부 -->
+      <div class="flex items-center gap-1">
+        <input type="text" id="taskInputMobile" placeholder="할 일 또는 루틴 입력..." required onfocus="toggleMobileOptions(true)" oninput="handleNaturalLanguageInput('mobile')"
+               class="flex-1 px-2.5 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700">
+        
+        <button type="button" onclick="toggleMobileOptions()" class="p-1.5 text-slate-400 hover:text-slate-600 text-xs font-semibold rounded border border-slate-200 dark:border-slate-700">
+          ⚙️
+        </button>
+
+        <button type="submit" class="bg-indigo-600 text-white font-semibold px-3 py-1.5 rounded-lg text-xs shadow-2xs touch-target flex-shrink-0">
+          등록
+        </button>
+      </div>
     </form>
   </div>
 
@@ -261,10 +334,39 @@
     let savedAccounts = JSON.parse(localStorage.getItem('sunhong_todo_accounts') || '[]');
     let localUsers = JSON.parse(localStorage.getItem('sunhong_todo_user_db') || '{}');
     let todos = [];
+    let routines = [];
     let currentTab = 'all';
     let currentSort = 'createdAt';
     let hideCompleted = false;
     let swRegistration = null;
+
+    /* 다크모드 초기화 */
+    if (localStorage.getItem('sunhong_theme') === 'dark' || (!('sunhong_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    function toggleDarkMode() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('sunhong_theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('sunhong_theme', 'dark');
+      }
+      updateDarkModeBtnUI();
+    }
+
+    function updateDarkModeBtnUI() {
+      const btn = document.getElementById('darkModeBtn');
+      if (!btn) return;
+      if (document.documentElement.classList.contains('dark')) {
+        btn.innerHTML = "☀️ 주간";
+      } else {
+        btn.innerHTML = "🌙 야간";
+      }
+    }
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').then(reg => { 
@@ -279,7 +381,101 @@
       }
     });
 
-    /* 🔐 비밀번호 기반 로그인/회원가입 제어 */
+    /* 💡 강력하고 유연한 정규식 기반 스마트 자연어 파서 */
+    function handleNaturalLanguageInput(mode) {
+      const categoryVal = mode === 'pc' ? document.getElementById('categoryInputPc').value : document.getElementById('categoryInputMobile').value;
+      if (categoryVal === 'routine') return;
+
+      const inputId = mode === 'pc' ? 'taskInputPc' : 'taskInputMobile';
+      const inputElem = document.getElementById(inputId);
+      if (!inputElem) return;
+
+      const text = inputElem.value;
+      const now = new Date();
+      let targetDate = new Date();
+      let matched = false;
+
+      // 1. 날짜 파싱 (오늘, 내일, 모레)
+      if (text.includes('모레')) {
+        targetDate.setDate(now.getDate() + 2);
+        matched = true;
+      } else if (text.includes('내일')) {
+        targetDate.setDate(now.getDate() + 1);
+        matched = true;
+      } else if (text.includes('오늘')) {
+        matched = true;
+      }
+
+      // 2. 상대 시간 파싱 (예: "3시간 뒤", "2시간후")
+      const relativeHourMatch = text.match(/(\d+)\s*시간\s*(뒤|후)/);
+      if (relativeHourMatch) {
+        const hoursToAdd = parseInt(relativeHourMatch[1], 10);
+        targetDate = new Date(now.getTime() + hoursToAdd * 60 * 60 * 1000);
+        matched = true;
+      } else {
+        // 3. 시/분 파싱 (오전/오후 처리 포함)
+        const isPm = text.includes('오후') || text.includes('저녁') || text.includes('밤');
+        const isAm = text.includes('오전') || text.includes('아침');
+
+        // 숫자 시간 추출 (예: "3시", "15시", "3시반", "3시 30분")
+        const timeMatch = text.match(/(\d{1,2})\s*시(?:\s*(\d{1,2})\s*분?)?/);
+        if (timeMatch) {
+          let hours = parseInt(timeMatch[1], 10);
+          const minutes = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
+
+          if (isPm && hours < 12) {
+            hours += 12;
+          } else if (isAm && hours === 12) {
+            hours = 0;
+          } else if (!isAm && !isPm && hours < 8 && hours !== 0) {
+            // 오전/오후가 명시되지 않고 1~7 사이라면 기본적으로 오후로 센스있게 해석 (원하면 24시간제 유지)
+            // 예: "3시 회의" -> 오후 3시(15시)로 해석하는 것이 자연스러움
+            hours += 12;
+          }
+
+          targetDate.setHours(hours, minutes, 0, 0);
+          matched = true;
+        }
+      }
+
+      if (matched) {
+        const year = targetDate.getFullYear();
+        const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+        const day = String(targetDate.getDate()).padStart(2, '0');
+        const hours = String(targetDate.getHours()).padStart(2, '0');
+        const minutes = String(targetDate.getMinutes()).padStart(2, '0');
+
+        const timeStr = `${year}-${month}-${day}T${hours}:${minutes}`;
+        if (mode === 'pc') document.getElementById('timeInputPc').value = timeStr;
+        else document.getElementById('timeInputMobile').value = timeStr;
+      }
+    }
+
+    function toggleMobileOptions(show) {
+      const opts = document.getElementById('mobileMoreOptions');
+      if (!opts) return;
+      if (show === true) opts.classList.remove('hidden');
+      else if (show === false) opts.classList.add('hidden');
+      else opts.classList.toggle('hidden');
+    }
+
+    function toggleSubTooltip(event, elemId) {
+      event.stopPropagation();
+      const allTooltips = document.querySelectorAll('.has-tooltip');
+      allTooltips.forEach(el => {
+        if (el.id !== elemId) el.classList.remove('active-tooltip');
+      });
+      const target = document.getElementById(elemId);
+      if (target) {
+        target.classList.toggle('active-tooltip');
+        setTimeout(() => target.classList.remove('active-tooltip'), 3000);
+      }
+    }
+
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.has-tooltip').forEach(el => el.classList.remove('active-tooltip'));
+    });
+
     function switchAuthTab(tab) {
       const tabLogin = document.getElementById('tabLogin');
       const tabRegister = document.getElementById('tabRegister');
@@ -287,13 +483,13 @@
       const registerForm = document.getElementById('registerForm');
 
       if (tab === 'login') {
-        tabLogin.className = "flex-1 py-2.5 text-center font-semibold text-indigo-600 border-b-2 border-indigo-600 text-sm";
-        tabRegister.className = "flex-1 py-2.5 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-sm";
+        tabLogin.className = "flex-1 py-1.5 text-center font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 text-xs sm:text-sm";
+        tabRegister.className = "flex-1 py-1.5 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-xs sm:text-sm";
         loginForm.classList.remove('hidden');
         registerForm.classList.add('hidden');
       } else {
-        tabRegister.className = "flex-1 py-2.5 text-center font-semibold text-indigo-600 border-b-2 border-indigo-600 text-sm";
-        tabLogin.className = "flex-1 py-2.5 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-sm";
+        tabRegister.className = "flex-1 py-1.5 text-center font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 text-xs sm:text-sm";
+        tabLogin.className = "flex-1 py-1.5 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-xs sm:text-sm";
         registerForm.classList.remove('hidden');
         loginForm.classList.add('hidden');
       }
@@ -313,7 +509,6 @@
 
       try {
         if (window.firebaseDb) {
-          // Firebase DB 가입 처리 및 중복 검사
           const userRef = window.dbRef(window.firebaseDb, `users/${username}`);
           const snapshot = await window.dbGet(userRef);
 
@@ -323,7 +518,6 @@
           }
           await window.dbSet(userRef, { password: password, createdAt: Date.now() });
         } else {
-          // Firebase 미연동 시 로컬 저장소 중복 검사
           if (localUsers[username]) {
             alert('이미 존재하는 아이디입니다.');
             return;
@@ -337,7 +531,7 @@
           localStorage.setItem('sunhong_todo_accounts', JSON.stringify(savedAccounts));
         }
 
-        alert('🎉 가입이 완료되었습니다! 로그인해 주세요.');
+        alert('가입이 완료되었습니다! 로그인해 주세요.');
         document.getElementById('regUsername').value = '';
         document.getElementById('regPassword').value = '';
         document.getElementById('regPasswordConfirm').value = '';
@@ -400,7 +594,6 @@
       document.getElementById('loginPassword').focus();
     }
 
-    /* ⚙️ 관리자 모드 제어 */
     function openAdminPrompt() {
       const input = prompt("관리자 비밀번호를 입력하세요:");
       if (input === "전선홍관리자") {
@@ -419,7 +612,7 @@
 
     async function loadAdminUserList() {
       const listElem = document.getElementById('adminUserList');
-      listElem.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">목록을 불러오는 중...</td></tr>';
+      listElem.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-slate-400">목록을 불러오는 중...</td></tr>';
 
       let userMap = {};
 
@@ -438,17 +631,17 @@
 
       const keys = Object.keys(userMap);
       if (keys.length === 0) {
-        listElem.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">가입된 회원이 없습니다.</td></tr>';
+        listElem.innerHTML = '<tr><td colspan="3" class="p-2 text-center text-slate-400">가입된 회원이 없습니다.</td></tr>';
         return;
       }
 
       listElem.innerHTML = keys.map(uname => `
         <tr>
-          <td class="p-3 font-semibold text-slate-800">${uname}</td>
-          <td class="p-3 font-mono text-xs text-indigo-600">${userMap[uname]}</td>
-          <td class="p-3 text-right space-x-1">
-            <button onclick="adminEditUser('${uname}', '${userMap[uname]}')" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-2.5 py-1 rounded">수정</button>
-            <button onclick="adminDeleteUser('${uname}')" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 px-2.5 py-1 rounded">삭제</button>
+          <td class="p-1.5 font-semibold text-slate-800 dark:text-slate-100">${uname}</td>
+          <td class="p-1.5 font-mono text-[11px] text-indigo-600 dark:text-indigo-400">${userMap[uname]}</td>
+          <td class="p-1.5 text-right space-x-1">
+            <button onclick="adminEditUser('${uname}', '${userMap[uname]}')" class="text-[11px] bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-2 py-0.5 rounded">수정</button>
+            <button onclick="adminDeleteUser('${uname}')" class="text-[11px] bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-300 px-2 py-0.5 rounded">삭제</button>
           </td>
         </tr>
       `).join('');
@@ -476,8 +669,10 @@
       if (window.firebaseDb) {
         const userRef = window.dbRef(window.firebaseDb, `users/${uname}`);
         const userTodosRef = window.dbRef(window.firebaseDb, `todos/${uname}`);
+        const userRoutinesRef = window.dbRef(window.firebaseDb, `routines/${uname}`);
         await window.dbRemove(userRef);
         await window.dbRemove(userTodosRef);
+        await window.dbRemove(userRoutinesRef);
       } else {
         delete localUsers[uname];
         localStorage.setItem('sunhong_todo_user_db', JSON.stringify(localUsers));
@@ -490,7 +685,6 @@
       loadAdminUserList();
     }
 
-    /* 구글 캘린더 일정 추가 */
     function addToGoogleCalendar(taskTitle, category, dueString) {
       let startDateStr, endDateStr;
 
@@ -522,20 +716,20 @@
       if (!btn) return;
 
       if (!('Notification' in window)) {
-        btn.className = "text-xs px-3 py-1.5 rounded-full font-medium bg-slate-100 text-slate-400";
-        btn.innerText = "🔔 알림 미지원";
+        btn.className = "text-[11px] px-2 py-0.5 rounded-full font-medium bg-slate-100 text-slate-400";
+        btn.innerText = "알림 미지원";
         return;
       }
 
       if (Notification.permission === 'granted') {
-        btn.className = "text-xs px-3 py-1.5 rounded-full font-medium bg-emerald-50 text-emerald-600 border border-emerald-200";
-        btn.innerText = "🔔 알림 켜짐";
+        btn.className = "text-[11px] px-2 py-0.5 rounded-full font-medium bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800";
+        btn.innerText = "알림 켜짐";
       } else if (Notification.permission === 'denied') {
-        btn.className = "text-xs px-3 py-1.5 rounded-full font-medium bg-rose-50 text-rose-600 border border-rose-200";
-        btn.innerText = "🔔 알림 차단됨";
+        btn.className = "text-[11px] px-2 py-0.5 rounded-full font-medium bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800";
+        btn.innerText = "알림 차단됨";
       } else {
-        btn.className = "text-xs px-3 py-1.5 rounded-full font-medium bg-amber-50 text-amber-600 border border-amber-200 animate-pulse";
-        btn.innerText = "🔔 알림 설정 필요";
+        btn.className = "text-[11px] px-2 py-0.5 rounded-full font-medium bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 animate-pulse";
+        btn.innerText = "알림 설정 필요";
       }
     }
 
@@ -546,14 +740,14 @@
       }
 
       if (Notification.permission === 'granted') {
-        triggerNotification("🔔 알림 테스트", "선홍님의 푸시 알림이 정상적으로 작동하고 있습니다!");
+        triggerNotification("알림 테스트", "선홍님의 푸시 알림이 정상적으로 작동하고 있습니다!");
       } else if (Notification.permission === 'denied') {
         alert('브라우저 설정에서 알림 권한을 [허용]으로 변경해 주셔야 합니다.');
       } else {
         Notification.requestPermission().then(permission => {
           updateNotificationUI();
           if (permission === 'granted') {
-            triggerNotification("🎉 알림 활성화 완료", "이제 마감 10분 전 및 마감 정시에 알림이 발송됩니다.");
+            triggerNotification("알림 활성화 완료", "이제 마감 10분 전 및 마감 정시에 알림이 발송됩니다.");
           }
         });
       }
@@ -590,13 +784,13 @@
           const diffMinutes = (dueTime - now) / (1000 * 60);
 
           if (diffMinutes > 0 && diffMinutes <= 10 && !t.notified10m) {
-            triggerNotification("⏰ 마감 10분 전!", `[${t.category}] ${t.task} 마감 10분 전입니다.`);
+            triggerNotification("마감 10분 전!", `[${t.category}] ${t.task} 마감 10분 전입니다.`);
             t.notified10m = true;
             updated = true;
           }
 
           if (now >= dueTime && (now - dueTime) < 10 * 60 * 1000 && !t.notified) {
-            triggerNotification("🔥 마감 시간이 되었습니다!", `[${t.category}] ${t.task} 마감 시각이 되었습니다.`);
+            triggerNotification("마감 시간이 되었습니다!", `[${t.category}] ${t.task} 마감 시각이 되었습니다.`);
             t.notified = true;
             t.notified10m = true;
             updated = true;
@@ -610,13 +804,13 @@
               const subDiffMinutes = (subDueTime - now) / (1000 * 60);
 
               if (subDiffMinutes > 0 && subDiffMinutes <= 10 && !s.notified10m) {
-                triggerNotification("⏰ 하위 할 일 10분 전!", `[하위] ${s.task} 마감 10분 전입니다.`);
+                triggerNotification("하위 할 일 10분 전!", `[하위] ${s.task} 마감 10분 전입니다.`);
                 s.notified10m = true;
                 updated = true;
               }
 
               if (now >= subDueTime && (now - subDueTime) < 10 * 60 * 1000 && !s.notified) {
-                triggerNotification("🔥 하위 할 일 마감!", `[하위] ${s.task} 마감 시각이 되었습니다.`);
+                triggerNotification("하위 할 일 마감!", `[하위] ${s.task} 마감 시각이 되었습니다.`);
                 s.notified = true;
                 s.notified10m = true;
                 updated = true;
@@ -665,7 +859,15 @@
       updateChipHighlight('1h', 'mobile');
     }
 
-    function setQuickTime(type, mode = 'pc') {
+    function populateMonthSelects() {
+      const optionsHtml = Array.from({length: 31}, (_, i) => `<option value="${i + 1}">${i + 1}일</option>`).join('');
+      ['pcRoutineMonth', 'mobileRoutineMonth', 'editRoutineMonth'].forEach(id => {
+        const elem = document.getElementById(id);
+        if (elem) elem.innerHTML = optionsHtml;
+      });
+    }
+
+    function setQuickTime(type, mode = 'pc', targetElementId = null) {
       const now = new Date();
       let targetDate = new Date();
       let chipKey = '';
@@ -684,8 +886,11 @@
         targetDate.setDate(now.getDate() + 1);
         targetDate.setHours(17, 0, 0, 0);
         chipKey = 'tomorrow17';
-      } else if (type === 1) {
+      } else if (type === 1 || type === '1h') {
         targetDate.setHours(now.getHours() + 1);
+        const mins = Math.ceil(now.getMinutes() / 10) * 10;
+        targetDate.setMinutes(mins);
+        targetDate.setSeconds(0);
         chipKey = '1h';
       }
 
@@ -697,15 +902,18 @@
 
       const timeStr = `${year}-${month}-${day}T${hours}:${minutes}`;
 
-      if (mode === 'pc') {
+      if (targetElementId) {
+        const inputElem = document.getElementById(targetElementId);
+        if (inputElem) inputElem.value = timeStr;
+      } else if (mode === 'pc') {
         const inputPc = document.getElementById('timeInputPc');
         if (inputPc) inputPc.value = timeStr;
+        updateChipHighlight(chipKey, mode);
       } else {
         const inputMobile = document.getElementById('timeInputMobile');
         if (inputMobile) inputMobile.value = timeStr;
+        updateChipHighlight(chipKey, mode);
       }
-
-      updateChipHighlight(chipKey, mode);
     }
 
     function updateChipHighlight(activeKey, mode) {
@@ -714,15 +922,15 @@
 
       document.querySelectorAll(classGroup).forEach(btn => {
         btn.className = mode === 'pc' 
-          ? "quick-chip-pc px-3 py-1.5 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200"
-          : "quick-chip-mobile px-3 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200";
+          ? "quick-chip-pc px-2 py-0.5 rounded-full font-medium text-[11px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100"
+          : "quick-chip-mobile px-1.5 py-0.5 rounded-full font-medium text-[10px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100";
       });
 
       const activeBtn = document.getElementById(prefix + activeKey);
       if (activeBtn) {
         activeBtn.className = mode === 'pc'
-          ? "quick-chip-pc px-3 py-1.5 rounded-full font-bold text-xs flex-shrink-0 transition bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-300 border border-indigo-600"
-          : "quick-chip-mobile px-3 py-1 rounded-full font-bold text-xs flex-shrink-0 transition bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-300 border border-indigo-600";
+          ? "quick-chip-pc px-2 py-0.5 rounded-full font-bold text-[11px] flex-shrink-0 transition bg-indigo-600 text-white shadow-2xs border border-indigo-600"
+          : "quick-chip-mobile px-1.5 py-0.5 rounded-full font-bold text-[10px] flex-shrink-0 transition bg-indigo-600 text-white shadow-2xs border border-indigo-600";
       }
     }
 
@@ -732,48 +940,58 @@
       const dateStr = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일 (${days[now.getDay()]})`;
       const timeStr = now.toLocaleTimeString('ko-KR', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
       const clockElem = document.getElementById('clock');
-      if (clockElem) clockElem.innerText = `📅 ${dateStr}  ⏰ ${timeStr}`;
+      if (clockElem) clockElem.innerText = `${dateStr} ${timeStr}`;
+
+      if (currentTab === 'today' && now.getSeconds() === 0) {
+        render();
+      }
     }
     setInterval(updateClock, 1000);
 
     /* --- Firebase 실시간 동기화 --- */
     function setupFirebaseListener() {
       if (!window.firebaseDb || !currentUser) return;
-      const userTodosRef = window.dbRef(window.firebaseDb, `todos/${currentUser}`);
       
+      const userTodosRef = window.dbRef(window.firebaseDb, `todos/${currentUser}`);
       window.dbOnValue(userTodosRef, (snapshot) => {
         const data = snapshot.val();
-        if (data) {
-          todos = Array.isArray(data) ? data : Object.values(data);
-          todos = todos.map(t => ({ ...t, subitems: t.subitems || [] }));
-        } else {
-          todos = [];
-        }
+        todos = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+        todos = todos.map(t => ({ ...t, subitems: t.subitems || [] }));
         localStorage.setItem(`sunhong_todos_${currentUser}`, JSON.stringify(todos));
+        render();
+      });
+
+      const userRoutinesRef = window.dbRef(window.firebaseDb, `routines/${currentUser}`);
+      window.dbOnValue(userRoutinesRef, (snapshot) => {
+        const data = snapshot.val();
+        routines = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+        localStorage.setItem(`sunhong_routines_${currentUser}`, JSON.stringify(routines));
         render();
       });
     }
 
     function syncToFirebase() {
       if (!window.firebaseDb || !currentUser) return;
-      const userTodosRef = window.dbRef(window.firebaseDb, `todos/${currentUser}`);
-      window.dbSet(userTodosRef, todos);
+      window.dbSet(window.dbRef(window.firebaseDb, `todos/${currentUser}`), todos);
+      window.dbSet(window.dbRef(window.firebaseDb, `routines/${currentUser}`), routines);
     }
 
     function saveAndRender() {
       if (currentUser) {
         localStorage.setItem(`sunhong_todos_${currentUser}`, JSON.stringify(todos));
+        localStorage.setItem(`sunhong_routines_${currentUser}`, JSON.stringify(routines));
         syncToFirebase();
       }
       render();
     }
 
     function exportData() {
-      if (!todos.length) { alert('백업할 데이터가 없습니다.'); return; }
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(todos, null, 2));
+      if (!todos.length && !routines.length) { alert('백업할 데이터가 없습니다.'); return; }
+      const payload = { todos, routines };
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `todo_backup_${currentUser}_${new Date().toISOString().slice(0,10)}.json`);
+      downloadAnchor.setAttribute("download", `todo_routine_backup_${currentUser}_${new Date().toISOString().slice(0,10)}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
@@ -786,14 +1004,15 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         try {
-          const importedTodos = JSON.parse(e.target.result);
-          if (Array.isArray(importedTodos)) {
-            todos = importedTodos;
-            saveAndRender();
-            alert('데이터가 성공적으로 복원되었습니다.');
-          } else {
-            alert('올바르지 않은 백업 파일 형식입니다.');
+          const imported = JSON.parse(e.target.result);
+          if (Array.isArray(imported)) {
+            todos = imported;
+          } else if (imported.todos || imported.routines) {
+            todos = imported.todos || [];
+            routines = imported.routines || [];
           }
+          saveAndRender();
+          alert('데이터가 성공적으로 복원되었습니다.');
         } catch (err) {
           alert('파일을 읽는 중 오류가 발생했습니다.');
         }
@@ -812,13 +1031,13 @@
       const diffDays = Math.ceil((targetDay - now) / (1000 * 60 * 60 * 24));
 
       if (new Date() > target && diffDays <= 0) {
-        return `<span class="text-xs font-bold bg-rose-100 text-rose-600 border border-rose-200 px-2 py-0.5 rounded-md animate-pulse">🔥 기한 초과</span>`;
+        return `<span class="text-[9px] font-bold bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800 px-1 py-0.2 rounded animate-pulse">기한 초과</span>`;
       } else if (diffDays === 0) {
-        return `<span class="text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-md">⚡ D-Day</span>`;
+        return `<span class="text-[9px] font-bold bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800 px-1 py-0.2 rounded">D-Day</span>`;
       } else if (diffDays > 0) {
-        return `<span class="text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-200 px-2 py-0.5 rounded-md">D-${diffDays}</span>`;
+        return `<span class="text-[9px] font-semibold bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800 px-1 py-0.2 rounded">D-${diffDays}</span>`;
       } else {
-        return `<span class="text-xs font-bold bg-rose-100 text-rose-600 border border-rose-200 px-2 py-0.5 rounded-md">🔥 기한 초과</span>`;
+        return `<span class="text-[9px] font-bold bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800 px-1 py-0.2 rounded">기한 초과</span>`;
       }
     }
 
@@ -828,8 +1047,8 @@
       if (savedAccounts.length > 0) {
         container.classList.remove('hidden');
         listElem.innerHTML = savedAccounts.map(acc => `
-          <button type="button" onclick="fillUsername('${acc}')" class="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-lg text-xs font-semibold transition touch-target">
-            👤 ${acc}
+          <button type="button" onclick="fillUsername('${acc}')" class="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded text-[11px] font-medium transition touch-target">
+            ${acc}
           </button>
         `).join('');
       } else {
@@ -860,7 +1079,12 @@
       const savedData = localStorage.getItem(`sunhong_todos_${currentUser}`);
       todos = savedData ? JSON.parse(savedData) : [];
 
+      const savedRoutines = localStorage.getItem(`sunhong_routines_${currentUser}`);
+      routines = savedRoutines ? JSON.parse(savedRoutines) : [];
+
+      populateMonthSelects();
       updateClock();
+      updateDarkModeBtnUI();
       setDefaultTimeInputs();
       updateNotificationUI();
       setupFirebaseListener();
@@ -872,28 +1096,163 @@
       hideCompleted = !hideCompleted;
       const btn = document.getElementById('hideCompletedBtn');
       if (hideCompleted) {
-        btn.className = "text-xs text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1.5 rounded-lg font-medium transition";
-        btn.innerHTML = "👁️ 완료 숨김 적용 중";
+        btn.className = "text-[11px] text-white bg-indigo-600 hover:bg-indigo-700 px-2 py-0.5 rounded font-medium transition";
+        btn.innerHTML = "완료 숨김 적용 중";
       } else {
-        btn.className = "text-xs text-slate-600 bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-lg font-medium transition";
-        btn.innerHTML = "👁️ 완료 숨기기";
+        btn.className = "text-[11px] text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 px-2 py-0.5 rounded font-medium transition";
+        btn.innerHTML = "완료 숨기기";
       }
       render();
     }
 
-    function addTodo(e, mode) {
+    function handleCategoryChange(val, mode) {
+      const isRoutine = val === 'routine';
+      const timeInput = document.getElementById(mode === 'pc' ? 'timeInputPc' : 'timeInputMobile');
+      const routineOpts = document.getElementById(mode === 'pc' ? 'pcRoutineOptions' : 'mobileRoutineOptions');
+      const chipsContainer = document.getElementById(mode === 'pc' ? 'pcQuickChipsContainer' : 'mobileQuickChipsContainer');
+
+      if (isRoutine) {
+        if (timeInput) timeInput.classList.add('hidden');
+        if (chipsContainer) chipsContainer.classList.add('hidden');
+        if (routineOpts) routineOpts.classList.remove('hidden');
+      } else {
+        if (timeInput) timeInput.classList.remove('hidden');
+        if (chipsContainer) chipsContainer.classList.remove('hidden');
+        if (routineOpts) routineOpts.classList.add('hidden');
+      }
+    }
+
+    function handleRoutineFreqChange(val, mode, prefix = '') {
+      const daySelect = document.getElementById(prefix ? `${prefix}RoutineDay` : (mode === 'pc' ? 'pcRoutineDay' : 'mobileRoutineDay'));
+      const monthSelect = document.getElementById(prefix ? `${prefix}RoutineMonth` : (mode === 'pc' ? 'pcRoutineMonth' : 'mobileRoutineMonth'));
+      if (!daySelect || !monthSelect) return;
+
+      if (val === '매주') {
+        daySelect.classList.remove('hidden');
+        monthSelect.classList.add('hidden');
+      } else if (val === '매월') {
+        monthSelect.classList.remove('hidden');
+        daySelect.classList.add('hidden');
+      } else {
+        daySelect.classList.add('hidden');
+        monthSelect.classList.add('hidden');
+      }
+    }
+
+    function addUnifiedItem(e, mode) {
       e.preventDefault();
-      const task = mode === 'pc' ? document.getElementById('taskInputPc').value : document.getElementById('taskInputMobile').value;
-      const due = mode === 'pc' ? document.getElementById('timeInputPc').value : document.getElementById('timeInputMobile').value;
+      const task = mode === 'pc' ? document.getElementById('taskInputPc').value.trim() : document.getElementById('taskInputMobile').value.trim();
       const category = mode === 'pc' ? document.getElementById('categoryInputPc').value : document.getElementById('categoryInputMobile').value;
 
-      todos.unshift({ id: Date.now(), task, due, category, completed: false, isEditing: false, isAddingSub: false, notified: false, notified10m: false, subitems: [] });
-      
-      if (mode === 'pc') document.getElementById('taskInputPc').value = '';
-      else document.getElementById('taskInputMobile').value = '';
+      if (!task) return;
+
+      if (category === 'routine') {
+        const freq = mode === 'pc' ? document.getElementById('pcRoutineFreq').value : document.getElementById('mobileRoutineFreq').value;
+        const dueTime = mode === 'pc' ? document.getElementById('pcRoutineTime').value : document.getElementById('mobileRoutineTime').value;
+        let dayVal = '';
+
+        if (freq === '매주') {
+          dayVal = mode === 'pc' ? document.getElementById('pcRoutineDay').value : document.getElementById('mobileRoutineDay').value;
+        } else if (freq === '매월') {
+          dayVal = mode === 'pc' ? document.getElementById('pcRoutineMonth').value : document.getElementById('mobileRoutineMonth').value;
+        }
+
+        routines.unshift({
+          id: Date.now(),
+          task: task,
+          freq: freq,
+          dayVal: dayVal,
+          dueTime: dueTime,
+          lastCompletedDate: null
+        });
+
+      } else {
+        const due = mode === 'pc' ? document.getElementById('timeInputPc').value : document.getElementById('timeInputMobile').value;
+        todos.unshift({ id: Date.now(), task, due, category, completed: false, isEditing: false, isAddingSub: false, notified: false, notified10m: false, subitems: [] });
+      }
+
+      if (mode === 'pc') {
+        document.getElementById('taskInputPc').value = '';
+      } else {
+        document.getElementById('taskInputMobile').value = '';
+        toggleMobileOptions(false);
+      }
 
       setDefaultTimeInputs();
       saveAndRender();
+    }
+
+    function toggleRoutineToday(id) {
+      const todayStr = getTodayString();
+      routines = routines.map(r => {
+        if (r.id === id) {
+          r.lastCompletedDate = r.lastCompletedDate === todayStr ? null : todayStr;
+        }
+        return r;
+      });
+      saveAndRender();
+    }
+
+    function toggleEditRoutine(id) {
+      routines = routines.map(r => r.id === id ? { ...r, isEditing: !r.isEditing } : r);
+      render();
+    }
+
+    function saveEditRoutine(id) {
+      const taskInput = document.getElementById(`editRoutineTask_${id}`).value.trim();
+      const freqInput = document.getElementById(`editRoutineFreq_${id}`).value;
+      const dueTimeInput = document.getElementById(`editRoutineTime_${id}`).value;
+      let dayVal = '';
+
+      if (freqInput === '매주') {
+        dayVal = document.getElementById(`editRoutineDay_${id}`).value;
+      } else if (freqInput === '매월') {
+        dayVal = document.getElementById(`editRoutineMonth_${id}`).value;
+      }
+
+      if (!taskInput) return;
+
+      routines = routines.map(r => r.id === id ? {
+        ...r,
+        task: taskInput,
+        freq: freqInput,
+        dayVal: dayVal,
+        dueTime: dueTimeInput,
+        isEditing: false
+      } : r);
+
+      saveAndRender();
+    }
+
+    function deleteRoutine(id) {
+      routines = routines.filter(r => r.id !== id);
+      saveAndRender();
+    }
+
+    function isRoutineDueToday(routine) {
+      const now = new Date();
+      const currentDayOfWeek = now.getDay();
+      const currentDayOfMonth = now.getDate();
+
+      if (routine.freq === '매일') return true;
+
+      if (routine.freq === '매주') {
+        if (!routine.dayVal || routine.dayVal === 'all') return true;
+        return parseInt(routine.dayVal, 10) === currentDayOfWeek;
+      }
+
+      if (routine.freq === '매월') {
+        if (!routine.dayVal) return true;
+        const targetDay = parseInt(routine.dayVal, 10);
+        const lastDayOfCurrentMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+        if (targetDay > lastDayOfCurrentMonth) {
+          return currentDayOfMonth === lastDayOfCurrentMonth;
+        }
+        return currentDayOfMonth === targetDay;
+      }
+
+      return false;
     }
 
     function toggleAddSubForm(parentId) {
@@ -902,6 +1261,7 @@
       if (document.getElementById(`subTaskInput_${parentId}`)) {
         document.getElementById(`subTaskInput_${parentId}`).focus();
         document.getElementById(`subDueInput_${parentId}`).value = getOneHourLaterString();
+        updateSubChipHighlight(parentId, '1h');
       }
     }
 
@@ -999,17 +1359,19 @@
       currentTab = tab;
       const tabAll = document.getElementById('tabAll');
       const tabToday = document.getElementById('tabToday');
+      const tabRoutine = document.getElementById('tabRoutine');
       const sortContainer = document.getElementById('sortContainer');
 
-      if (tab === 'all') {
-        tabAll.className = "flex-1 sm:flex-initial sm:px-8 py-2.5 text-center font-semibold text-indigo-600 border-b-2 border-indigo-600 text-sm sm:text-base";
-        tabToday.className = "flex-1 sm:flex-initial sm:px-8 py-2.5 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-sm sm:text-base";
-        sortContainer.classList.remove('hidden');
-      } else {
-        tabToday.className = "flex-1 sm:flex-initial sm:px-8 py-2.5 text-center font-semibold text-indigo-600 border-b-2 border-indigo-600 text-sm sm:text-base";
-        tabAll.className = "flex-1 sm:flex-initial sm:px-8 py-2.5 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-sm sm:text-base";
-        sortContainer.classList.add('hidden');
-      }
+      const activeClass = "flex-1 sm:flex-initial sm:px-4 py-1 text-center font-bold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 transition text-xs sm:text-sm";
+      const inactiveClass = "flex-1 sm:flex-initial sm:px-4 py-1 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-xs sm:text-sm";
+
+      tabAll.className = tab === 'all' ? activeClass : inactiveClass;
+      tabToday.className = tab === 'today' ? activeClass : inactiveClass;
+      tabRoutine.className = tab === 'routine' ? activeClass : inactiveClass;
+
+      if (tab === 'all') sortContainer.classList.remove('hidden');
+      else sortContainer.classList.add('hidden');
+
       render();
     }
 
@@ -1019,12 +1381,13 @@
 
       if (currentTab === 'all') {
         renderAllTab(container);
-      } else {
+      } else if (currentTab === 'today') {
         renderTodayTimelineTab(container);
+      } else {
+        renderRoutineTab(container);
       }
     }
 
-    /* 1. All 탭 렌더링 */
     function renderAllTab(container) {
       let filteredTodos = [...todos];
 
@@ -1036,94 +1399,102 @@
       else filteredTodos.sort((a, b) => b.id - a.id);
 
       if (filteredTodos.length === 0) {
-        container.innerHTML = `<ul class="space-y-3"><li class="text-center py-10 text-slate-400 text-sm">등록된 할 일이 없습니다.</li></ul>`;
+        container.innerHTML = `<ul class="space-y-1.5"><li class="text-center py-6 text-slate-400 text-xs">등록된 할 일이 없습니다.</li></ul>`;
         return;
       }
 
-      container.innerHTML = `<ul class="space-y-3">${filteredTodos.map(t => {
+      container.innerHTML = `<ul class="space-y-1.5">${filteredTodos.map(t => {
         const hasSub = t.subitems && t.subitems.length > 0;
         const totalSub = hasSub ? t.subitems.length : 0;
         const compSub = hasSub ? t.subitems.filter(s => s.completed).length : 0;
         const prog = hasSub ? Math.round((compSub / totalSub) * 100) : 0;
 
         return `
-          <li class="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 sm:p-4 shadow-sm transition ${t.completed ? 'opacity-60 bg-slate-100/50' : ''}">
+          <li class="bg-slate-50 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-lg p-2 sm:p-2.5 shadow-2xs transition ${t.completed ? 'opacity-60 bg-slate-100/50 dark:bg-slate-900/40' : ''}">
             ${t.isEditing ? `
-              <div class="space-y-3 bg-white p-3 rounded-xl border border-indigo-200">
-                <input type="text" id="editTask_${t.id}" value="${t.task}" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg">
-                <div class="flex flex-wrap items-center gap-2">
-                  <select id="editCategory_${t.id}" class="px-2.5 py-1.5 text-xs border border-slate-300 rounded-lg bg-white">
-                    <option value="업무" ${t.category === '업무' ? 'selected' : ''}>🏢 업무</option>
-                    <option value="개인" ${t.category === '개인' ? 'selected' : ''}>👤 개인</option>
-                    <option value="기타" ${t.category === '기타' ? 'selected' : ''}>📌 기타</option>
+              <div class="space-y-1.5 bg-white dark:bg-slate-800 p-2 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                <input type="text" id="editTask_${t.id}" value="${t.task}" class="w-full px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                <div class="flex flex-wrap items-center gap-1">
+                  <select id="editCategory_${t.id}" class="px-1.5 py-0.5 text-xs border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 font-medium">
+                    <option value="업무" ${t.category === '업무' ? 'selected' : ''}>업무</option>
+                    <option value="개인" ${t.category === '개인' ? 'selected' : ''}>개인</option>
+                    <option value="기타" ${t.category === '기타' ? 'selected' : ''}>기타</option>
                   </select>
-                  ${!hasSub ? `<input type="datetime-local" id="editDue_${t.id}" step="600" value="${t.due || ''}" class="flex-1 px-3 py-1.5 text-xs border border-slate-300 rounded-lg">` : `<span class="text-xs text-indigo-600 font-medium">그룹 할 일</span>`}
-                  <button onclick="saveEditMain(${t.id})" class="px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-lg">저장</button>
-                  <button onclick="toggleEditMain(${t.id})" class="px-3 py-1.5 bg-slate-200 text-slate-600 text-xs rounded-lg">취소</button>
+                  ${!hasSub ? `<input type="datetime-local" id="editDue_${t.id}" step="600" value="${t.due || ''}" class="flex-1 px-1.5 py-0.5 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">` : `<span class="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">그룹 할 일</span>`}
+                  <button onclick="saveEditMain(${t.id})" class="px-2 py-0.5 bg-indigo-600 text-white text-xs rounded">저장</button>
+                  <button onclick="toggleEditMain(${t.id})" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded">취소</button>
                 </div>
               </div>
             ` : `
-              <div class="flex items-start justify-between gap-3">
-                <div class="flex items-start gap-3 flex-1">
-                  <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleComplete(${t.id})" class="w-5 h-5 accent-indigo-600 rounded mt-0.5 touch-target">
+              <div class="flex items-start justify-between gap-1.5">
+                <div class="flex items-start gap-1.5 flex-1">
+                  <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleComplete(${t.id})" class="w-3.5 h-3.5 accent-indigo-600 rounded mt-0.5 cursor-pointer">
                   <div class="flex-1">
-                    <div class="flex items-center gap-2 flex-wrap">
-                      <span class="font-semibold ${t.completed ? 'line-through text-slate-400' : 'text-slate-800'} text-sm sm:text-base">${t.task}</span>
-                      <span class="text-xs bg-slate-200 px-2 py-0.5 rounded-md text-slate-600">${t.category}</span>
-                      ${hasSub ? `<span class="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md">📂 그룹</span>` : ''}
+                    <div class="flex items-center gap-1 flex-wrap">
+                      <span class="font-semibold ${t.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100'} text-xs">${t.task}</span>
+                      <span class="text-[9px] bg-slate-200 dark:bg-slate-700 px-1 py-0.2 rounded text-slate-600 dark:text-slate-300 font-medium">${t.category}</span>
+                      ${hasSub ? `<span class="text-[9px] font-semibold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-1 py-0.2 rounded">그룹</span>` : ''}
                       ${!t.completed && t.due ? getDDayTag(t.due) : ''}
                     </div>
-                    <div class="mt-1.5 text-xs text-slate-500">
-                      ${hasSub ? `<div class="flex items-center gap-2 mt-1"><span class="font-medium text-indigo-600">완료율 ${prog}% (${compSub}/${totalSub})</span>
-                        <div class="w-24 bg-slate-200 rounded-full h-1.5 overflow-hidden"><div class="bg-indigo-600 h-1.5" style="width: ${prog}%"></div></div></div>` 
+                    <div class="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400">
+                      ${hasSub ? `<div class="flex items-center gap-1 mt-0.5"><span class="font-medium text-indigo-600 dark:text-indigo-400">완료율 ${prog}% (${compSub}/${totalSub})</span>
+                        <div class="w-16 bg-slate-200 dark:bg-slate-700 rounded-full h-1 overflow-hidden"><div class="bg-indigo-600 dark:bg-indigo-400 h-1" style="width: ${prog}%"></div></div></div>` 
                       : `${t.due ? `<span>⏰ ${new Date(t.due).toLocaleString('ko-KR', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}</span>` : '<span class="text-slate-400">마감 없음</span>'}`}
                     </div>
                   </div>
                 </div>
-                <div class="flex items-center gap-1">
-                  <button onclick="addToGoogleCalendar('${t.task.replace(/'/g, "\\'")}', '${t.category}', '${t.due || ''}')" title="구글 캘린더에 추가" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 p-2 rounded-lg touch-target flex items-center gap-1 font-medium">📅</button>
-                  <button onclick="toggleEditMain(${t.id})" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 p-2 rounded-lg touch-target">✏️</button>
-                  <button onclick="toggleAddSubForm(${t.id})" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-2.5 py-2 rounded-lg touch-target">+ 하위</button>
-                  <button onclick="deleteTodo(${t.id})" class="text-slate-400 hover:text-red-500 p-2 text-xs touch-target">✕</button>
+                <div class="flex items-center gap-0.5">
+                  <button onclick="addToGoogleCalendar('${t.task.replace(/'/g, "\\'")}', '${t.category}', '${t.due || ''}')" title="구글 캘린더에 추가" class="text-[10px] bg-blue-50 dark:bg-blue-950 hover:bg-blue-100 text-blue-600 dark:text-blue-300 px-1.5 py-0.5 rounded font-medium">캘린더</button>
+                  <button onclick="toggleEditMain(${t.id})" class="text-[10px] bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded">수정</button>
+                  <button onclick="toggleAddSubForm(${t.id})" class="text-[10px] bg-indigo-50 dark:bg-indigo-950 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-300 px-1.5 py-0.5 rounded font-medium">+하위</button>
+                  <button onclick="deleteTodo(${t.id})" class="text-slate-400 hover:text-rose-500 px-1 py-0.5 text-[10px] font-bold">✕</button>
                 </div>
               </div>
             `}
 
             ${t.isAddingSub ? `
-              <div class="mt-3 sm:ml-6 p-3 bg-indigo-50/60 rounded-xl border border-indigo-100 space-y-2">
+              <div class="mt-1.5 sm:ml-4 p-1.5 bg-indigo-50/60 dark:bg-indigo-950/40 rounded border border-indigo-100 dark:border-indigo-900 space-y-1">
+                <div id="subChipGroup_${t.id}" class="flex items-center gap-1 overflow-x-auto pb-0.5 text-[10px]">
+                  <span class="text-slate-400 flex-shrink-0 font-medium">빠른 마감:</span>
+                  <button type="button" id="btnSub_${t.id}_today11" onclick="setQuickTime('today11', 'pc', 'subDueInput_${t.id}')" class="px-1 py-0.2 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">오늘 11시</button>
+                  <button type="button" id="btnSub_${t.id}_today17" onclick="setQuickTime('today17', 'pc', 'subDueInput_${t.id}')" class="px-1 py-0.2 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">오늘 17시</button>
+                  <button type="button" id="btnSub_${t.id}_tomorrow11" onclick="setQuickTime('tomorrow11', 'pc', 'subDueInput_${t.id}')" class="px-1 py-0.2 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">내일 11시</button>
+                  <button type="button" id="btnSub_${t.id}_tomorrow17" onclick="setQuickTime('tomorrow17', 'pc', 'subDueInput_${t.id}')" class="px-1 py-0.2 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">내일 17시</button>
+                  <button type="button" id="btnSub_${t.id}_1h" onclick="setQuickTime('1h', 'pc', 'subDueInput_${t.id}')" class="px-1 py-0.2 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">+1시간</button>
+                </div>
                 <input type="text" id="subTaskInput_${t.id}" placeholder="하위 할 일 내용" onkeydown="if(event.key==='Enter') saveInlineSubitem(${t.id})"
-                       class="w-full px-3 py-2 text-xs border border-indigo-200 rounded-lg">
-                <div class="flex gap-2">
-                  <input type="datetime-local" id="subDueInput_${t.id}" step="600" class="flex-1 px-2 py-1.5 text-xs border border-indigo-200 rounded-lg">
-                  <button onclick="saveInlineSubitem(${t.id})" class="px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-lg">추가</button>
-                  <button onclick="toggleAddSubForm(${t.id})" class="px-3 py-1.5 bg-slate-200 text-slate-600 text-xs rounded-lg">취소</button>
+                       class="w-full px-2 py-1 text-xs border border-indigo-200 dark:border-indigo-800 rounded bg-white dark:bg-slate-800">
+                <div class="flex gap-1">
+                  <input type="datetime-local" id="subDueInput_${t.id}" step="600" class="flex-1 px-1.5 py-0.5 text-xs border border-indigo-200 dark:border-indigo-800 rounded bg-white dark:bg-slate-800">
+                  <button onclick="saveInlineSubitem(${t.id})" class="px-2 py-0.5 bg-indigo-600 text-white text-xs rounded">추가</button>
+                  <button onclick="toggleAddSubForm(${t.id})" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded">취소</button>
                 </div>
               </div>
             ` : ''}
 
             ${hasSub ? `
-              <ul class="mt-3 pl-3 sm:pl-6 border-l-2 border-indigo-100 space-y-2">
+              <ul class="mt-1.5 pl-2 sm:pl-4 border-l-2 border-indigo-100 dark:border-indigo-900 space-y-0.5">
                 ${t.subitems.map(s => `
-                  <li class="py-1">
+                  <li class="py-0.5">
                     ${s.isEditing ? `
-                      <div class="flex items-center gap-2 bg-white p-2 rounded-lg border border-indigo-200">
-                        <input type="text" id="editSubTask_${s.id}" value="${s.task}" class="flex-1 px-2 py-1 text-xs border border-slate-300 rounded">
-                        <input type="datetime-local" id="editSubDue_${s.id}" step="600" value="${s.due || ''}" class="px-2 py-1 text-xs border border-slate-300 rounded">
-                        <button onclick="saveEditSub(${t.id}, ${s.id})" class="px-2 py-1 bg-indigo-600 text-white text-xs rounded">저장</button>
-                        <button onclick="toggleEditSub(${t.id}, ${s.id})" class="px-2 py-1 bg-slate-200 text-slate-600 text-xs rounded">취소</button>
+                      <div class="flex items-center gap-1 bg-white dark:bg-slate-800 p-1 rounded border border-indigo-200 dark:border-indigo-800">
+                        <input type="text" id="editSubTask_${s.id}" value="${s.task}" class="flex-1 px-1.5 py-0.5 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                        <input type="datetime-local" id="editSubDue_${s.id}" step="600" value="${s.due || ''}" class="px-1.5 py-0.5 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                        <button onclick="saveEditSub(${t.id}, ${s.id})" class="px-1.5 py-0.5 bg-indigo-600 text-white text-xs rounded">저장</button>
+                        <button onclick="toggleEditSub(${t.id}, ${s.id})" class="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded">취소</button>
                       </div>
                     ` : `
-                      <div class="flex items-center justify-between text-sm">
-                        <div class="flex items-center gap-2.5">
-                          <input type="checkbox" ${s.completed ? 'checked' : ''} onchange="toggleSubitem(${t.id}, ${s.id})" class="w-4 h-4 accent-indigo-600 rounded">
-                          <span class="${s.completed ? 'line-through text-slate-400' : 'text-slate-700'}">${s.task}</span>
+                      <div class="flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-1.5">
+                          <input type="checkbox" ${s.completed ? 'checked' : ''} onchange="toggleSubitem(${t.id}, ${s.id})" class="w-3.5 h-3.5 accent-indigo-600 rounded cursor-pointer">
+                          <span class="${s.completed ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-200'}">${s.task}</span>
                           ${!s.completed && s.due ? getDDayTag(s.due) : ''}
-                          ${s.due ? `<span class="text-xs text-slate-400">⏰ ${new Date(s.due).toLocaleString('ko-KR', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}</span>` : ''}
+                          ${s.due ? `<span class="text-[9px] text-slate-400">⏰ ${new Date(s.due).toLocaleString('ko-KR', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}</span>` : ''}
                         </div>
-                        <div class="flex items-center gap-1">
-                          <button onclick="addToGoogleCalendar('${s.task.replace(/'/g, "\\'")}', '하위할일', '${s.due || ''}')" title="구글 캘린더에 추가" class="text-xs text-blue-500 hover:text-blue-700 p-1">📅</button>
-                          <button onclick="toggleEditSub(${t.id}, ${s.id})" class="text-xs text-slate-400 hover:text-slate-600 p-1">✏️</button>
-                          <button onclick="deleteSubitem(${t.id}, ${s.id})" class="text-xs text-slate-300 hover:text-red-400 p-1">✕</button>
+                        <div class="flex items-center gap-0.5">
+                          <button onclick="addToGoogleCalendar('${s.task.replace(/'/g, "\\'")}', '하위할일', '${s.due || ''}')" title="구글 캘린더에 추가" class="text-[10px] text-blue-500 hover:text-blue-700 p-0.5">캘린더</button>
+                          <button onclick="toggleEditSub(${t.id}, ${s.id})" class="text-[10px] text-slate-400 hover:text-slate-600 p-0.5">수정</button>
+                          <button onclick="deleteSubitem(${t.id}, ${s.id})" class="text-[10px] text-slate-300 hover:text-rose-500 p-0.5 font-bold">✕</button>
                         </div>
                       </div>
                     `}
@@ -1136,26 +1507,48 @@
       }).join('')}</ul>`;
     }
 
-    /* 2. Today 탭 (타임라인) 렌더링 */
     function renderTodayTimelineTab(container) {
       const currentHour = new Date().getHours();
+      const todayStr = getTodayString();
       
       let todayItems = [];
-      todos.forEach(t => {
-        if (hideCompleted && t.completed) return;
 
-        const isMainToday = isToday(t.due);
-        if (isMainToday) {
-          todayItems.push({ ...t, isSub: false, parentId: null });
+      todos.forEach(t => {
+        const hasSub = t.subitems && t.subitems.length > 0;
+
+        if (!hasSub && isToday(t.due)) {
+          if (!hideCompleted || !t.completed) {
+            todayItems.push({ ...t, isSub: false, isRoutine: false, parentId: null, parentTask: null });
+          }
         }
 
-        if (t.subitems && t.subitems.length > 0) {
+        if (hasSub) {
           t.subitems.forEach(s => {
-            if (hideCompleted && s.completed) return;
             if (isToday(s.due)) {
-              todayItems.push({ ...s, isSub: true, parentId: t.id, parentCategory: t.category });
+              if (!hideCompleted || !s.completed) {
+                todayItems.push({ ...s, isSub: true, isRoutine: false, parentId: t.id, parentTask: t.task, parentCategory: t.category });
+              }
             }
           });
+        }
+      });
+
+      routines.forEach(r => {
+        if (isRoutineDueToday(r)) {
+          const isDone = r.lastCompletedDate === todayStr;
+          if (!hideCompleted || !isDone) {
+            const fullDueStr = r.dueTime ? `${todayStr}T${r.dueTime}` : '';
+            todayItems.push({
+              id: r.id,
+              task: r.task,
+              due: fullDueStr,
+              category: '루틴',
+              completed: isDone,
+              isSub: false,
+              isRoutine: true,
+              freq: r.freq
+            });
+          }
         }
       });
 
@@ -1175,20 +1568,20 @@
 
       if (todayItems.length === 0) {
         container.innerHTML = `
-          <div class="text-center py-12 bg-slate-50 border border-slate-200/80 rounded-2xl">
-            <p class="text-slate-400 text-sm">📅 오늘 예정된 일정이 없습니다.</p>
+          <div class="text-center py-8 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 rounded-lg">
+            <p class="text-slate-400 text-xs">오늘 예정된 일정 및 루틴이 없습니다.</p>
           </div>
         `;
         return;
       }
 
-      let html = `<div class="space-y-3">`;
+      let html = `<div class="space-y-1.5">`;
 
       if (noTimeItems.length > 0) {
         html += `
-          <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl p-3">
-            <h3 class="text-xs font-bold text-indigo-700 mb-2 flex items-center gap-1">📌 오늘 시간 미지정</h3>
-            <div class="space-y-1.5 pl-2">
+          <div class="bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900 rounded-lg p-2">
+            <h3 class="text-xs font-bold text-indigo-700 dark:text-indigo-300 mb-1">오늘 시간 미지정</h3>
+            <div class="space-y-1 pl-1">
               ${noTimeItems.map(item => renderTimelineItemHtml(item)).join('')}
             </div>
           </div>
@@ -1203,13 +1596,13 @@
           const hourLabel = `${String(h).padStart(2, '0')}:00`;
 
           html += `
-            <div class="flex items-start gap-3 p-3 rounded-xl border transition ${isCurrentHour ? 'bg-blue-50/60 border-blue-300 ring-2 ring-blue-200' : 'bg-slate-50/70 border-slate-200/70'}">
-              <div class="w-14 text-xs font-bold ${isCurrentHour ? 'text-blue-600' : 'text-slate-500'} flex flex-col items-start pt-0.5">
+            <div class="flex items-start gap-1.5 p-1.5 rounded-lg border transition ${isCurrentHour ? 'bg-blue-50/60 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700 ring-1 ring-blue-200 dark:ring-blue-800' : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/70 dark:border-slate-700/70'}">
+              <div class="w-11 text-xs font-bold ${isCurrentHour ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'} flex flex-col items-start pt-0.5">
                 <span>${hourLabel}</span>
-                ${isCurrentHour ? `<span class="text-[10px] bg-blue-600 text-white px-1 py-0.5 rounded mt-1">LIVE</span>` : ''}
+                ${isCurrentHour ? `<span class="text-[8px] bg-blue-600 text-white px-1 rounded mt-0.5">LIVE</span>` : ''}
               </div>
-              <div class="flex-1 min-h-[28px] space-y-2">
-                ${items.length > 0 ? items.map(item => renderTimelineItemHtml(item)).join('') : `<span class="text-xs text-slate-300 italic">현재 시각 (일정 없음)</span>`}
+              <div class="flex-1 min-h-[22px] space-y-1">
+                ${items.length > 0 ? items.map(item => renderTimelineItemHtml(item)).join('') : `<span class="text-[11px] text-slate-300 dark:text-slate-600 italic">현재 시각 (일정 없음)</span>`}
               </div>
             </div>
           `;
@@ -1222,38 +1615,153 @@
 
     function renderTimelineItemHtml(item) {
       const dueTimeStr = item.due && item.due.includes('T') ? item.due.split('T')[1] : '';
-      if (item.isSub) {
+
+      if (item.isRoutine) {
         return `
-          <div class="flex items-center justify-between text-xs bg-white p-2.5 rounded-lg border border-slate-200 shadow-2xs">
-            <div class="flex items-center gap-2">
-              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleSubitem(${item.parentId}, ${item.id})" class="w-4 h-4 accent-indigo-600 rounded">
-              <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-700 font-medium'}">${item.task}</span>
-              <span class="text-[10px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded">하위</span>
+          <div class="flex items-center justify-between text-xs bg-emerald-50/60 dark:bg-emerald-950/30 p-1.5 rounded border border-emerald-200 dark:border-emerald-800/60 shadow-2xs">
+            <div class="flex items-center gap-1.5">
+              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleRoutineToday(${item.id})" class="w-3.5 h-3.5 accent-emerald-600 rounded cursor-pointer">
+              <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100 font-semibold'}">${item.task}</span>
+              <span class="text-[9px] bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-1 py-0.2 rounded font-medium">🔄 ${item.freq}</span>
             </div>
             <div class="flex items-center gap-1">
-              ${dueTimeStr ? `<span class="text-[11px] font-semibold text-slate-500">⏰ ${dueTimeStr}</span>` : ''}
-              <button onclick="addToGoogleCalendar('${item.task.replace(/'/g, "\\'")}', '하위할일', '${item.due || ''}')" title="구글 캘린더에 추가" class="text-xs text-blue-500 hover:text-blue-700 p-1">📅</button>
+              ${dueTimeStr ? `<span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">⏰ ${dueTimeStr}</span>` : ''}
+            </div>
+          </div>
+        `;
+      } else if (item.isSub) {
+        const tooltipId = `tooltip_sub_${item.id}`;
+        return `
+          <div class="flex items-center justify-between text-xs bg-white dark:bg-slate-800 p-1.5 rounded border border-slate-200 dark:border-slate-700 shadow-2xs">
+            <div class="flex items-center gap-1.5">
+              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleSubitem(${item.parentId}, ${item.id})" class="w-3.5 h-3.5 accent-indigo-600 rounded cursor-pointer">
+              <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-200 font-medium'}">${item.task}</span>
+              
+              <div id="${tooltipId}" class="relative inline-block has-tooltip cursor-pointer" onclick="toggleSubTooltip(event, '${tooltipId}')">
+                <span class="text-[9px] bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-1 py-0.2 rounded font-semibold border border-indigo-100 dark:border-indigo-800">하위</span>
+                <div class="tooltip-box bg-slate-800 dark:bg-slate-900 text-white text-[10px] px-2 py-1 rounded shadow-lg border border-slate-700">
+                  📂 그룹: ${item.parentTask || '상위 그룹'}
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1">
+              ${dueTimeStr ? `<span class="text-[10px] font-semibold text-slate-500 dark:text-slate-400">⏰ ${dueTimeStr}</span>` : ''}
             </div>
           </div>
         `;
       } else {
         return `
-          <div class="flex items-center justify-between text-xs bg-white p-2.5 rounded-lg border border-slate-200 shadow-2xs">
-            <div class="flex items-center gap-2">
-              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleComplete(${item.id})" class="w-4 h-4 accent-indigo-600 rounded">
-              <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-800 font-semibold'}">${item.task}</span>
-              <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">${item.category}</span>
+          <div class="flex items-center justify-between text-xs bg-white dark:bg-slate-800 p-1.5 rounded border border-slate-200 dark:border-slate-700 shadow-2xs">
+            <div class="flex items-center gap-1.5">
+              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleComplete(${item.id})" class="w-3.5 h-3.5 accent-indigo-600 rounded cursor-pointer">
+              <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100 font-semibold'}">${item.task}</span>
+              <span class="text-[9px] bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-1 py-0.2 rounded font-medium">${item.category}</span>
             </div>
             <div class="flex items-center gap-1">
-              ${dueTimeStr ? `<span class="text-[11px] font-bold text-indigo-600">⏰ ${dueTimeStr}</span>` : ''}
-              <button onclick="addToGoogleCalendar('${item.task.replace(/'/g, "\\'")}', '${item.category}', '${item.due || ''}')" title="구글 캘린더에 추가" class="text-xs text-blue-500 hover:text-blue-700 p-1">📅</button>
+              ${dueTimeStr ? `<span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">⏰ ${dueTimeStr}</span>` : ''}
             </div>
           </div>
         `;
       }
     }
 
+    function renderRoutineTab(container) {
+      const todayStr = getTodayString();
+
+      const daysOfWeek = [
+        { val: 'all', label: '전체' },
+        { val: '1', label: '월' }, { val: '2', label: '화' }, { val: '3', label: '수' },
+        { val: '4', label: '목' }, { val: '5', label: '금' }, { val: '6', label: '토' }, { val: '0', label: '일' }
+      ];
+
+      container.innerHTML = `
+        <div class="space-y-2">
+          ${routines.length === 0 ? `
+            <div class="text-center py-10 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 rounded-lg">
+              <p class="text-slate-500 dark:text-slate-400 text-xs font-medium">등록된 습관/반복 루틴이 없습니다.</p>
+              <p class="text-slate-400 dark:text-slate-500 text-[11px] mt-1">상단 입력창에서 카테고리를 <strong class="text-indigo-600 dark:text-indigo-400">[🔄 루틴]</strong>으로 선택하여 등록하세요.</p>
+            </div>
+          ` : `
+            <ul class="space-y-1.5">
+              ${routines.map(r => {
+                const isDoneToday = r.lastCompletedDate === todayStr;
+                const isDueToday = isRoutineDueToday(r);
+
+                let dayLabel = '';
+                if (r.freq === '매주') {
+                  const found = daysOfWeek.find(d => d.val === r.dayVal);
+                  dayLabel = found && found.val !== 'all' ? ` (${found.label}요일)` : ' (매일)';
+                } else if (r.freq === '매월') {
+                  dayLabel = r.dayVal ? ` (${r.dayVal}일)` : '';
+                }
+
+                return `
+                  <li class="bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 shadow-2xs ${!isDueToday ? 'opacity-50' : ''}">
+                    ${r.isEditing ? `
+                      <div class="space-y-1.5 bg-white dark:bg-slate-800 p-2 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                        <input type="text" id="editRoutineTask_${r.id}" value="${r.task}" class="w-full px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                        <div class="flex flex-wrap items-center gap-1">
+                          <select id="editRoutineFreq_${r.id}" onchange="handleRoutineFreqChange(this.value, '', 'editRoutine')" class="px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700">
+                            <option value="매일" ${r.freq === '매일' ? 'selected' : ''}>매일</option>
+                            <option value="매주" ${r.freq === '매주' ? 'selected' : ''}>매주</option>
+                            <option value="매월" ${r.freq === '매월' ? 'selected' : ''}>매월</option>
+                          </select>
+                          
+                          <select id="editRoutineDay_${r.id}" class="${r.freq === '매주' ? '' : 'hidden'} px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700">
+                            <option value="all" ${r.dayVal === 'all' ? 'selected' : ''}>전체</option>
+                            <option value="1" ${r.dayVal === '1' ? 'selected' : ''}>월</option>
+                            <option value="2" ${r.dayVal === '2' ? 'selected' : ''}>화</option>
+                            <option value="3" ${r.dayVal === '3' ? 'selected' : ''}>수</option>
+                            <option value="4" ${r.dayVal === '4' ? 'selected' : ''}>목</option>
+                            <option value="5" ${r.dayVal === '5' ? 'selected' : ''}>금</option>
+                            <option value="6" ${r.dayVal === '6' ? 'selected' : ''}>토</option>
+                            <option value="0" ${r.dayVal === '0' ? 'selected' : ''}>일</option>
+                          </select>
+
+                          <select id="editRoutineMonth_${r.id}" class="${r.freq === '매월' ? '' : 'hidden'} px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700">
+                            ${Array.from({length: 31}, (_, i) => `<option value="${i + 1}" ${parseInt(r.dayVal) === i + 1 ? 'selected' : ''}>${i + 1}일</option>`).join('')}
+                          </select>
+
+                          <input type="time" id="editRoutineTime_${r.id}" step="600" value="${r.dueTime || ''}" class="px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+
+                          <button onclick="saveEditRoutine(${r.id})" class="px-2 py-0.5 bg-indigo-600 text-white text-xs rounded">저장</button>
+                          <button onclick="toggleEditRoutine(${r.id})" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded">취소</button>
+                        </div>
+                      </div>
+                    ` : `
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                          <input type="checkbox" ${isDoneToday ? 'checked' : ''} onchange="toggleRoutineToday(${r.id})" class="w-4 h-4 accent-emerald-600 rounded cursor-pointer">
+                          <div>
+                            <div class="flex items-center gap-1.5">
+                              <span class="text-xs font-semibold ${isDoneToday ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'}">${r.task}</span>
+                              ${r.dueTime ? `<span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">⏰ ${r.dueTime}</span>` : ''}
+                            </div>
+                            <div class="flex items-center gap-1.5 mt-0.5">
+                              <span class="text-[9px] bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-1 py-0.2 rounded font-medium">🔄 ${r.freq}${dayLabel}</span>
+                              <span class="text-[10px] ${isDoneToday ? 'text-emerald-600 dark:text-emerald-400 font-bold' : isDueToday ? 'text-amber-600 font-medium' : 'text-slate-400'}">
+                                ${isDoneToday ? '✓ 오늘 달성 완료!' : isDueToday ? '오늘 수행 대상' : '오늘 비대상'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-1">
+                          <button onclick="toggleEditRoutine(${r.id})" class="text-[10px] bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded">수정</button>
+                          <button onclick="deleteRoutine(${r.id})" class="text-slate-400 hover:text-rose-500 text-xs px-1.5 py-0.5 font-bold">✕</button>
+                        </div>
+                      </div>
+                    `}
+                  </li>
+                `;
+              }).join('')}
+            </ul>
+          `}
+        </div>
+      `;
+    }
+
     initApp();
   </script>
 </body>
-</html>
+  </html>
