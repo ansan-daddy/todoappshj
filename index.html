@@ -49,7 +49,7 @@
   </script>
 
   <style>
-    .touch-target { min-height: 36px; }
+    .touch-target { min-height: 40px; }
     /* 스마트 툴팁 스타일 */
     .tooltip-box {
       display: none;
@@ -66,93 +66,93 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-100 p-2 sm:p-5 pb-20 sm:pb-6 transition-colors duration-200">
+<body class="bg-slate-100 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-100 p-3 sm:p-6 pb-24 sm:pb-8 transition-colors duration-200 text-sm sm:text-base">
 
   <!-- 1. 로그인 / 회원가입 / 관리자 진입 화면 -->
-  <div id="loginScreen" class="max-w-md mx-auto mt-6 sm:mt-10 bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 border border-slate-200 dark:border-slate-700">
-    <div class="text-center mb-4">
-      <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100">할 일 관리</h2>
-      <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">아이디와 비밀번호로 로그인하세요.</p>
+  <div id="loginScreen" class="max-w-md mx-auto mt-8 sm:mt-12 bg-white dark:bg-slate-800 rounded-xl shadow-md p-5 sm:p-7 border border-slate-200 dark:border-slate-700">
+    <div class="text-center mb-5">
+      <h2 class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100">할 일 관리</h2>
+      <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">아이디와 비밀번호로 로그인하세요.</p>
     </div>
 
     <!-- 탭 선택 (로그인 vs 회원가입) -->
-    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-4">
-      <button id="tabLogin" type="button" onclick="switchAuthTab('login')" class="flex-1 py-1.5 text-center font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 text-xs sm:text-sm">로그인</button>
-      <button id="tabRegister" type="button" onclick="switchAuthTab('register')" class="flex-1 py-1.5 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-xs sm:text-sm">회원가입</button>
+    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-5">
+      <button id="tabLogin" type="button" onclick="switchAuthTab('login')" class="flex-1 py-2 text-center font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 text-xs sm:text-base">로그인</button>
+      <button id="tabRegister" type="button" onclick="switchAuthTab('register')" class="flex-1 py-2 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-xs sm:text-base">회원가입</button>
     </div>
 
     <!-- 로그인 폼 -->
-    <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-2.5">
-      <div id="accountListContainer" class="hidden mb-2">
-        <p class="text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-1">최근 접속 계정</p>
-        <div id="accountList" class="flex flex-wrap gap-1"></div>
+    <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-3">
+      <div id="accountListContainer" class="hidden mb-3">
+        <p class="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">최근 접속 계정</p>
+        <div id="accountList" class="flex flex-wrap gap-1.5"></div>
       </div>
 
       <div>
-        <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">아이디</label>
+        <label class="block text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 mb-1">아이디</label>
         <input type="text" id="loginUsername" placeholder="아이디 입력" required
-               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs">
+               class="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs sm:text-sm">
       </div>
       <div>
-        <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">비밀번호</label>
+        <label class="block text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 mb-1">비밀번호</label>
         <input type="password" id="loginPassword" placeholder="비밀번호 입력" required
-               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs">
+               class="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs sm:text-sm">
       </div>
-      <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition text-xs shadow-xs touch-target">
+      <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition text-xs sm:text-sm shadow-xs touch-target">
         로그인
       </button>
 
-      <div class="text-center pt-1">
-        <button type="button" onclick="openAdminPrompt()" class="text-[11px] text-slate-400 hover:text-indigo-600 underline">
+      <div class="text-center pt-2">
+        <button type="button" onclick="openAdminPrompt()" class="text-xs sm:text-sm text-slate-400 hover:text-indigo-600 underline">
           관리자 모드
         </button>
       </div>
     </form>
 
     <!-- 회원가입 폼 -->
-    <form id="registerForm" onsubmit="handleRegisterSubmit(event)" class="space-y-2.5 hidden">
+    <form id="registerForm" onsubmit="handleRegisterSubmit(event)" class="space-y-3 hidden">
       <div>
-        <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">새 아이디</label>
+        <label class="block text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 mb-1">새 아이디</label>
         <input type="text" id="regUsername" placeholder="사용할 아이디" required
-               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs">
+               class="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs sm:text-sm">
       </div>
       <div>
-        <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">비밀번호</label>
+        <label class="block text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 mb-1">비밀번호</label>
         <input type="password" id="regPassword" placeholder="비밀번호 설정" required
-               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs">
+               class="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs sm:text-sm">
       </div>
       <div>
-        <label class="block text-[11px] font-semibold text-slate-600 dark:text-slate-400 mb-0.5">비밀번호 확인</label>
+        <label class="block text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400 mb-1">비밀번호 확인</label>
         <input type="password" id="regPasswordConfirm" placeholder="비밀번호 재입력" required
-               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs">
+               class="w-full px-3.5 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 text-xs sm:text-sm">
       </div>
-      <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition text-xs shadow-xs touch-target">
+      <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition text-xs sm:text-sm shadow-xs touch-target">
         가입하기
       </button>
     </form>
   </div>
 
   <!-- 관리자 전용 화면 -->
-  <div id="adminScreen" class="hidden max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 border border-slate-200 dark:border-slate-700 mt-4">
-    <div class="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-700 mb-3">
-      <h2 class="text-base font-bold text-slate-800 dark:text-slate-100">계정 관리자 모드</h2>
-      <button onclick="closeAdminScreen()" class="text-xs bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-md font-semibold transition">
+  <div id="adminScreen" class="hidden max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-5 border border-slate-200 dark:border-slate-700 mt-5">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700 mb-4">
+      <h2 class="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100">계정 관리자 모드</h2>
+      <button onclick="closeAdminScreen()" class="text-xs sm:text-sm bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-md font-semibold transition">
         ✕ 나가기
       </button>
     </div>
 
-    <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-2.5">등록된 회원들의 아이디 및 비밀번호를 수정하거나 삭제할 수 있습니다.</p>
+    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-3">등록된 회원들의 아이디 및 비밀번호를 수정하거나 삭제할 수 있습니다.</p>
 
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
-          <tr class="bg-slate-50 dark:bg-slate-700/50 text-[11px] text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-            <th class="p-1.5">아이디</th>
-            <th class="p-1.5">비밀번호</th>
-            <th class="p-1.5 text-right">관리</th>
+          <tr class="bg-slate-50 dark:bg-slate-700/50 text-xs sm:text-sm text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
+            <th class="p-2">아이디</th>
+            <th class="p-2">비밀번호</th>
+            <th class="p-2 text-right">관리</th>
           </tr>
         </thead>
-        <tbody id="adminUserList" class="text-xs divide-y divide-slate-100 dark:divide-slate-700">
+        <tbody id="adminUserList" class="text-xs sm:text-base divide-y divide-slate-100 dark:divide-slate-700">
           <!-- 관리자 목록 렌더링 -->
         </tbody>
       </table>
@@ -160,49 +160,49 @@
   </div>
 
   <!-- 2. 메인 서비스 화면 -->
-  <div id="mainScreen" class="hidden max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-3 sm:p-4 border border-slate-200/80 dark:border-slate-700/80">
+  <div id="mainScreen" class="hidden max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 border border-slate-200/80 dark:border-slate-700/80">
     <!-- 헤더 영역 -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-700 mb-3 gap-2">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700 mb-4 gap-3">
       <div>
-        <div class="flex items-center gap-1.5">
-          <h1 class="text-base sm:text-lg font-bold text-indigo-600 dark:text-indigo-400"><span id="displayName"></span>님의 할 일</h1>
-          <button onclick="handleLogout()" class="text-[11px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 underline">로그아웃</button>
+        <div class="flex items-center gap-2">
+          <h1 class="text-lg sm:text-2xl font-bold text-indigo-600 dark:text-indigo-400"><span id="displayName"></span>님의 할 일</h1>
+          <button onclick="handleLogout()" class="text-xs sm:text-sm text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 underline">로그아웃</button>
         </div>
-        <p id="clock" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mt-0.5"></p>
+        <p id="clock" class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-1"></p>
       </div>
 
-      <div class="flex items-center gap-1.5 self-start sm:self-auto flex-wrap">
-        <button id="darkModeBtn" onclick="toggleDarkMode()" class="text-[11px] bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded font-medium transition">
+      <div class="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+        <button id="darkModeBtn" onclick="toggleDarkMode()" class="text-xs sm:text-sm bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded font-medium transition">
           🌙 야간
         </button>
-        <button onclick="exportData()" class="text-[11px] bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded font-medium transition">백업</button>
-        <label class="text-[11px] bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-2 py-0.5 rounded font-medium transition cursor-pointer">
+        <button onclick="exportData()" class="text-xs sm:text-sm bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded font-medium transition">백업</button>
+        <label class="text-xs sm:text-sm bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-2.5 py-1 rounded font-medium transition cursor-pointer">
           복원 <input type="file" accept=".json" onchange="importData(event)" class="hidden">
         </label>
-        <button id="notifyBtn" onclick="handleNotificationClick()" class="text-[11px] px-2 py-0.5 rounded-full font-medium transition flex items-center gap-1 shadow-2xs">
+        <button id="notifyBtn" onclick="handleNotificationClick()" class="text-xs sm:text-sm px-2.5 py-1 rounded-full font-medium transition flex items-center gap-1 shadow-2xs">
           알림 확인 중...
         </button>
       </div>
     </div>
 
     <!-- 통합 스마트 입력 폼 (PC/대화면 전용) -->
-    <div id="pcAddTodoContainer" class="hidden sm:block mb-3 bg-slate-50 dark:bg-slate-900/60 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700">
-      <div id="pcQuickChipsContainer" class="flex items-center gap-1 mb-1.5 text-xs overflow-x-auto pb-0.5">
-        <span class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 flex-shrink-0">빠른 마감:</span>
-        <button type="button" id="btnPc_today11" onclick="setQuickTime('today11', 'pc')" class="quick-chip-pc px-2 py-0.5 rounded-full font-medium text-[11px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">오늘 11시</button>
-        <button type="button" id="btnPc_today17" onclick="setQuickTime('today17', 'pc')" class="quick-chip-pc px-2 py-0.5 rounded-full font-medium text-[11px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">오늘 17시</button>
-        <button type="button" id="btnPc_tomorrow11" onclick="setQuickTime('tomorrow11', 'pc')" class="quick-chip-pc px-2 py-0.5 rounded-full font-medium text-[11px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">내일 11시</button>
-        <button type="button" id="btnPc_tomorrow17" onclick="setQuickTime('tomorrow17', 'pc')" class="quick-chip-pc px-2 py-0.5 rounded-full font-medium text-[11px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">내일 17시</button>
-        <button type="button" id="btnPc_1h" onclick="setQuickTime('1h', 'pc')" class="quick-chip-pc px-2 py-0.5 rounded-full font-medium text-[11px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">+1시간</button>
+    <div id="pcAddTodoContainer" class="hidden sm:block mb-4 bg-slate-50 dark:bg-slate-900/60 p-3.5 rounded-lg border border-slate-200 dark:border-slate-700">
+      <div id="pcQuickChipsContainer" class="flex items-center gap-1.5 mb-2 text-xs sm:text-sm overflow-x-auto pb-1">
+        <span class="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 flex-shrink-0">빠른 마감:</span>
+        <button type="button" id="btnPc_today11" onclick="setQuickTime('today11', 'pc')" class="quick-chip-pc px-2.5 py-1 rounded-full font-medium text-xs sm:text-sm flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">오늘 11시</button>
+        <button type="button" id="btnPc_today17" onclick="setQuickTime('today17', 'pc')" class="quick-chip-pc px-2.5 py-1 rounded-full font-medium text-xs sm:text-sm flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">오늘 17시</button>
+        <button type="button" id="btnPc_tomorrow11" onclick="setQuickTime('tomorrow11', 'pc')" class="quick-chip-pc px-2.5 py-1 rounded-full font-medium text-xs sm:text-sm flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">내일 11시</button>
+        <button type="button" id="btnPc_tomorrow17" onclick="setQuickTime('tomorrow17', 'pc')" class="quick-chip-pc px-2.5 py-1 rounded-full font-medium text-xs sm:text-sm flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">내일 17시</button>
+        <button type="button" id="btnPc_1h" onclick="setQuickTime('1h', 'pc')" class="quick-chip-pc px-2.5 py-1 rounded-full font-medium text-xs sm:text-sm flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100">+1시간</button>
       </div>
 
-      <form id="todoFormPc" onsubmit="addUnifiedItem(event, 'pc')" class="space-y-1.5">
+      <form id="todoFormPc" onsubmit="addUnifiedItem(event, 'pc')" class="space-y-2">
         <input type="text" id="taskInputPc" placeholder="할 일 또는 반복 루틴 입력 (예: '내일 오후 3시 보고서')..." required oninput="handleNaturalLanguageInput('pc')"
-               class="w-full px-2.5 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-xs">
+               class="w-full px-3.5 py-2 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-xs sm:text-base">
         
-        <div class="flex flex-wrap gap-1.5 items-center">
+        <div class="flex flex-wrap gap-2 items-center">
           <!-- 카테고리 / 루틴 선택 -->
-          <select id="categoryInputPc" onchange="handleCategoryChange(this.value, 'pc')" class="px-2 py-1 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 font-bold text-indigo-600 dark:text-indigo-400">
+          <select id="categoryInputPc" onchange="handleCategoryChange(this.value, 'pc')" class="px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs sm:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 font-bold text-indigo-600 dark:text-indigo-400">
             <option value="업무">업무</option>
             <option value="개인">개인</option>
             <option value="기타">기타</option>
@@ -211,16 +211,16 @@
 
           <!-- 일반 마감 일시 -->
           <input type="datetime-local" id="timeInputPc" step="600"
-                 class="flex-1 min-w-[150px] px-2 py-1 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800">
+                 class="flex-1 min-w-[170px] px-3 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs sm:text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800">
 
           <!-- 루틴 동적 옵션 영역 (기본 숨김) -->
-          <div id="pcRoutineOptions" class="hidden flex items-center gap-1.5">
-            <select id="pcRoutineFreq" onchange="handleRoutineFreqChange(this.value, 'pc')" class="px-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 font-medium">
+          <div id="pcRoutineOptions" class="hidden flex items-center gap-2">
+            <select id="pcRoutineFreq" onchange="handleRoutineFreqChange(this.value, 'pc')" class="px-2.5 py-1.5 text-xs sm:text-base border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 font-medium">
               <option value="매일">매일</option>
               <option value="매주">매주</option>
               <option value="매월">매월</option>
             </select>
-            <select id="pcRoutineDay" class="hidden px-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
+            <select id="pcRoutineDay" class="hidden px-2.5 py-1.5 text-xs sm:text-base border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
               <option value="all">전체 요일(선택 안함)</option>
               <option value="1">월요일</option>
               <option value="2">화요일</option>
@@ -230,34 +230,34 @@
               <option value="6">토요일</option>
               <option value="0">일요일</option>
             </select>
-            <select id="pcRoutineMonth" class="hidden px-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
+            <select id="pcRoutineMonth" class="hidden px-2.5 py-1.5 text-xs sm:text-base border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
               <!-- 1일 ~ 31일 -->
             </select>
-            <span class="text-[11px] text-slate-400">마감:</span>
-            <input type="time" id="pcRoutineTime" step="600" class="px-2 py-1 text-xs border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
+            <span class="text-xs sm:text-sm text-slate-400">마감:</span>
+            <input type="time" id="pcRoutineTime" step="600" class="px-2.5 py-1.5 text-xs sm:text-base border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800">
           </div>
 
-          <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-3.5 py-1 rounded-lg transition text-xs shadow-2xs">등록</button>
+          <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-1.5 rounded-lg transition text-xs sm:text-base shadow-2xs">등록</button>
         </div>
       </form>
     </div>
 
     <!-- 탭 메뉴 (All / Today / Routine) & 컨트롤 바 -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 dark:border-slate-700 mb-2.5 gap-1">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 dark:border-slate-700 mb-3 gap-2">
       <div class="flex flex-1">
-        <button id="tabAll" onclick="switchTab('all')" class="flex-1 sm:flex-initial sm:px-4 py-1 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 transition text-xs sm:text-sm">All</button>
-        <button id="tabToday" onclick="switchTab('today')" class="flex-1 sm:flex-initial sm:px-4 py-1 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-xs sm:text-sm">Today</button>
-        <button id="tabRoutine" onclick="switchTab('routine')" class="flex-1 sm:flex-initial sm:px-4 py-1 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-xs sm:text-sm">Routine 🔄</button>
+        <button id="tabAll" onclick="switchTab('all')" class="flex-1 sm:flex-initial sm:px-5 py-1.5 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 transition text-xs sm:text-base">All</button>
+        <button id="tabToday" onclick="switchTab('today')" class="flex-1 sm:flex-initial sm:px-5 py-1.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-xs sm:text-base">Today</button>
+        <button id="tabRoutine" onclick="switchTab('routine')" class="flex-1 sm:flex-initial sm:px-5 py-1.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-xs sm:text-base">Routine 🔄</button>
       </div>
 
-      <div class="flex items-center justify-between sm:justify-end gap-1.5 pb-1 sm:pb-0">
-        <button id="hideCompletedBtn" onclick="toggleHideCompleted()" class="text-[11px] text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 px-2 py-0.5 rounded font-medium transition">
+      <div class="flex items-center justify-between sm:justify-end gap-2 pb-1.5 sm:pb-0">
+        <button id="hideCompletedBtn" onclick="toggleHideCompleted()" class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 px-2.5 py-1 rounded font-medium transition">
           완료 숨기기
         </button>
 
-        <div id="sortContainer" class="flex items-center gap-1">
-          <span class="text-[11px] text-slate-400">정렬:</span>
-          <select id="sortInput" onchange="changeSortOrder(this.value)" class="text-[11px] bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-1 py-0.5 text-slate-600 dark:text-slate-200 font-medium focus:outline-none">
+        <div id="sortContainer" class="flex items-center gap-1.5">
+          <span class="text-xs sm:text-sm text-slate-400">정렬:</span>
+          <select id="sortInput" onchange="changeSortOrder(this.value)" class="text-xs sm:text-sm bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 text-slate-600 dark:text-slate-200 font-medium focus:outline-none">
             <option value="createdAt">최신순</option>
             <option value="dueDate">마감순</option>
           </select>
@@ -267,62 +267,62 @@
 
     <!-- 할 일 / 루틴 목록 렌더링 영역 -->
     <div id="todoContainer">
-      <ul id="todoList" class="space-y-1.5"></ul>
+      <ul id="todoList" class="space-y-2"></ul>
     </div>
   </div>
 
   <!-- 모바일 전용 통합 하단 고정 바 -->
-  <div id="mobileAddTodoContainer" class="block sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-2xl p-2 z-40">
-    <form id="todoFormMobile" onsubmit="addUnifiedItem(event, 'mobile')" class="space-y-1.5">
+  <div id="mobileAddTodoContainer" class="block sm:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-2xl p-2.5 z-40">
+    <form id="todoFormMobile" onsubmit="addUnifiedItem(event, 'mobile')" class="space-y-2">
       <!-- 접힘/펼침 세부 옵션 -->
-      <div id="mobileMoreOptions" class="hidden space-y-1.5 pt-0.5 border-b border-slate-100 dark:border-slate-700 pb-1.5">
-        <div id="mobileQuickChipsContainer" class="flex items-center gap-1 overflow-x-auto pb-0.5 text-[10px]">
+      <div id="mobileMoreOptions" class="hidden space-y-2 pt-1 border-b border-slate-100 dark:border-slate-700 pb-2">
+        <div id="mobileQuickChipsContainer" class="flex items-center gap-1 overflow-x-auto pb-1 text-xs">
           <span class="text-slate-400 flex-shrink-0 font-medium">빠른 마감:</span>
-          <button type="button" id="btnMobile_today11" onclick="setQuickTime('today11', 'mobile')" class="quick-chip-mobile px-1.5 py-0.5 rounded-full font-medium text-[10px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">오늘 11시</button>
-          <button type="button" id="btnMobile_today17" onclick="setQuickTime('today17', 'mobile')" class="quick-chip-mobile px-1.5 py-0.5 rounded-full font-medium text-[10px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">오늘 17시</button>
-          <button type="button" id="btnMobile_tomorrow11" onclick="setQuickTime('tomorrow11', 'mobile')" class="quick-chip-mobile px-1.5 py-0.5 rounded-full font-medium text-[10px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">내일 11시</button>
-          <button type="button" id="btnMobile_tomorrow17" onclick="setQuickTime('tomorrow17', 'mobile')" class="quick-chip-mobile px-1.5 py-0.5 rounded-full font-medium text-[10px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">내일 17시</button>
-          <button type="button" id="btnMobile_1h" onclick="setQuickTime('1h', 'mobile')" class="quick-chip-mobile px-1.5 py-0.5 rounded-full font-medium text-[10px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">+1시간</button>
+          <button type="button" id="btnMobile_today11" onclick="setQuickTime('today11', 'mobile')" class="quick-chip-mobile px-2 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">오늘 11시</button>
+          <button type="button" id="btnMobile_today17" onclick="setQuickTime('today17', 'mobile')" class="quick-chip-mobile px-2 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">오늘 17시</button>
+          <button type="button" id="btnMobile_tomorrow11" onclick="setQuickTime('tomorrow11', 'mobile')" class="quick-chip-mobile px-2 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">내일 11시</button>
+          <button type="button" id="btnMobile_tomorrow17" onclick="setQuickTime('tomorrow17', 'mobile')" class="quick-chip-mobile px-2 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">내일 17시</button>
+          <button type="button" id="btnMobile_1h" onclick="setQuickTime('1h', 'mobile')" class="quick-chip-mobile px-2 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">+1시간</button>
         </div>
 
-        <div class="flex flex-wrap items-center gap-1">
-          <select id="categoryInputMobile" onchange="handleCategoryChange(this.value, 'mobile')" class="px-1.5 py-1 border border-slate-200 dark:border-slate-700 rounded text-[11px] bg-slate-50 dark:bg-slate-700 font-bold text-indigo-600 dark:text-indigo-400">
+        <div class="flex flex-wrap items-center gap-1.5">
+          <select id="categoryInputMobile" onchange="handleCategoryChange(this.value, 'mobile')" class="px-2 py-1.5 border border-slate-200 dark:border-slate-700 rounded text-xs bg-slate-50 dark:bg-slate-700 font-bold text-indigo-600 dark:text-indigo-400">
             <option value="업무">업무</option>
             <option value="개인">개인</option>
             <option value="기타">기타</option>
             <option value="routine">🔄 루틴 (반복)</option>
           </select>
 
-          <input type="datetime-local" id="timeInputMobile" step="600" class="flex-1 px-2 py-1 border border-slate-200 dark:border-slate-700 rounded text-[11px] bg-slate-50 dark:bg-slate-700">
+          <input type="datetime-local" id="timeInputMobile" step="600" class="flex-1 px-2.5 py-1.5 border border-slate-200 dark:border-slate-700 rounded text-xs bg-slate-50 dark:bg-slate-700">
 
-          <div id="mobileRoutineOptions" class="hidden flex items-center gap-1 flex-1">
-            <select id="mobileRoutineFreq" onchange="handleRoutineFreqChange(this.value, 'mobile')" class="px-1.5 py-1 text-[11px] border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-700">
+          <div id="mobileRoutineOptions" class="hidden flex items-center gap-1.5 flex-1">
+            <select id="mobileRoutineFreq" onchange="handleRoutineFreqChange(this.value, 'mobile')" class="px-2 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-700">
               <option value="매일">매일</option>
               <option value="매주">매주</option>
               <option value="매월">매월</option>
             </select>
-            <select id="mobileRoutineDay" class="hidden px-1.5 py-1 text-[11px] border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-700">
+            <select id="mobileRoutineDay" class="hidden px-2 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-700">
               <option value="all">전체 요일</option>
               <option value="1">월</option><option value="2">화</option><option value="3">수</option><option value="4">목</option><option value="5">금</option><option value="6">토</option><option value="0">일</option>
             </select>
-            <select id="mobileRoutineMonth" class="hidden px-1.5 py-1 text-[11px] border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-700">
+            <select id="mobileRoutineMonth" class="hidden px-2 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-700">
               <!-- 1 ~ 31 -->
             </select>
-            <input type="time" id="mobileRoutineTime" step="600" class="px-1 py-1 text-[11px] border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-700">
+            <input type="time" id="mobileRoutineTime" step="600" class="px-2 py-1.5 text-xs border border-slate-200 dark:border-slate-700 rounded bg-slate-50 dark:bg-slate-700">
           </div>
         </div>
       </div>
 
       <!-- 메인 한 줄 입력부 -->
-      <div class="flex items-center gap-1">
+      <div class="flex items-center gap-1.5">
         <input type="text" id="taskInputMobile" placeholder="할 일 또는 루틴 입력..." required onfocus="toggleMobileOptions(true)" oninput="handleNaturalLanguageInput('mobile')"
-               class="flex-1 px-2.5 py-1.5 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700">
+               class="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700">
         
-        <button type="button" onclick="toggleMobileOptions()" class="p-1.5 text-slate-400 hover:text-slate-600 text-xs font-semibold rounded border border-slate-200 dark:border-slate-700">
+        <button type="button" onclick="toggleMobileOptions()" class="p-2 text-slate-400 hover:text-slate-600 text-xs font-semibold rounded border border-slate-200 dark:border-slate-700">
           ⚙️
         </button>
 
-        <button type="submit" class="bg-indigo-600 text-white font-semibold px-3 py-1.5 rounded-lg text-xs shadow-2xs touch-target flex-shrink-0">
+        <button type="submit" class="bg-indigo-600 text-white font-semibold px-3.5 py-2 rounded-lg text-xs sm:text-sm shadow-2xs touch-target flex-shrink-0">
           등록
         </button>
       </div>
@@ -428,8 +428,6 @@
           } else if (isAm && hours === 12) {
             hours = 0;
           } else if (!isAm && !isPm && hours < 8 && hours !== 0) {
-            // 오전/오후가 명시되지 않고 1~7 사이라면 기본적으로 오후로 센스있게 해석 (원하면 24시간제 유지)
-            // 예: "3시 회의" -> 오후 3시(15시)로 해석하는 것이 자연스러움
             hours += 12;
           }
 
@@ -483,13 +481,13 @@
       const registerForm = document.getElementById('registerForm');
 
       if (tab === 'login') {
-        tabLogin.className = "flex-1 py-1.5 text-center font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 text-xs sm:text-sm";
-        tabRegister.className = "flex-1 py-1.5 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-xs sm:text-sm";
+        tabLogin.className = "flex-1 py-2 text-center font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 text-xs sm:text-base";
+        tabRegister.className = "flex-1 py-2 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-xs sm:text-base";
         loginForm.classList.remove('hidden');
         registerForm.classList.add('hidden');
       } else {
-        tabRegister.className = "flex-1 py-1.5 text-center font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 text-xs sm:text-sm";
-        tabLogin.className = "flex-1 py-1.5 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-xs sm:text-sm";
+        tabRegister.className = "flex-1 py-2 text-center font-semibold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 text-xs sm:text-base";
+        tabLogin.className = "flex-1 py-2 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-xs sm:text-base";
         registerForm.classList.remove('hidden');
         loginForm.classList.add('hidden');
       }
@@ -637,11 +635,11 @@
 
       listElem.innerHTML = keys.map(uname => `
         <tr>
-          <td class="p-1.5 font-semibold text-slate-800 dark:text-slate-100">${uname}</td>
-          <td class="p-1.5 font-mono text-[11px] text-indigo-600 dark:text-indigo-400">${userMap[uname]}</td>
-          <td class="p-1.5 text-right space-x-1">
-            <button onclick="adminEditUser('${uname}', '${userMap[uname]}')" class="text-[11px] bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-2 py-0.5 rounded">수정</button>
-            <button onclick="adminDeleteUser('${uname}')" class="text-[11px] bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-300 px-2 py-0.5 rounded">삭제</button>
+          <td class="p-2 font-semibold text-slate-800 dark:text-slate-100">${uname}</td>
+          <td class="p-2 font-mono text-xs sm:text-sm text-indigo-600 dark:text-indigo-400">${userMap[uname]}</td>
+          <td class="p-2 text-right space-x-1.5">
+            <button onclick="adminEditUser('${uname}', '${userMap[uname]}')" class="text-xs sm:text-sm bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-2.5 py-1 rounded">수정</button>
+            <button onclick="adminDeleteUser('${uname}')" class="text-xs sm:text-sm bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-300 px-2.5 py-1 rounded">삭제</button>
           </td>
         </tr>
       `).join('');
@@ -716,19 +714,19 @@
       if (!btn) return;
 
       if (!('Notification' in window)) {
-        btn.className = "text-[11px] px-2 py-0.5 rounded-full font-medium bg-slate-100 text-slate-400";
+        btn.className = "text-xs sm:text-sm px-2.5 py-1 rounded-full font-medium bg-slate-100 text-slate-400";
         btn.innerText = "알림 미지원";
         return;
       }
 
       if (Notification.permission === 'granted') {
-        btn.className = "text-[11px] px-2 py-0.5 rounded-full font-medium bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800";
+        btn.className = "text-xs sm:text-sm px-2.5 py-1 rounded-full font-medium bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800";
         btn.innerText = "알림 켜짐";
       } else if (Notification.permission === 'denied') {
-        btn.className = "text-[11px] px-2 py-0.5 rounded-full font-medium bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800";
+        btn.className = "text-xs sm:text-sm px-2.5 py-1 rounded-full font-medium bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800";
         btn.innerText = "알림 차단됨";
       } else {
-        btn.className = "text-[11px] px-2 py-0.5 rounded-full font-medium bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 animate-pulse";
+        btn.className = "text-xs sm:text-sm px-2.5 py-1 rounded-full font-medium bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 animate-pulse";
         btn.innerText = "알림 설정 필요";
       }
     }
@@ -922,15 +920,15 @@
 
       document.querySelectorAll(classGroup).forEach(btn => {
         btn.className = mode === 'pc' 
-          ? "quick-chip-pc px-2 py-0.5 rounded-full font-medium text-[11px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100"
-          : "quick-chip-mobile px-1.5 py-0.5 rounded-full font-medium text-[10px] flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100";
+          ? "quick-chip-pc px-2.5 py-1 rounded-full font-medium text-xs sm:text-sm flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100"
+          : "quick-chip-mobile px-2 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100";
       });
 
       const activeBtn = document.getElementById(prefix + activeKey);
       if (activeBtn) {
         activeBtn.className = mode === 'pc'
-          ? "quick-chip-pc px-2 py-0.5 rounded-full font-bold text-[11px] flex-shrink-0 transition bg-indigo-600 text-white shadow-2xs border border-indigo-600"
-          : "quick-chip-mobile px-1.5 py-0.5 rounded-full font-bold text-[10px] flex-shrink-0 transition bg-indigo-600 text-white shadow-2xs border border-indigo-600";
+          ? "quick-chip-pc px-2.5 py-1 rounded-full font-bold text-xs sm:text-sm flex-shrink-0 transition bg-indigo-600 text-white shadow-2xs border border-indigo-600"
+          : "quick-chip-mobile px-2 py-1 rounded-full font-bold text-xs flex-shrink-0 transition bg-indigo-600 text-white shadow-2xs border border-indigo-600";
       }
     }
 
@@ -1031,13 +1029,13 @@
       const diffDays = Math.ceil((targetDay - now) / (1000 * 60 * 60 * 24));
 
       if (new Date() > target && diffDays <= 0) {
-        return `<span class="text-[9px] font-bold bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800 px-1 py-0.2 rounded animate-pulse">기한 초과</span>`;
+        return `<span class="text-[10px] sm:text-xs font-bold bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800 px-1.5 py-0.5 rounded animate-pulse">기한 초과</span>`;
       } else if (diffDays === 0) {
-        return `<span class="text-[9px] font-bold bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800 px-1 py-0.2 rounded">D-Day</span>`;
+        return `<span class="text-[10px] sm:text-xs font-bold bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800 px-1.5 py-0.5 rounded">D-Day</span>`;
       } else if (diffDays > 0) {
-        return `<span class="text-[9px] font-semibold bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800 px-1 py-0.2 rounded">D-${diffDays}</span>`;
+        return `<span class="text-[10px] sm:text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800 px-1.5 py-0.5 rounded">D-${diffDays}</span>`;
       } else {
-        return `<span class="text-[9px] font-bold bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800 px-1 py-0.2 rounded">기한 초과</span>`;
+        return `<span class="text-[10px] sm:text-xs font-bold bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800 px-1.5 py-0.5 rounded">기한 초과</span>`;
       }
     }
 
@@ -1047,7 +1045,7 @@
       if (savedAccounts.length > 0) {
         container.classList.remove('hidden');
         listElem.innerHTML = savedAccounts.map(acc => `
-          <button type="button" onclick="fillUsername('${acc}')" class="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded text-[11px] font-medium transition touch-target">
+          <button type="button" onclick="fillUsername('${acc}')" class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded text-xs sm:text-sm font-medium transition touch-target">
             ${acc}
           </button>
         `).join('');
@@ -1096,10 +1094,10 @@
       hideCompleted = !hideCompleted;
       const btn = document.getElementById('hideCompletedBtn');
       if (hideCompleted) {
-        btn.className = "text-[11px] text-white bg-indigo-600 hover:bg-indigo-700 px-2 py-0.5 rounded font-medium transition";
+        btn.className = "text-xs sm:text-sm text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded font-medium transition";
         btn.innerHTML = "완료 숨김 적용 중";
       } else {
-        btn.className = "text-[11px] text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 px-2 py-0.5 rounded font-medium transition";
+        btn.className = "text-xs sm:text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 px-2.5 py-1 rounded font-medium transition";
         btn.innerHTML = "완료 숨기기";
       }
       render();
@@ -1362,8 +1360,8 @@
       const tabRoutine = document.getElementById('tabRoutine');
       const sortContainer = document.getElementById('sortContainer');
 
-      const activeClass = "flex-1 sm:flex-initial sm:px-4 py-1 text-center font-bold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 transition text-xs sm:text-sm";
-      const inactiveClass = "flex-1 sm:flex-initial sm:px-4 py-1 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-xs sm:text-sm";
+      const activeClass = "flex-1 sm:flex-initial sm:px-5 py-1.5 text-center font-bold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 transition text-xs sm:text-base";
+      const inactiveClass = "flex-1 sm:flex-initial sm:px-5 py-1.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-xs sm:text-base";
 
       tabAll.className = tab === 'all' ? activeClass : inactiveClass;
       tabToday.className = tab === 'today' ? activeClass : inactiveClass;
@@ -1399,102 +1397,102 @@
       else filteredTodos.sort((a, b) => b.id - a.id);
 
       if (filteredTodos.length === 0) {
-        container.innerHTML = `<ul class="space-y-1.5"><li class="text-center py-6 text-slate-400 text-xs">등록된 할 일이 없습니다.</li></ul>`;
+        container.innerHTML = `<ul class="space-y-2"><li class="text-center py-8 text-slate-400 text-xs sm:text-base">등록된 할 일이 없습니다.</li></ul>`;
         return;
       }
 
-      container.innerHTML = `<ul class="space-y-1.5">${filteredTodos.map(t => {
+      container.innerHTML = `<ul class="space-y-2.5">${filteredTodos.map(t => {
         const hasSub = t.subitems && t.subitems.length > 0;
         const totalSub = hasSub ? t.subitems.length : 0;
         const compSub = hasSub ? t.subitems.filter(s => s.completed).length : 0;
         const prog = hasSub ? Math.round((compSub / totalSub) * 100) : 0;
 
         return `
-          <li class="bg-slate-50 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-lg p-2 sm:p-2.5 shadow-2xs transition ${t.completed ? 'opacity-60 bg-slate-100/50 dark:bg-slate-900/40' : ''}">
+          <li class="bg-slate-50 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-3 sm:p-4 shadow-2xs transition ${t.completed ? 'opacity-60 bg-slate-100/50 dark:bg-slate-900/40' : ''}">
             ${t.isEditing ? `
-              <div class="space-y-1.5 bg-white dark:bg-slate-800 p-2 rounded-lg border border-indigo-200 dark:border-indigo-800">
-                <input type="text" id="editTask_${t.id}" value="${t.task}" class="w-full px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
-                <div class="flex flex-wrap items-center gap-1">
-                  <select id="editCategory_${t.id}" class="px-1.5 py-0.5 text-xs border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 font-medium">
+              <div class="space-y-2 bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                <input type="text" id="editTask_${t.id}" value="${t.task}" class="w-full px-2.5 py-1.5 text-xs sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <select id="editCategory_${t.id}" class="px-2 py-1 text-xs sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 font-medium">
                     <option value="업무" ${t.category === '업무' ? 'selected' : ''}>업무</option>
                     <option value="개인" ${t.category === '개인' ? 'selected' : ''}>개인</option>
                     <option value="기타" ${t.category === '기타' ? 'selected' : ''}>기타</option>
                   </select>
-                  ${!hasSub ? `<input type="datetime-local" id="editDue_${t.id}" step="600" value="${t.due || ''}" class="flex-1 px-1.5 py-0.5 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">` : `<span class="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">그룹 할 일</span>`}
-                  <button onclick="saveEditMain(${t.id})" class="px-2 py-0.5 bg-indigo-600 text-white text-xs rounded">저장</button>
-                  <button onclick="toggleEditMain(${t.id})" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded">취소</button>
+                  ${!hasSub ? `<input type="datetime-local" id="editDue_${t.id}" step="600" value="${t.due || ''}" class="flex-1 px-2 py-1 text-xs sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">` : `<span class="text-xs sm:text-sm text-indigo-600 dark:text-indigo-400 font-medium">그룹 할 일</span>`}
+                  <button onclick="saveEditMain(${t.id})" class="px-3 py-1 bg-indigo-600 text-white text-xs sm:text-base rounded">저장</button>
+                  <button onclick="toggleEditMain(${t.id})" class="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs sm:text-base rounded">취소</button>
                 </div>
               </div>
             ` : `
-              <div class="flex items-start justify-between gap-1.5">
-                <div class="flex items-start gap-1.5 flex-1">
-                  <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleComplete(${t.id})" class="w-3.5 h-3.5 accent-indigo-600 rounded mt-0.5 cursor-pointer">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-start gap-2.5 flex-1">
+                  <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleComplete(${t.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded mt-0.5 cursor-pointer">
                   <div class="flex-1">
-                    <div class="flex items-center gap-1 flex-wrap">
-                      <span class="font-semibold ${t.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100'} text-xs">${t.task}</span>
-                      <span class="text-[9px] bg-slate-200 dark:bg-slate-700 px-1 py-0.2 rounded text-slate-600 dark:text-slate-300 font-medium">${t.category}</span>
-                      ${hasSub ? `<span class="text-[9px] font-semibold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-1 py-0.2 rounded">그룹</span>` : ''}
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="font-semibold ${t.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100'} text-xs sm:text-base">${t.task}</span>
+                      <span class="text-[10px] sm:text-xs bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${t.category}</span>
+                      ${hasSub ? `<span class="text-[10px] sm:text-xs font-semibold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.5 rounded">그룹</span>` : ''}
                       ${!t.completed && t.due ? getDDayTag(t.due) : ''}
                     </div>
-                    <div class="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400">
-                      ${hasSub ? `<div class="flex items-center gap-1 mt-0.5"><span class="font-medium text-indigo-600 dark:text-indigo-400">완료율 ${prog}% (${compSub}/${totalSub})</span>
-                        <div class="w-16 bg-slate-200 dark:bg-slate-700 rounded-full h-1 overflow-hidden"><div class="bg-indigo-600 dark:bg-indigo-400 h-1" style="width: ${prog}%"></div></div></div>` 
+                    <div class="mt-1 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                      ${hasSub ? `<div class="flex items-center gap-2 mt-1"><span class="font-medium text-indigo-600 dark:text-indigo-400">완료율 ${prog}% (${compSub}/${totalSub})</span>
+                        <div class="w-20 sm:w-28 bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden"><div class="bg-indigo-600 dark:bg-indigo-400 h-1.5" style="width: ${prog}%"></div></div></div>` 
                       : `${t.due ? `<span>⏰ ${new Date(t.due).toLocaleString('ko-KR', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}</span>` : '<span class="text-slate-400">마감 없음</span>'}`}
                     </div>
                   </div>
                 </div>
-                <div class="flex items-center gap-0.5">
-                  <button onclick="addToGoogleCalendar('${t.task.replace(/'/g, "\\'")}', '${t.category}', '${t.due || ''}')" title="구글 캘린더에 추가" class="text-[10px] bg-blue-50 dark:bg-blue-950 hover:bg-blue-100 text-blue-600 dark:text-blue-300 px-1.5 py-0.5 rounded font-medium">캘린더</button>
-                  <button onclick="toggleEditMain(${t.id})" class="text-[10px] bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded">수정</button>
-                  <button onclick="toggleAddSubForm(${t.id})" class="text-[10px] bg-indigo-50 dark:bg-indigo-950 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-300 px-1.5 py-0.5 rounded font-medium">+하위</button>
-                  <button onclick="deleteTodo(${t.id})" class="text-slate-400 hover:text-rose-500 px-1 py-0.5 text-[10px] font-bold">✕</button>
+                <div class="flex items-center gap-1">
+                  <button onclick="addToGoogleCalendar('${t.task.replace(/'/g, "\\'")}', '${t.category}', '${t.due || ''}')" title="구글 캘린더에 추가" class="text-xs sm:text-sm bg-blue-50 dark:bg-blue-950 hover:bg-blue-100 text-blue-600 dark:text-blue-300 px-2.5 py-1 rounded font-medium">캘린더</button>
+                  <button onclick="toggleEditMain(${t.id})" class="text-xs sm:text-sm bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded">수정</button>
+                  <button onclick="toggleAddSubForm(${t.id})" class="text-xs sm:text-sm bg-indigo-50 dark:bg-indigo-950 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-300 px-2.5 py-1 rounded font-medium">+하위</button>
+                  <button onclick="deleteTodo(${t.id})" class="text-slate-400 hover:text-rose-500 px-1.5 py-1 text-xs sm:text-sm font-bold">✕</button>
                 </div>
               </div>
             `}
 
             ${t.isAddingSub ? `
-              <div class="mt-1.5 sm:ml-4 p-1.5 bg-indigo-50/60 dark:bg-indigo-950/40 rounded border border-indigo-100 dark:border-indigo-900 space-y-1">
-                <div id="subChipGroup_${t.id}" class="flex items-center gap-1 overflow-x-auto pb-0.5 text-[10px]">
+              <div class="mt-2.5 sm:ml-6 p-2.5 bg-indigo-50/60 dark:bg-indigo-950/40 rounded-lg border border-indigo-100 dark:border-indigo-900 space-y-2">
+                <div id="subChipGroup_${t.id}" class="flex items-center gap-1 overflow-x-auto pb-1 text-xs">
                   <span class="text-slate-400 flex-shrink-0 font-medium">빠른 마감:</span>
-                  <button type="button" id="btnSub_${t.id}_today11" onclick="setQuickTime('today11', 'pc', 'subDueInput_${t.id}')" class="px-1 py-0.2 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">오늘 11시</button>
-                  <button type="button" id="btnSub_${t.id}_today17" onclick="setQuickTime('today17', 'pc', 'subDueInput_${t.id}')" class="px-1 py-0.2 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">오늘 17시</button>
-                  <button type="button" id="btnSub_${t.id}_tomorrow11" onclick="setQuickTime('tomorrow11', 'pc', 'subDueInput_${t.id}')" class="px-1 py-0.2 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">내일 11시</button>
-                  <button type="button" id="btnSub_${t.id}_tomorrow17" onclick="setQuickTime('tomorrow17', 'pc', 'subDueInput_${t.id}')" class="px-1 py-0.2 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">내일 17시</button>
-                  <button type="button" id="btnSub_${t.id}_1h" onclick="setQuickTime('1h', 'pc', 'subDueInput_${t.id}')" class="px-1 py-0.2 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">+1시간</button>
+                  <button type="button" id="btnSub_${t.id}_today11" onclick="setQuickTime('today11', 'pc', 'subDueInput_${t.id}')" class="px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">오늘 11시</button>
+                  <button type="button" id="btnSub_${t.id}_today17" onclick="setQuickTime('today17', 'pc', 'subDueInput_${t.id}')" class="px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">오늘 17시</button>
+                  <button type="button" id="btnSub_${t.id}_tomorrow11" onclick="setQuickTime('tomorrow11', 'pc', 'subDueInput_${t.id}')" class="px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">내일 11시</button>
+                  <button type="button" id="btnSub_${t.id}_tomorrow17" onclick="setQuickTime('tomorrow17', 'pc', 'subDueInput_${t.id}')" class="px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">내일 17시</button>
+                  <button type="button" id="btnSub_${t.id}_1h" onclick="setQuickTime('1h', 'pc', 'subDueInput_${t.id}')" class="px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 flex-shrink-0">+1시간</button>
                 </div>
                 <input type="text" id="subTaskInput_${t.id}" placeholder="하위 할 일 내용" onkeydown="if(event.key==='Enter') saveInlineSubitem(${t.id})"
-                       class="w-full px-2 py-1 text-xs border border-indigo-200 dark:border-indigo-800 rounded bg-white dark:bg-slate-800">
-                <div class="flex gap-1">
-                  <input type="datetime-local" id="subDueInput_${t.id}" step="600" class="flex-1 px-1.5 py-0.5 text-xs border border-indigo-200 dark:border-indigo-800 rounded bg-white dark:bg-slate-800">
-                  <button onclick="saveInlineSubitem(${t.id})" class="px-2 py-0.5 bg-indigo-600 text-white text-xs rounded">추가</button>
-                  <button onclick="toggleAddSubForm(${t.id})" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded">취소</button>
+                       class="w-full px-3 py-1.5 text-xs sm:text-base border border-indigo-200 dark:border-indigo-800 rounded bg-white dark:bg-slate-800">
+                <div class="flex gap-1.5">
+                  <input type="datetime-local" id="subDueInput_${t.id}" step="600" class="flex-1 px-2.5 py-1 text-xs sm:text-base border border-indigo-200 dark:border-indigo-800 rounded bg-white dark:bg-slate-800">
+                  <button onclick="saveInlineSubitem(${t.id})" class="px-3 py-1 bg-indigo-600 text-white text-xs sm:text-base rounded">추가</button>
+                  <button onclick="toggleAddSubForm(${t.id})" class="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs sm:text-base rounded">취소</button>
                 </div>
               </div>
             ` : ''}
 
             ${hasSub ? `
-              <ul class="mt-1.5 pl-2 sm:pl-4 border-l-2 border-indigo-100 dark:border-indigo-900 space-y-0.5">
+              <ul class="mt-2.5 pl-3 sm:pl-6 border-l-2 border-indigo-100 dark:border-indigo-900 space-y-1.5">
                 ${t.subitems.map(s => `
-                  <li class="py-0.5">
+                  <li class="py-1">
                     ${s.isEditing ? `
-                      <div class="flex items-center gap-1 bg-white dark:bg-slate-800 p-1 rounded border border-indigo-200 dark:border-indigo-800">
-                        <input type="text" id="editSubTask_${s.id}" value="${s.task}" class="flex-1 px-1.5 py-0.5 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
-                        <input type="datetime-local" id="editSubDue_${s.id}" step="600" value="${s.due || ''}" class="px-1.5 py-0.5 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
-                        <button onclick="saveEditSub(${t.id}, ${s.id})" class="px-1.5 py-0.5 bg-indigo-600 text-white text-xs rounded">저장</button>
-                        <button onclick="toggleEditSub(${t.id}, ${s.id})" class="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded">취소</button>
+                      <div class="flex items-center gap-1.5 bg-white dark:bg-slate-800 p-1.5 rounded border border-indigo-200 dark:border-indigo-800">
+                        <input type="text" id="editSubTask_${s.id}" value="${s.task}" class="flex-1 px-2 py-1 text-xs sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                        <input type="datetime-local" id="editSubDue_${s.id}" step="600" value="${s.due || ''}" class="px-2 py-1 text-xs sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                        <button onclick="saveEditSub(${t.id}, ${s.id})" class="px-2.5 py-1 bg-indigo-600 text-white text-xs sm:text-base rounded">저장</button>
+                        <button onclick="toggleEditSub(${t.id}, ${s.id})" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs sm:text-base rounded">취소</button>
                       </div>
                     ` : `
-                      <div class="flex items-center justify-between text-xs">
-                        <div class="flex items-center gap-1.5">
-                          <input type="checkbox" ${s.completed ? 'checked' : ''} onchange="toggleSubitem(${t.id}, ${s.id})" class="w-3.5 h-3.5 accent-indigo-600 rounded cursor-pointer">
+                      <div class="flex items-center justify-between text-xs sm:text-base">
+                        <div class="flex items-center gap-2">
+                          <input type="checkbox" ${s.completed ? 'checked' : ''} onchange="toggleSubitem(${t.id}, ${s.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer">
                           <span class="${s.completed ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-200'}">${s.task}</span>
                           ${!s.completed && s.due ? getDDayTag(s.due) : ''}
-                          ${s.due ? `<span class="text-[9px] text-slate-400">⏰ ${new Date(s.due).toLocaleString('ko-KR', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}</span>` : ''}
+                          ${s.due ? `<span class="text-[10px] sm:text-xs text-slate-400">⏰ ${new Date(s.due).toLocaleString('ko-KR', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}</span>` : ''}
                         </div>
-                        <div class="flex items-center gap-0.5">
-                          <button onclick="addToGoogleCalendar('${s.task.replace(/'/g, "\\'")}', '하위할일', '${s.due || ''}')" title="구글 캘린더에 추가" class="text-[10px] text-blue-500 hover:text-blue-700 p-0.5">캘린더</button>
-                          <button onclick="toggleEditSub(${t.id}, ${s.id})" class="text-[10px] text-slate-400 hover:text-slate-600 p-0.5">수정</button>
-                          <button onclick="deleteSubitem(${t.id}, ${s.id})" class="text-[10px] text-slate-300 hover:text-rose-500 p-0.5 font-bold">✕</button>
+                        <div class="flex items-center gap-1">
+                          <button onclick="addToGoogleCalendar('${s.task.replace(/'/g, "\\'")}', '하위할일', '${s.due || ''}')" title="구글 캘린더에 추가" class="text-xs sm:text-sm text-blue-500 hover:text-blue-700 p-1">캘린더</button>
+                          <button onclick="toggleEditSub(${t.id}, ${s.id})" class="text-xs sm:text-sm text-slate-400 hover:text-slate-600 p-1">수정</button>
+                          <button onclick="deleteSubitem(${t.id}, ${s.id})" class="text-xs sm:text-sm text-slate-300 hover:text-rose-500 p-1 font-bold">✕</button>
                         </div>
                       </div>
                     `}
@@ -1568,20 +1566,20 @@
 
       if (todayItems.length === 0) {
         container.innerHTML = `
-          <div class="text-center py-8 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 rounded-lg">
-            <p class="text-slate-400 text-xs">오늘 예정된 일정 및 루틴이 없습니다.</p>
+          <div class="text-center py-10 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 rounded-xl">
+            <p class="text-slate-400 text-xs sm:text-base">오늘 예정된 일정 및 루틴이 없습니다.</p>
           </div>
         `;
         return;
       }
 
-      let html = `<div class="space-y-1.5">`;
+      let html = `<div class="space-y-2">`;
 
       if (noTimeItems.length > 0) {
         html += `
-          <div class="bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900 rounded-lg p-2">
-            <h3 class="text-xs font-bold text-indigo-700 dark:text-indigo-300 mb-1">오늘 시간 미지정</h3>
-            <div class="space-y-1 pl-1">
+          <div class="bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900 rounded-xl p-3">
+            <h3 class="text-xs sm:text-base font-bold text-indigo-700 dark:text-indigo-300 mb-1.5">오늘 시간 미지정</h3>
+            <div class="space-y-1.5 pl-1">
               ${noTimeItems.map(item => renderTimelineItemHtml(item)).join('')}
             </div>
           </div>
@@ -1596,13 +1594,13 @@
           const hourLabel = `${String(h).padStart(2, '0')}:00`;
 
           html += `
-            <div class="flex items-start gap-1.5 p-1.5 rounded-lg border transition ${isCurrentHour ? 'bg-blue-50/60 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700 ring-1 ring-blue-200 dark:ring-blue-800' : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/70 dark:border-slate-700/70'}">
-              <div class="w-11 text-xs font-bold ${isCurrentHour ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'} flex flex-col items-start pt-0.5">
+            <div class="flex items-start gap-2 p-2.5 rounded-xl border transition ${isCurrentHour ? 'bg-blue-50/60 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700 ring-1 ring-blue-200 dark:ring-blue-800' : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/70 dark:border-slate-700/70'}">
+              <div class="w-14 sm:w-16 text-xs sm:text-base font-bold ${isCurrentHour ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'} flex flex-col items-start pt-1">
                 <span>${hourLabel}</span>
-                ${isCurrentHour ? `<span class="text-[8px] bg-blue-600 text-white px-1 rounded mt-0.5">LIVE</span>` : ''}
+                ${isCurrentHour ? `<span class="text-[9px] sm:text-xs bg-blue-600 text-white px-1.5 py-0.5 rounded mt-0.5">LIVE</span>` : ''}
               </div>
-              <div class="flex-1 min-h-[22px] space-y-1">
-                ${items.length > 0 ? items.map(item => renderTimelineItemHtml(item)).join('') : `<span class="text-[11px] text-slate-300 dark:text-slate-600 italic">현재 시각 (일정 없음)</span>`}
+              <div class="flex-1 min-h-[26px] space-y-1.5">
+                ${items.length > 0 ? items.map(item => renderTimelineItemHtml(item)).join('') : `<span class="text-xs sm:text-sm text-slate-300 dark:text-slate-600 italic">현재 시각 (일정 없음)</span>`}
               </div>
             </div>
           `;
@@ -1618,48 +1616,48 @@
 
       if (item.isRoutine) {
         return `
-          <div class="flex items-center justify-between text-xs bg-emerald-50/60 dark:bg-emerald-950/30 p-1.5 rounded border border-emerald-200 dark:border-emerald-800/60 shadow-2xs">
-            <div class="flex items-center gap-1.5">
-              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleRoutineToday(${item.id})" class="w-3.5 h-3.5 accent-emerald-600 rounded cursor-pointer">
+          <div class="flex items-center justify-between text-xs sm:text-base bg-emerald-50/60 dark:bg-emerald-950/30 p-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800/60 shadow-2xs">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleRoutineToday(${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-emerald-600 rounded cursor-pointer">
               <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100 font-semibold'}">${item.task}</span>
-              <span class="text-[9px] bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-1 py-0.2 rounded font-medium">🔄 ${item.freq}</span>
+              <span class="text-[10px] sm:text-xs bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded font-medium">🔄 ${item.freq}</span>
             </div>
             <div class="flex items-center gap-1">
-              ${dueTimeStr ? `<span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">⏰ ${dueTimeStr}</span>` : ''}
+              ${dueTimeStr ? `<span class="text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400">⏰ ${dueTimeStr}</span>` : ''}
             </div>
           </div>
         `;
       } else if (item.isSub) {
         const tooltipId = `tooltip_sub_${item.id}`;
         return `
-          <div class="flex items-center justify-between text-xs bg-white dark:bg-slate-800 p-1.5 rounded border border-slate-200 dark:border-slate-700 shadow-2xs">
-            <div class="flex items-center gap-1.5">
-              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleSubitem(${item.parentId}, ${item.id})" class="w-3.5 h-3.5 accent-indigo-600 rounded cursor-pointer">
+          <div class="flex items-center justify-between text-xs sm:text-base bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleSubitem(${item.parentId}, ${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer">
               <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-200 font-medium'}">${item.task}</span>
               
               <div id="${tooltipId}" class="relative inline-block has-tooltip cursor-pointer" onclick="toggleSubTooltip(event, '${tooltipId}')">
-                <span class="text-[9px] bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-1 py-0.2 rounded font-semibold border border-indigo-100 dark:border-indigo-800">하위</span>
-                <div class="tooltip-box bg-slate-800 dark:bg-slate-900 text-white text-[10px] px-2 py-1 rounded shadow-lg border border-slate-700">
+                <span class="text-[10px] sm:text-xs bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-1.5 py-0.5 rounded font-semibold border border-indigo-100 dark:border-indigo-800">하위</span>
+                <div class="tooltip-box bg-slate-800 dark:bg-slate-900 text-white text-xs px-2.5 py-1 rounded-lg shadow-lg border border-slate-700">
                   📂 그룹: ${item.parentTask || '상위 그룹'}
                 </div>
               </div>
             </div>
 
             <div class="flex items-center gap-1">
-              ${dueTimeStr ? `<span class="text-[10px] font-semibold text-slate-500 dark:text-slate-400">⏰ ${dueTimeStr}</span>` : ''}
+              ${dueTimeStr ? `<span class="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400">⏰ ${dueTimeStr}</span>` : ''}
             </div>
           </div>
         `;
       } else {
         return `
-          <div class="flex items-center justify-between text-xs bg-white dark:bg-slate-800 p-1.5 rounded border border-slate-200 dark:border-slate-700 shadow-2xs">
-            <div class="flex items-center gap-1.5">
-              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleComplete(${item.id})" class="w-3.5 h-3.5 accent-indigo-600 rounded cursor-pointer">
+          <div class="flex items-center justify-between text-xs sm:text-base bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleComplete(${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer">
               <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100 font-semibold'}">${item.task}</span>
-              <span class="text-[9px] bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-1 py-0.2 rounded font-medium">${item.category}</span>
+              <span class="text-[10px] sm:text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded font-medium">${item.category}</span>
             </div>
             <div class="flex items-center gap-1">
-              ${dueTimeStr ? `<span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">⏰ ${dueTimeStr}</span>` : ''}
+              ${dueTimeStr ? `<span class="text-xs sm:text-sm font-bold text-indigo-600 dark:text-indigo-400">⏰ ${dueTimeStr}</span>` : ''}
             </div>
           </div>
         `;
@@ -1676,14 +1674,14 @@
       ];
 
       container.innerHTML = `
-        <div class="space-y-2">
+        <div class="space-y-2.5">
           ${routines.length === 0 ? `
-            <div class="text-center py-10 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 rounded-lg">
-              <p class="text-slate-500 dark:text-slate-400 text-xs font-medium">등록된 습관/반복 루틴이 없습니다.</p>
-              <p class="text-slate-400 dark:text-slate-500 text-[11px] mt-1">상단 입력창에서 카테고리를 <strong class="text-indigo-600 dark:text-indigo-400">[🔄 루틴]</strong>으로 선택하여 등록하세요.</p>
+            <div class="text-center py-12 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 rounded-xl">
+              <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-base font-medium">등록된 습관/반복 루틴이 없습니다.</p>
+              <p class="text-slate-400 dark:text-slate-500 text-xs sm:text-sm mt-1.5">상단 입력창에서 카테고리를 <strong class="text-indigo-600 dark:text-indigo-400">[🔄 루틴]</strong>으로 선택하여 등록하세요.</p>
             </div>
           ` : `
-            <ul class="space-y-1.5">
+            <ul class="space-y-2">
               ${routines.map(r => {
                 const isDoneToday = r.lastCompletedDate === todayStr;
                 const isDueToday = isRoutineDueToday(r);
@@ -1697,18 +1695,18 @@
                 }
 
                 return `
-                  <li class="bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-lg p-2.5 shadow-2xs ${!isDueToday ? 'opacity-50' : ''}">
+                  <li class="bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl p-3 sm:p-4 shadow-2xs ${!isDueToday ? 'opacity-50' : ''}">
                     ${r.isEditing ? `
-                      <div class="space-y-1.5 bg-white dark:bg-slate-800 p-2 rounded-lg border border-indigo-200 dark:border-indigo-800">
-                        <input type="text" id="editRoutineTask_${r.id}" value="${r.task}" class="w-full px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
-                        <div class="flex flex-wrap items-center gap-1">
-                          <select id="editRoutineFreq_${r.id}" onchange="handleRoutineFreqChange(this.value, '', 'editRoutine')" class="px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700">
+                      <div class="space-y-2 bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                        <input type="text" id="editRoutineTask_${r.id}" value="${r.task}" class="w-full px-2.5 py-1.5 text-xs sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                        <div class="flex flex-wrap items-center gap-1.5">
+                          <select id="editRoutineFreq_${r.id}" onchange="handleRoutineFreqChange(this.value, '', 'editRoutine')" class="px-2.5 py-1.5 text-xs sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700">
                             <option value="매일" ${r.freq === '매일' ? 'selected' : ''}>매일</option>
                             <option value="매주" ${r.freq === '매주' ? 'selected' : ''}>매주</option>
                             <option value="매월" ${r.freq === '매월' ? 'selected' : ''}>매월</option>
                           </select>
                           
-                          <select id="editRoutineDay_${r.id}" class="${r.freq === '매주' ? '' : 'hidden'} px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700">
+                          <select id="editRoutineDay_${r.id}" class="${r.freq === '매주' ? '' : 'hidden'} px-2.5 py-1.5 text-xs sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700">
                             <option value="all" ${r.dayVal === 'all' ? 'selected' : ''}>전체</option>
                             <option value="1" ${r.dayVal === '1' ? 'selected' : ''}>월</option>
                             <option value="2" ${r.dayVal === '2' ? 'selected' : ''}>화</option>
@@ -1719,36 +1717,36 @@
                             <option value="0" ${r.dayVal === '0' ? 'selected' : ''}>일</option>
                           </select>
 
-                          <select id="editRoutineMonth_${r.id}" class="${r.freq === '매월' ? '' : 'hidden'} px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700">
+                          <select id="editRoutineMonth_${r.id}" class="${r.freq === '매월' ? '' : 'hidden'} px-2.5 py-1.5 text-xs sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700">
                             ${Array.from({length: 31}, (_, i) => `<option value="${i + 1}" ${parseInt(r.dayVal) === i + 1 ? 'selected' : ''}>${i + 1}일</option>`).join('')}
                           </select>
 
-                          <input type="time" id="editRoutineTime_${r.id}" step="600" value="${r.dueTime || ''}" class="px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                          <input type="time" id="editRoutineTime_${r.id}" step="600" value="${r.dueTime || ''}" class="px-2.5 py-1.5 text-xs sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
 
-                          <button onclick="saveEditRoutine(${r.id})" class="px-2 py-0.5 bg-indigo-600 text-white text-xs rounded">저장</button>
-                          <button onclick="toggleEditRoutine(${r.id})" class="px-2 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded">취소</button>
+                          <button onclick="saveEditRoutine(${r.id})" class="px-3 py-1 bg-indigo-600 text-white text-xs sm:text-base rounded">저장</button>
+                          <button onclick="toggleEditRoutine(${r.id})" class="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs sm:text-base rounded">취소</button>
                         </div>
                       </div>
                     ` : `
                       <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                          <input type="checkbox" ${isDoneToday ? 'checked' : ''} onchange="toggleRoutineToday(${r.id})" class="w-4 h-4 accent-emerald-600 rounded cursor-pointer">
+                        <div class="flex items-center gap-2.5">
+                          <input type="checkbox" ${isDoneToday ? 'checked' : ''} onchange="toggleRoutineToday(${r.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-emerald-600 rounded cursor-pointer">
                           <div>
-                            <div class="flex items-center gap-1.5">
-                              <span class="text-xs font-semibold ${isDoneToday ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'}">${r.task}</span>
-                              ${r.dueTime ? `<span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">⏰ ${r.dueTime}</span>` : ''}
+                            <div class="flex items-center gap-2">
+                              <span class="text-xs sm:text-base font-semibold ${isDoneToday ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'}">${r.task}</span>
+                              ${r.dueTime ? `<span class="text-xs sm:text-sm font-bold text-indigo-600 dark:text-indigo-400">⏰ ${r.dueTime}</span>` : ''}
                             </div>
-                            <div class="flex items-center gap-1.5 mt-0.5">
-                              <span class="text-[9px] bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-1 py-0.2 rounded font-medium">🔄 ${r.freq}${dayLabel}</span>
-                              <span class="text-[10px] ${isDoneToday ? 'text-emerald-600 dark:text-emerald-400 font-bold' : isDueToday ? 'text-amber-600 font-medium' : 'text-slate-400'}">
+                            <div class="flex items-center gap-2 mt-1">
+                              <span class="text-[10px] sm:text-xs bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.5 rounded font-medium">🔄 ${r.freq}${dayLabel}</span>
+                              <span class="text-xs sm:text-sm ${isDoneToday ? 'text-emerald-600 dark:text-emerald-400 font-bold' : isDueToday ? 'text-amber-600 font-medium' : 'text-slate-400'}">
                                 ${isDoneToday ? '✓ 오늘 달성 완료!' : isDueToday ? '오늘 수행 대상' : '오늘 비대상'}
                               </span>
                             </div>
                           </div>
                         </div>
-                        <div class="flex items-center gap-1">
-                          <button onclick="toggleEditRoutine(${r.id})" class="text-[10px] bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-300 px-1.5 py-0.5 rounded">수정</button>
-                          <button onclick="deleteRoutine(${r.id})" class="text-slate-400 hover:text-rose-500 text-xs px-1.5 py-0.5 font-bold">✕</button>
+                        <div class="flex items-center gap-1.5">
+                          <button onclick="toggleEditRoutine(${r.id})" class="text-xs sm:text-sm bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded">수정</button>
+                          <button onclick="deleteRoutine(${r.id})" class="text-slate-400 hover:text-rose-500 text-xs sm:text-base px-2 py-1 font-bold">✕</button>
                         </div>
                       </div>
                     `}
@@ -1764,4 +1762,4 @@
     initApp();
   </script>
 </body>
-  </html>
+</html>
