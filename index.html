@@ -10,9 +10,9 @@
   <!-- Firebase SDK 모듈 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, get, child, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, set, get, remove, child, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // 🔴 본인의 Firebase 프로젝트 설정값을 입력해 주세요.
+    // 🔴 본인의 Firebase 설정값이 있다면 아래에 입력해 주세요. (미입력 시 로컬 저장소 모드로 작동)
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -23,15 +23,22 @@
       appId: "YOUR_APP_ID"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    try {
+      if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-    window.firebaseDb = db;
-    window.dbRef = ref;
-    window.dbSet = set;
-    window.dbGet = get;
-    window.dbChild = child;
-    window.dbOnValue = onValue;
+        window.firebaseDb = db;
+        window.dbRef = ref;
+        window.dbSet = set;
+        window.dbGet = get;
+        window.dbRemove = remove;
+        window.dbChild = child;
+        window.dbOnValue = onValue;
+      }
+    } catch (e) {
+      console.warn("Firebase Config 오류 - 로컬 모드로 작동합니다:", e);
+    }
 
     window.dispatchEvent(new Event('firebase-ready'));
   </script>
@@ -43,7 +50,7 @@
 </head>
 <body class="bg-slate-100 min-h-screen text-slate-800 p-3 sm:p-8 pb-28 sm:pb-8">
 
-  <!-- 1. 로그인 / 회원가입 화면 -->
+  <!-- 1. 로그인 / 회원가입 / 관리자 진입 화면 -->
   <div id="loginScreen" class="max-w-md mx-auto mt-8 sm:mt-12 bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-slate-100">
     <div class="text-center mb-6">
       <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl font-bold">📝</div>
@@ -53,8 +60,8 @@
 
     <!-- 탭 선택 (로그인 vs 회원가입) -->
     <div class="flex border-b border-slate-200 mb-6">
-      <button id="tabLogin" onclick="switchAuthTab('login')" class="flex-1 py-2.5 text-center font-semibold text-indigo-600 border-b-2 border-indigo-600 text-sm">로그인</button>
-      <button id="tabRegister" onclick="switchAuthTab('register')" class="flex-1 py-2.5 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-sm">회원가입</button>
+      <button id="tabLogin" type="button" onclick="switchAuthTab('login')" class="flex-1 py-2.5 text-center font-semibold text-indigo-600 border-b-2 border-indigo-600 text-sm">로그인</button>
+      <button id="tabRegister" type="button" onclick="switchAuthTab('register')" class="flex-1 py-2.5 text-center font-semibold text-slate-400 border-b-2 border-transparent hover:text-slate-600 text-sm">회원가입</button>
     </div>
 
     <!-- 로그인 폼 -->
@@ -77,6 +84,12 @@
       <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition text-sm shadow-md shadow-indigo-100 touch-target">
         로그인
       </button>
+
+      <div class="text-center pt-2">
+        <button type="button" onclick="openAdminPrompt()" class="text-xs text-slate-400 hover:text-indigo-600 underline">
+          ⚙️ 관리자 모드
+        </button>
+      </div>
     </form>
 
     <!-- 회원가입 폼 -->
@@ -100,6 +113,36 @@
         가입하기
       </button>
     </form>
+  </div>
+
+  <!-- 🛠️ 관리자 전용 화면 -->
+  <div id="adminScreen" class="hidden max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-4 sm:p-6 border border-slate-200 mt-6">
+    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">⚙️</span>
+        <h2 class="text-xl font-bold text-slate-800">계정 관리자 모드</h2>
+      </div>
+      <button onclick="closeAdminScreen()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg font-semibold transition">
+        ✕ 관리자 나가기
+      </button>
+    </div>
+
+    <p class="text-xs text-slate-500 mb-4">등록된 회원들의 아이디 및 비밀번호를 수정하거나 삭제할 수 있습니다.</p>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-slate-50 text-xs text-slate-500 border-b border-slate-200">
+            <th class="p-3">아이디</th>
+            <th class="p-3">비밀번호</th>
+            <th class="p-3 text-right">관리</th>
+          </tr>
+        </thead>
+        <tbody id="adminUserList" class="text-sm divide-y divide-slate-100">
+          <!-- 관리자 목록 렌더링 -->
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- 2. 메인 서비스 화면 -->
@@ -215,6 +258,7 @@
   <script>
     let currentUser = localStorage.getItem('sunhong_todo_user') || '';
     let savedAccounts = JSON.parse(localStorage.getItem('sunhong_todo_accounts') || '[]');
+    let localUsers = JSON.parse(localStorage.getItem('sunhong_todo_user_db') || '{}');
     let todos = [];
     let currentTab = 'all';
     let currentSort = 'createdAt';
@@ -262,39 +306,46 @@
 
       if (!username || !password) return;
       if (password !== confirmPassword) {
-        alert('비밀번호가 서로 일치하지 않습니다.');
+        alert('비밀번호가 일치하지 않습니다.');
         return;
       }
 
-      if (!window.firebaseDb) {
-        alert('Firebase 데이터베이스 연결 중입니다. 잠시 후 다시 시도해 주세요.');
-        return;
+      try {
+        if (window.firebaseDb) {
+          // Firebase DB 가입 처리 및 중복 검사
+          const userRef = window.dbRef(window.firebaseDb, `users/${username}`);
+          const snapshot = await window.dbGet(userRef);
+
+          if (snapshot.exists()) {
+            alert('이미 존재하는 아이디입니다.');
+            return;
+          }
+          await window.dbSet(userRef, { password: password, createdAt: Date.now() });
+        } else {
+          // Firebase 미연동 시 로컬 저장소 중복 검사
+          if (localUsers[username]) {
+            alert('이미 존재하는 아이디입니다.');
+            return;
+          }
+          localUsers[username] = password;
+          localStorage.setItem('sunhong_todo_user_db', JSON.stringify(localUsers));
+        }
+
+        if (!savedAccounts.includes(username)) {
+          savedAccounts.push(username);
+          localStorage.setItem('sunhong_todo_accounts', JSON.stringify(savedAccounts));
+        }
+
+        alert('🎉 가입이 완료되었습니다! 로그인해 주세요.');
+        document.getElementById('regUsername').value = '';
+        document.getElementById('regPassword').value = '';
+        document.getElementById('regPasswordConfirm').value = '';
+
+        switchAuthTab('login');
+        fillUsername(username);
+      } catch (err) {
+        alert('회원가입 처리 중 오류가 발생했습니다: ' + err.message);
       }
-
-      // Firebase에서 중복 사용자 확인
-      const userRef = window.dbRef(window.firebaseDb, `users/${username}`);
-      const snapshot = await window.dbGet(userRef);
-
-      if (snapshot.exists()) {
-        alert('이미 존재하는 아이디입니다. 다른 아이디를 입력해 주세요.');
-        return;
-      }
-
-      // 새 계정 생성 및 Firebase DB 저장
-      await window.dbSet(userRef, { password: password, createdAt: Date.now() });
-
-      if (!savedAccounts.includes(username)) {
-        savedAccounts.push(username);
-        localStorage.setItem('sunhong_todo_accounts', JSON.stringify(savedAccounts));
-      }
-
-      alert('회원가입이 성공적으로 완료되었습니다! 로그인해 주세요.');
-      document.getElementById('regUsername').value = '';
-      document.getElementById('regPassword').value = '';
-      document.getElementById('regPasswordConfirm').value = '';
-
-      switchAuthTab('login');
-      document.getElementById('loginUsername').value = username;
     }
 
     async function handleLoginSubmit(e) {
@@ -304,34 +355,43 @@
 
       if (!username || !password) return;
 
-      if (!window.firebaseDb) {
-        alert('Firebase 연결 중입니다. 잠시 후 시도해 주세요.');
-        return;
+      try {
+        let isSuccess = false;
+
+        if (window.firebaseDb) {
+          const userRef = window.dbRef(window.firebaseDb, `users/${username}`);
+          const snapshot = await window.dbGet(userRef);
+
+          if (!snapshot.exists()) {
+            alert('존재하지 않는 아이디입니다.');
+            return;
+          }
+          const userData = snapshot.val();
+          if (userData.password === password) {
+            isSuccess = true;
+          }
+        } else {
+          if (localUsers[username] && localUsers[username] === password) {
+            isSuccess = true;
+          }
+        }
+
+        if (!isSuccess) {
+          alert('비밀번호가 올바르지 않습니다.');
+          return;
+        }
+
+        if (!savedAccounts.includes(username)) {
+          savedAccounts.push(username);
+          localStorage.setItem('sunhong_todo_accounts', JSON.stringify(savedAccounts));
+        }
+
+        currentUser = username;
+        localStorage.setItem('sunhong_todo_user', currentUser);
+        initApp();
+      } catch (err) {
+        alert('로그인 시도 중 오류가 발생했습니다: ' + err.message);
       }
-
-      const userRef = window.dbRef(window.firebaseDb, `users/${username}`);
-      const snapshot = await window.dbGet(userRef);
-
-      if (!snapshot.exists()) {
-        alert('존재하지 않는 아이디입니다. 회원가입을 먼저 진행해 주세요.');
-        return;
-      }
-
-      const userData = snapshot.val();
-      if (userData.password !== password) {
-        alert('비밀번호가 일치하지 않습니다.');
-        return;
-      }
-
-      // 로그인 성공
-      if (!savedAccounts.includes(username)) {
-        savedAccounts.push(username);
-        localStorage.setItem('sunhong_todo_accounts', JSON.stringify(savedAccounts));
-      }
-
-      currentUser = username;
-      localStorage.setItem('sunhong_todo_user', currentUser);
-      initApp();
     }
 
     function fillUsername(username) {
@@ -339,7 +399,97 @@
       document.getElementById('loginPassword').focus();
     }
 
-    /* 구글 캘린더 일정 추가 링크 생성 및 새 창 열기 */
+    /* ⚙️ 관리자 모드 제어 */
+    function openAdminPrompt() {
+      const input = prompt("관리자 비밀번호를 입력하세요:");
+      if (input === "전선홍관리자") {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('adminScreen').classList.remove('hidden');
+        loadAdminUserList();
+      } else if (input !== null) {
+        alert("비밀번호가 올바르지 않습니다.");
+      }
+    }
+
+    function closeAdminScreen() {
+      document.getElementById('adminScreen').classList.add('hidden');
+      document.getElementById('loginScreen').classList.remove('hidden');
+    }
+
+    async function loadAdminUserList() {
+      const listElem = document.getElementById('adminUserList');
+      listElem.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">목록을 불러오는 중...</td></tr>';
+
+      let userMap = {};
+
+      if (window.firebaseDb) {
+        const usersRef = window.dbRef(window.firebaseDb, 'users');
+        const snapshot = await window.dbGet(usersRef);
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          Object.keys(data).forEach(uname => {
+            userMap[uname] = data[uname].password || '***';
+          });
+        }
+      } else {
+        userMap = localUsers;
+      }
+
+      const keys = Object.keys(userMap);
+      if (keys.length === 0) {
+        listElem.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-400">가입된 회원이 없습니다.</td></tr>';
+        return;
+      }
+
+      listElem.innerHTML = keys.map(uname => `
+        <tr>
+          <td class="p-3 font-semibold text-slate-800">${uname}</td>
+          <td class="p-3 font-mono text-xs text-indigo-600">${userMap[uname]}</td>
+          <td class="p-3 text-right space-x-1">
+            <button onclick="adminEditUser('${uname}', '${userMap[uname]}')" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-2.5 py-1 rounded">수정</button>
+            <button onclick="adminDeleteUser('${uname}')" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 px-2.5 py-1 rounded">삭제</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function adminEditUser(uname, oldPass) {
+      const newPass = prompt(`[${uname}] 회원의 새 비밀번호를 입력하세요:`, oldPass);
+      if (!newPass || newPass === oldPass) return;
+
+      if (window.firebaseDb) {
+        const userRef = window.dbRef(window.firebaseDb, `users/${uname}`);
+        await window.dbSet(userRef, { password: newPass, updatedAt: Date.now() });
+      } else {
+        localUsers[uname] = newPass;
+        localStorage.setItem('sunhong_todo_user_db', JSON.stringify(localUsers));
+      }
+
+      alert(`[${uname}] 회원의 비밀번호가 변경되었습니다.`);
+      loadAdminUserList();
+    }
+
+    async function adminDeleteUser(uname) {
+      if (!confirm(`정말로 [${uname}] 계정을 삭제하시겠습니까? 데이터는 복구되지 않습니다.`)) return;
+
+      if (window.firebaseDb) {
+        const userRef = window.dbRef(window.firebaseDb, `users/${uname}`);
+        const userTodosRef = window.dbRef(window.firebaseDb, `todos/${uname}`);
+        await window.dbRemove(userRef);
+        await window.dbRemove(userTodosRef);
+      } else {
+        delete localUsers[uname];
+        localStorage.setItem('sunhong_todo_user_db', JSON.stringify(localUsers));
+      }
+
+      savedAccounts = savedAccounts.filter(a => a !== uname);
+      localStorage.setItem('sunhong_todo_accounts', JSON.stringify(savedAccounts));
+
+      alert(`[${uname}] 계정이 삭제되었습니다.`);
+      loadAdminUserList();
+    }
+
+    /* 구글 캘린더 일정 추가 */
     function addToGoogleCalendar(taskTitle, category, dueString) {
       let startDateStr, endDateStr;
 
@@ -427,7 +577,6 @@
       }
     }
 
-    /* ⏰ 마감 알림 체크 */
     function checkDueNotifications() {
       if (Notification.permission !== 'granted' || !todos.length) return;
 
@@ -586,7 +735,7 @@
     }
     setInterval(updateClock, 1000);
 
-    /* --- Firebase 실시간 동기화 리스너 --- */
+    /* --- Firebase 실시간 동기화 --- */
     function setupFirebaseListener() {
       if (!window.firebaseDb || !currentUser) return;
       const userTodosRef = window.dbRef(window.firebaseDb, `todos/${currentUser}`);
@@ -640,7 +789,7 @@
           if (Array.isArray(importedTodos)) {
             todos = importedTodos;
             saveAndRender();
-            alert('데이터가 성공적으로 복원되어 클라우드에 저장되었습니다.');
+            alert('데이터가 성공적으로 복원되었습니다.');
           } else {
             alert('올바르지 않은 백업 파일 형식입니다.');
           }
