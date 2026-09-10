@@ -1011,18 +1011,21 @@
       reader.readAsText(file);
     }
 
-    // 더욱 작고 슬림한 미니멀 D-Day 태그 제안 적용
     function getDDayTag(dateString) {
       if (!dateString) return '';
       const now = new Date();
       now.setHours(0,0,0,0);
-      const target = new Date(dateString);
-      const targetDay = new Date(dateString);
+      
+      const parts = dateString.split('T')[0].split('-');
+      if (parts.length !== 3) return '';
+      
+      const targetDay = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
       targetDay.setHours(0,0,0,0);
 
-      const diffDays = Math.ceil((targetDay - now) / (1000 * 60 * 60 * 24));
+      const diffDays = Math.round((targetDay - now) / (1000 * 60 * 60 * 24));
+      const fullTarget = new Date(dateString);
 
-      if (new Date() > target && diffDays <= 0) {
+      if (new Date() > fullTarget && diffDays <= 0) {
         return `<span class="text-[10px] leading-none font-bold bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800 px-1.5 py-0.5 rounded-full">초과</span>`;
       } else if (diffDays === 0) {
         return `<span class="text-[10px] leading-none font-bold bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800 px-1.5 py-0.5 rounded-full">D-Day</span>`;
@@ -1267,7 +1270,6 @@
       }
     }
 
-    // 하위 항목 추가 시 상위 항목의 due 제거 (마감 초과 방지)
     function saveInlineSubitem(parentId) {
       const taskInput = document.getElementById(`subTaskInput_${parentId}`).value.trim();
       const dueInput = document.getElementById(`subDueInput_${parentId}`).value;
@@ -1277,7 +1279,7 @@
         if (t.id === parentId) {
           if (!t.subitems) t.subitems = [];
           t.subitems.push({ id: Date.now(), task: taskInput, due: dueInput, completed: false, isEditing: false, notified: false, notified10m: false });
-          t.due = ''; // 그룹으로 전환되므로 상위 항목 마감 시각 제거
+          t.due = '';
           t.isAddingSub = false;
         }
         return t;
@@ -1289,7 +1291,8 @@
 
     function saveEditMain(id) {
       const taskInput = document.getElementById(`editTask_${id}`).value.trim();
-      const dueInput = document.getElementById(`editDue_${id}`) ? document.getElementById(`editDue_${id}`).value : '';
+      const dueInputElem = document.getElementById(`editDue_${id}`);
+      const dueInput = dueInputElem ? dueInputElem.value : '';
 
       if (!taskInput) return;
       todos = todos.map(t => t.id === id ? { ...t, task: taskInput, due: (t.subitems && t.subitems.length > 0) ? '' : dueInput, notified: false, notified10m: false, isEditing: false } : t);
@@ -1451,7 +1454,6 @@
                     </div>
                   </div>
                 </div>
-                <!-- 버튼 간격 절반(gap-0.5)으로 단축 -->
                 <div class="flex items-center gap-0.5">
                   <button onclick="addToGoogleCalendar('${t.task.replace(/'/g, "\\'")}', '할일', '${t.due || ''}')" title="구글 캘린더에 추가" class="text-base p-1 sm:p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition touch-target">📅</button>
                   <button onclick="toggleEditMain(${t.id})" title="수정" class="text-base p-1 sm:p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition touch-target">✏️</button>
@@ -1492,7 +1494,6 @@
                           ${!s.completed && s.due ? getDDayTag(s.due) : ''}
                           ${s.due ? `<span class="text-xs text-slate-400 ml-1">${formatSimpleDue(s.due)}</span>` : ''}
                         </div>
-                        <!-- 하위 아이템 버튼 간격 축소 -->
                         <div class="flex items-center gap-0.5">
                           <button onclick="addToGoogleCalendar('${s.task.replace(/'/g, "\\'")}', '하위할일', '${s.due || ''}')" title="구글 캘린더에 추가" class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded touch-target">📅</button>
                           <button onclick="toggleEditSub(${t.id}, ${s.id})" title="수정" class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded touch-target">✏️</button>
