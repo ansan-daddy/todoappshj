@@ -1510,8 +1510,11 @@
       }).join('')}</ul>`;
     }
 
+    /* 30분 단위 타임라인 및 우측 시각 제거 최적화 렌더링 */
     function renderTodayTimelineTab(container) {
-      const currentHour = new Date().getHours();
+      const now = new Date();
+      const currentHour = now.getHours();
+      const currentMinGroup = now.getMinutes() < 30 ? 0 : 30;
       const todayStr = getTodayString();
       
       let todayItems = [];
@@ -1555,16 +1558,24 @@
         }
       });
 
-      const hourlyMap = {};
-      for (let h = 0; h < 24; h++) hourlyMap[h] = [];
+      // 48개의 30분 슬롯 Map 생성
+      const halfHourMap = {};
+      for (let h = 0; h < 24; h++) {
+        halfHourMap[`${h}_0`] = [];
+        halfHourMap[`${h}_30`] = [];
+      }
       const noTimeItems = [];
 
       todayItems.forEach(item => {
         if (!item.due || !item.due.includes('T')) {
           noTimeItems.push(item);
         } else {
-          const hour = parseInt(item.due.split('T')[1].split(':')[0], 10);
-          if (hourlyMap[hour]) hourlyMap[hour].push(item);
+          const timeParts = item.due.split('T')[1].split(':');
+          const hour = parseInt(timeParts[0], 10);
+          const min = parseInt(timeParts[1], 10);
+          const slotKey = `${hour}_${min < 30 ? 0 : 30}`;
+
+          if (halfHourMap[slotKey]) halfHourMap[slotKey].push(item);
           else noTimeItems.push(item);
         }
       });
@@ -1578,13 +1589,13 @@
         return;
       }
 
-      let html = `<div class="space-y-3">`;
+      let html = `<div class="space-y-2">`;
 
       if (noTimeItems.length > 0) {
         html += `
-          <div class="bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900 rounded-xl p-4">
-            <h3 class="text-base font-bold text-indigo-700 dark:text-indigo-300 mb-2">오늘 시간 미지정</h3>
-            <div class="space-y-2 pl-1">
+          <div class="bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900 rounded-xl p-3 mb-3">
+            <h3 class="text-sm font-bold text-indigo-700 dark:text-indigo-300 mb-1.5">오늘 시간 미지정</h3>
+            <div class="space-y-1.5 pl-0.5">
               ${noTimeItems.map(item => renderTimelineItemHtml(item)).join('')}
             </div>
           </div>
@@ -1592,76 +1603,68 @@
       }
 
       for (let h = 0; h < 24; h++) {
-        const items = hourlyMap[h];
-        const isCurrentHour = h === currentHour;
+        [0, 30].forEach(m => {
+          const slotKey = `${h}_${m}`;
+          const items = halfHourMap[slotKey];
+          const isCurrentSlot = h === currentHour && m === currentMinGroup;
 
-        if (items.length > 0 || isCurrentHour) {
-          const hourLabel = `${String(h).padStart(2, '0')}:00`;
+          if (items.length > 0 || isCurrentSlot) {
+            const timeLabel = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 
-          html += `
-            <div class="flex items-start gap-3 p-3.5 rounded-xl border transition ${isCurrentHour ? 'bg-blue-50/60 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700 ring-1 ring-blue-200 dark:ring-blue-800' : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/70 dark:border-slate-700/70'}">
-              <div class="w-16 sm:w-20 text-base font-bold ${isCurrentHour ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'} flex flex-col items-start pt-1">
-                <span>${hourLabel}</span>
-                ${isCurrentHour ? `<span class="text-xs bg-blue-600 text-white px-2 py-0.5 rounded mt-0.5">LIVE</span>` : ''}
+            html += `
+              <div class="flex items-start gap-1.5 p-2 sm:p-2.5 rounded-xl border transition ${isCurrentSlot ? 'bg-blue-50/60 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700 ring-1 ring-blue-200 dark:ring-blue-800' : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/70 dark:border-slate-700/70'}">
+                <div class="w-11 sm:w-13 text-xs sm:text-sm font-bold ${isCurrentSlot ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'} flex flex-col items-start pt-1 flex-shrink-0">
+                  <span>${timeLabel}</span>
+                  ${isCurrentSlot ? `<span class="text-[9px] leading-tight bg-blue-600 text-white px-1 py-0.5 rounded mt-0.5">LIVE</span>` : ''}
+                </div>
+                <div class="flex-1 min-h-[28px] space-y-1.5">
+                  ${items.length > 0 ? items.map(item => renderTimelineItemHtml(item)).join('') : `<span class="text-xs text-slate-300 dark:text-slate-600 italic leading-7">일정 없음</span>`}
+                </div>
               </div>
-              <div class="flex-1 min-h-[30px] space-y-2">
-                ${items.length > 0 ? items.map(item => renderTimelineItemHtml(item)).join('') : `<span class="text-sm text-slate-300 dark:text-slate-600 italic">현재 시각 (일정 없음)</span>`}
-              </div>
-            </div>
-          `;
-        }
+            `;
+          }
+        });
       }
 
       html += `</div>`;
       container.innerHTML = html;
     }
 
+    /* 우측 시각 표기가 완전히 제거된 카드 템플릿 */
     function renderTimelineItemHtml(item) {
-      const dueTimeStr = item.due && item.due.includes('T') ? item.due.split('T')[1] : '';
-
       if (item.isRoutine) {
         return `
-          <div class="flex items-center justify-between text-base bg-emerald-50/60 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800/60 shadow-2xs">
-            <div class="flex items-center gap-3">
-              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleRoutineToday(${item.id})" class="w-5 h-5 sm:w-6 sm:h-6 accent-emerald-600 rounded cursor-pointer touch-target">
+          <div class="flex items-center justify-between text-sm sm:text-base bg-emerald-50/60 dark:bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800/60 shadow-2xs">
+            <div class="flex items-center gap-2.5">
+              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleRoutineToday(${item.id})" class="w-5 h-5 sm:w-5 sm:h-5 accent-emerald-600 rounded cursor-pointer touch-target">
               <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100 font-semibold'}">${item.task}</span>
-              <span class="text-xs sm:text-sm bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded font-medium">${item.freq}</span>
-            </div>
-            <div class="flex items-center gap-1">
-              ${dueTimeStr ? `<span class="text-base font-bold text-emerald-600 dark:text-emerald-400">${dueTimeStr}</span>` : ''}
+              <span class="text-xs bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-1.5 py-0.5 rounded font-medium">${item.freq}</span>
             </div>
           </div>
         `;
       } else if (item.isSub) {
         const tooltipId = `tooltip_sub_${item.id}`;
         return `
-          <div class="flex items-center justify-between text-base bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs">
-            <div class="flex items-center gap-3">
-              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleSubitem(${item.parentId}, ${item.id})" class="w-5 h-5 sm:w-6 sm:h-6 accent-indigo-600 rounded cursor-pointer touch-target">
+          <div class="flex items-center justify-between text-sm sm:text-base bg-white dark:bg-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs">
+            <div class="flex items-center gap-2.5">
+              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleSubitem(${item.parentId}, ${item.id})" class="w-5 h-5 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target">
               <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-200 font-medium'}">${item.task}</span>
               
               <div id="${tooltipId}" class="relative inline-block has-tooltip cursor-pointer" onclick="toggleSubTooltip(event, '${tooltipId}')">
                 <span class="text-[10px] leading-none bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-1.5 py-0.5 rounded font-semibold border border-indigo-100 dark:border-indigo-800">하위</span>
-                <div class="tooltip-box bg-slate-800 dark:bg-slate-900 text-white text-sm px-3 py-1.5 rounded-lg shadow-lg border border-slate-700">
+                <div class="tooltip-box bg-slate-800 dark:bg-slate-900 text-white text-xs px-2.5 py-1 rounded-lg shadow-lg border border-slate-700">
                   📂 그룹: ${item.parentTask || '상위 그룹'}
                 </div>
               </div>
-            </div>
-
-            <div class="flex items-center gap-1">
-              ${dueTimeStr ? `<span class="text-sm font-semibold text-slate-500 dark:text-slate-400">${dueTimeStr}</span>` : ''}
             </div>
           </div>
         `;
       } else {
         return `
-          <div class="flex items-center justify-between text-base bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs">
-            <div class="flex items-center gap-3">
-              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleComplete(${item.id})" class="w-5 h-5 sm:w-6 sm:h-6 accent-indigo-600 rounded cursor-pointer touch-target">
+          <div class="flex items-center justify-between text-sm sm:text-base bg-white dark:bg-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-2xs">
+            <div class="flex items-center gap-2.5">
+              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleComplete(${item.id})" class="w-5 h-5 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target">
               <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100 font-semibold'}">${item.task}</span>
-            </div>
-            <div class="flex items-center gap-1">
-              ${dueTimeStr ? `<span class="text-base font-bold text-indigo-600 dark:text-indigo-400">${dueTimeStr}</span>` : ''}
             </div>
           </div>
         `;
