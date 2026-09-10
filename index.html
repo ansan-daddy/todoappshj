@@ -272,7 +272,7 @@
     let routines = [];
     let currentTab = 'all';
     
-    // 설정값 유지 (localStorage)
+    // 설정값 저장 유지
     let currentSort = localStorage.getItem('sunhong_todo_sort') || 'createdAt';
     let hideCompleted = localStorage.getItem('sunhong_todo_hide_completed') === 'true';
 
@@ -712,13 +712,13 @@
           const diffMinutes = (dueTime - now) / (1000 * 60);
 
           if (diffMinutes > 0 && diffMinutes <= 10 && !t.notified10m) {
-            triggerNotification("마감 10분 전!", `[${t.category}] ${t.task} 마감 10분 전입니다.`);
+            triggerNotification("마감 10분 전!", `[${t.category || '할일'}] ${t.task} 마감 10분 전입니다.`);
             t.notified10m = true;
             updated = true;
           }
 
           if (now >= dueTime && (now - dueTime) < 10 * 60 * 1000 && !t.notified) {
-            triggerNotification("마감 시간이 되었습니다!", `[${t.category}] ${t.task} 마감 시각이 되었습니다.`);
+            triggerNotification("마감 시간이 되었습니다!", `[${t.category || '할일'}] ${t.task} 마감 시각이 되었습니다.`);
             t.notified = true;
             t.notified10m = true;
             updated = true;
@@ -866,15 +866,15 @@
     }
     setInterval(updateClock, 1000);
 
-    /* --- Firebase 실시간 동기화 --- */
+    /* --- Firebase 실시간 동기화 안전 파싱 --- */
     function setupFirebaseListener() {
       if (!window.firebaseDb || !currentUser) return;
       
       const userTodosRef = window.dbRef(window.firebaseDb, `todos/${currentUser}`);
       window.dbOnValue(userTodosRef, (snapshot) => {
         const data = snapshot.val();
-        todos = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
-        todos = todos.map(t => ({ ...t, subitems: t.subitems || [] }));
+        let rawList = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+        todos = rawList.filter(Boolean).map(t => ({ ...t, subitems: t.subitems || [] }));
         localStorage.setItem(`sunhong_todos_${currentUser}`, JSON.stringify(todos));
         render();
       });
@@ -882,7 +882,8 @@
       const userRoutinesRef = window.dbRef(window.firebaseDb, `routines/${currentUser}`);
       window.dbOnValue(userRoutinesRef, (snapshot) => {
         const data = snapshot.val();
-        routines = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+        let rawRoutines = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
+        routines = rawRoutines.filter(Boolean);
         localStorage.setItem(`sunhong_routines_${currentUser}`, JSON.stringify(routines));
         render();
       });
@@ -1000,7 +1001,6 @@
       const savedRoutines = localStorage.getItem(`sunhong_routines_${currentUser}`);
       routines = savedRoutines ? JSON.parse(savedRoutines) : [];
 
-      // 정렬 및 완료 숨기기 UI 복원
       const sortSelect = document.getElementById('sortInput');
       if (sortSelect) sortSelect.value = currentSort;
       updateHideCompletedBtnUI();
@@ -1217,7 +1217,7 @@
       const dueInput = document.getElementById(`editDue_${id}`) ? document.getElementById(`editDue_${id}`).value : '';
 
       if (!taskInput) return;
-      todos = todos.map(t => t.id === id ? { ...t, task: taskInput, category: '할일', due: dueInput, notified: false, notified10m: false, isEditing: false } : t);
+      todos = todos.map(t => t.id === id ? { ...t, task: taskInput, due: dueInput, notified: false, notified10m: false, isEditing: false } : t);
       saveAndRender();
     }
 
@@ -1303,7 +1303,6 @@
       render();
     }
 
-    // 시계 아이콘 제거된 단순한 날짜/시간 포맷터
     function formatSimpleDue(dueStr) {
       if (!dueStr) return '';
       const d = new Date(dueStr);
@@ -1526,7 +1525,6 @@
       container.innerHTML = html;
     }
 
-    // 시계 및 루틴 아이콘 완벽 제거
     function renderTimelineItemHtml(item) {
       const dueTimeStr = item.due && item.due.includes('T') ? item.due.split('T')[1] : '';
 
