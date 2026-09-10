@@ -866,15 +866,84 @@
     }
     setInterval(updateClock, 1000);
 
-    /* --- Firebase 실시간 동기화 안전 파싱 --- */
+    /* --- 데이터 하위 호환 안전 수집 함수 --- */
+    function extractAllTodos(rawData) {
+      if (!rawData) return [];
+      let extracted = [];
+
+      function parseRecursive(val) {
+        if (!val) return;
+        if (Array.isArray(val)) {
+          val.forEach(item => parseRecursive(item));
+        } else if (typeof val === 'object') {
+          if (val.task || val.text || val.title) {
+            extracted.push({
+              id: val.id || Date.now() + Math.random(),
+              task: val.task || val.text || val.title || '내용 없음',
+              due: val.due || val.dueDate || val.date || '',
+              category: val.category || '할일',
+              completed: !!val.completed,
+              isEditing: false,
+              isAddingSub: false,
+              notified: !!val.notified,
+              notified10m: !!val.notified10m,
+              subitems: Array.isArray(val.subitems) ? val.subitems.map(s => ({
+                id: s.id || Date.now() + Math.random(),
+                task: s.task || s.text || s.title || '',
+                due: s.due || s.dueDate || '',
+                completed: !!s.completed,
+                isEditing: false,
+                notified: !!s.notified,
+                notified10m: !!s.notified10m
+              })) : []
+            });
+          } else {
+            Object.values(val).forEach(child => parseRecursive(child));
+          }
+        }
+      }
+
+      parseRecursive(rawData);
+      return extracted;
+    }
+
+    function extractAllRoutines(rawData) {
+      if (!rawData) return [];
+      let extracted = [];
+
+      function parseRecursive(val) {
+        if (!val) return;
+        if (Array.isArray(val)) {
+          val.forEach(item => parseRecursive(item));
+        } else if (typeof val === 'object') {
+          if (val.task || val.text || val.title) {
+            extracted.push({
+              id: val.id || Date.now() + Math.random(),
+              task: val.task || val.text || val.title || '',
+              freq: val.freq || '매일',
+              dayVal: val.dayVal || '',
+              dueTime: val.dueTime || val.time || '',
+              lastCompletedDate: val.lastCompletedDate || null,
+              isEditing: false
+            });
+          } else {
+            Object.values(val).forEach(child => parseRecursive(child));
+          }
+        }
+      }
+
+      parseRecursive(rawData);
+      return extracted;
+    }
+
+    /* --- Firebase 실시간 동기화 --- */
     function setupFirebaseListener() {
       if (!window.firebaseDb || !currentUser) return;
       
       const userTodosRef = window.dbRef(window.firebaseDb, `todos/${currentUser}`);
       window.dbOnValue(userTodosRef, (snapshot) => {
         const data = snapshot.val();
-        let rawList = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
-        todos = rawList.filter(Boolean).map(t => ({ ...t, subitems: t.subitems || [] }));
+        todos = extractAllTodos(data);
         localStorage.setItem(`sunhong_todos_${currentUser}`, JSON.stringify(todos));
         render();
       });
@@ -882,8 +951,7 @@
       const userRoutinesRef = window.dbRef(window.firebaseDb, `routines/${currentUser}`);
       window.dbOnValue(userRoutinesRef, (snapshot) => {
         const data = snapshot.val();
-        let rawRoutines = data ? (Array.isArray(data) ? data : Object.values(data)) : [];
-        routines = rawRoutines.filter(Boolean);
+        routines = extractAllRoutines(data);
         localStorage.setItem(`sunhong_routines_${currentUser}`, JSON.stringify(routines));
         render();
       });
@@ -925,10 +993,12 @@
         try {
           const imported = JSON.parse(e.target.result);
           if (Array.isArray(imported)) {
-            todos = imported;
+            todos = extractAllTodos(imported);
           } else if (imported.todos || imported.routines) {
-            todos = imported.todos || [];
-            routines = imported.routines || [];
+            todos = extractAllTodos(imported.todos);
+            routines = extractAllRoutines(imported.routines);
+          } else {
+            todos = extractAllTodos(imported);
           }
           saveAndRender();
           alert('데이터가 성공적으로 복원되었습니다.');
@@ -996,10 +1066,10 @@
       document.getElementById('displayName').innerText = currentUser;
 
       const savedData = localStorage.getItem(`sunhong_todos_${currentUser}`);
-      todos = savedData ? JSON.parse(savedData) : [];
+      todos = savedData ? extractAllTodos(JSON.parse(savedData)) : [];
 
       const savedRoutines = localStorage.getItem(`sunhong_routines_${currentUser}`);
-      routines = savedRoutines ? JSON.parse(savedRoutines) : [];
+      routines = savedRoutines ? extractAllRoutines(JSON.parse(savedRoutines)) : [];
 
       const sortSelect = document.getElementById('sortInput');
       if (sortSelect) sortSelect.value = currentSort;
@@ -1301,6 +1371,19 @@
       else sortContainer.classList.add('hidden');
 
       render();
+    }
+
+    function render() {
+      const container = document.getElementById('todoContainer');
+      if (!container) return;
+
+      if (currentTab === 'all') {
+        renderAllTab(container);
+      } else if (currentTab === 'today') {
+        renderTodayTimelineTab(container);
+      } else if (currentTab === 'routine') {
+        renderRoutineTab(container);
+      }
     }
 
     function formatSimpleDue(dueStr) {
