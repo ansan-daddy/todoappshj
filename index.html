@@ -23,6 +23,7 @@
       appId: "1:382912248399:web:1294528d4a9e52f47a083a",
       measurementId: "G-X7FNCNVZZ6"
     };
+
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
@@ -30,6 +31,8 @@
     window.dbRef = ref;
     window.dbSet = set;
     window.dbOnValue = onValue;
+
+    window.dispatchEvent(new Event('firebase-ready'));
   </script>
 
   <style>
@@ -92,8 +95,17 @@
       </div>
     </div>
 
-    <!-- PC 모드 전용 입력 폼 -->
+    <!-- PC/대화면 전용 입력 폼 -->
     <div class="hidden sm:block mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+      <div class="flex items-center gap-1.5 mb-3 text-xs overflow-x-auto pb-1">
+        <span class="text-xs font-semibold text-slate-500 flex-shrink-0">⚡ 빠른 마감:</span>
+        <button type="button" id="btnPc_today11" onclick="setQuickTime('today11', 'pc')" class="quick-chip-pc px-3 py-1.5 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">오늘 11시</button>
+        <button type="button" id="btnPc_today17" onclick="setQuickTime('today17', 'pc')" class="quick-chip-pc px-3 py-1.5 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">오늘 17시</button>
+        <button type="button" id="btnPc_tomorrow11" onclick="setQuickTime('tomorrow11', 'pc')" class="quick-chip-pc px-3 py-1.5 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">내일 11시</button>
+        <button type="button" id="btnPc_tomorrow17" onclick="setQuickTime('tomorrow17', 'pc')" class="quick-chip-pc px-3 py-1.5 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">내일 17시</button>
+        <button type="button" id="btnPc_1h" onclick="setQuickTime(1, 'pc')" class="quick-chip-pc px-3 py-1.5 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">+1시간</button>
+      </div>
+
       <form id="todoFormPc" onsubmit="addTodo(event, 'pc')" class="space-y-3">
         <input type="text" id="taskInputPc" placeholder="새 할 일을 입력하세요..." required
                class="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm">
@@ -108,7 +120,7 @@
             <option value="기타">📌 기타</option>
           </select>
 
-          <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-xl transition text-sm">추가</button>
+          <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-xl transition text-sm shadow-md shadow-indigo-100">추가</button>
         </div>
       </form>
     </div>
@@ -144,10 +156,12 @@
   <!-- 모바일 전용 하단 고정 스티키 입력바 -->
   <div class="block sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-2xl p-3 z-40">
     <div class="flex items-center gap-1.5 mb-2 overflow-x-auto pb-1 text-xs">
-      <span class="text-[11px] text-slate-400 flex-shrink-0">빠른 마감:</span>
-      <button type="button" onclick="setQuickTime(1)" class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-full font-medium flex-shrink-0 hover:bg-indigo-100">+1시간</button>
-      <button type="button" onclick="setQuickTime('evening')" class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-full font-medium flex-shrink-0 hover:bg-indigo-100">오늘 18시</button>
-      <button type="button" onclick="setQuickTime('tomorrow')" class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-full font-medium flex-shrink-0 hover:bg-indigo-100">내일 09시</button>
+      <span class="text-[11px] font-semibold text-slate-400 flex-shrink-0">빠른 마감:</span>
+      <button type="button" id="btnMobile_today11" onclick="setQuickTime('today11', 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">오늘 11시</button>
+      <button type="button" id="btnMobile_today17" onclick="setQuickTime('today17', 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">오늘 17시</button>
+      <button type="button" id="btnMobile_tomorrow11" onclick="setQuickTime('tomorrow11', 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">내일 11시</button>
+      <button type="button" id="btnMobile_tomorrow17" onclick="setQuickTime('tomorrow17', 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">내일 17시</button>
+      <button type="button" id="btnMobile_1h" onclick="setQuickTime(1, 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200">+1시간</button>
     </div>
 
     <form id="todoFormMobile" onsubmit="addTodo(event, 'mobile')" class="flex items-center gap-2">
@@ -184,6 +198,12 @@
       }).catch(err => console.log('SW 등록 실패:', err));
     }
 
+    window.addEventListener('firebase-ready', () => {
+      if (currentUser) {
+        setupFirebaseListener();
+      }
+    });
+
     function updateNotificationUI() {
       const btn = document.getElementById('notifyBtn');
       if (!btn) return;
@@ -196,7 +216,7 @@
 
       if (Notification.permission === 'granted') {
         btn.className = "text-xs px-3 py-1.5 rounded-full font-medium bg-emerald-50 text-emerald-600 border border-emerald-200";
-        btn.innerText = "🔔 알림 켜짐 (테스트)";
+        btn.innerText = "🔔 알림 켜짐";
       } else if (Notification.permission === 'denied') {
         btn.className = "text-xs px-3 py-1.5 rounded-full font-medium bg-rose-50 text-rose-600 border border-rose-200";
         btn.innerText = "🔔 알림 차단됨";
@@ -213,20 +233,19 @@
       }
 
       if (Notification.permission === 'granted') {
-        triggerNotification("🔔 알림 동작 성공", "선홍님의 푸시 알림이 정상적으로 작동하고 있습니다!");
+        triggerNotification("🔔 알림 테스트", "선홍님의 푸시 알림이 정상적으로 작동하고 있습니다!");
       } else if (Notification.permission === 'denied') {
         alert('브라우저 설정에서 알림 권한을 [허용]으로 변경해 주셔야 합니다.');
       } else {
         Notification.requestPermission().then(permission => {
           updateNotificationUI();
           if (permission === 'granted') {
-            triggerNotification("🎉 알림 활성화 완료", "이제 마감 시간에 알림이 발송됩니다.");
+            triggerNotification("🎉 알림 활성화 완료", "이제 마감 10분 전 및 마감 정시에 알림이 발송됩니다.");
           }
         });
       }
     }
 
-    // Service Worker 메세지 전송을 통한 강제 알림 발송 함수
     function triggerNotification(title, body) {
       if (Notification.permission !== 'granted') return;
 
@@ -246,7 +265,7 @@
       }
     }
 
-    /* ⏰ 마감 감지 타이머 (3초 주기) */
+    /* ⏰ 마감 알림 체크 */
     function checkDueNotifications() {
       if (Notification.permission !== 'granted' || !todos.length) return;
 
@@ -254,23 +273,40 @@
       let updated = false;
 
       todos.forEach(t => {
-        if (!t.completed && t.due && !t.notified) {
+        if (!t.completed && t.due) {
           const dueTime = new Date(t.due);
-          // 마감 시각 지나고 10분 이내 항목까지 처리하도록 유연성 확보
-          if (now >= dueTime && (now - dueTime) < 10 * 60 * 1000) {
-            triggerNotification("⏰ 마감 시간 알림", `[${t.category}] ${t.task} 마감 시간이 되었습니다!`);
+          const diffMinutes = (dueTime - now) / (1000 * 60);
+
+          if (diffMinutes > 0 && diffMinutes <= 10 && !t.notified10m) {
+            triggerNotification("⏰ 마감 10분 전!", `[${t.category}] ${t.task} 마감 10분 전입니다.`);
+            t.notified10m = true;
+            updated = true;
+          }
+
+          if (now >= dueTime && (now - dueTime) < 10 * 60 * 1000 && !t.notified) {
+            triggerNotification("🔥 마감 시간이 되었습니다!", `[${t.category}] ${t.task} 마감 시각이 되었습니다.`);
             t.notified = true;
+            t.notified10m = true;
             updated = true;
           }
         }
 
         if (t.subitems && t.subitems.length > 0) {
           t.subitems.forEach(s => {
-            if (!s.completed && s.due && !s.notified) {
+            if (!s.completed && s.due) {
               const subDueTime = new Date(s.due);
-              if (now >= subDueTime && (now - subDueTime) < 10 * 60 * 1000) {
-                triggerNotification("⏰ 하위 할 일 마감 알림", `[하위] ${s.task} 마감 시간이 되었습니다!`);
+              const subDiffMinutes = (subDueTime - now) / (1000 * 60);
+
+              if (subDiffMinutes > 0 && subDiffMinutes <= 10 && !s.notified10m) {
+                triggerNotification("⏰ 하위 할 일 10분 전!", `[하위] ${s.task} 마감 10분 전입니다.`);
+                s.notified10m = true;
+                updated = true;
+              }
+
+              if (now >= subDueTime && (now - subDueTime) < 10 * 60 * 1000 && !s.notified) {
+                triggerNotification("🔥 하위 할 일 마감!", `[하위] ${s.task} 마감 시각이 되었습니다.`);
                 s.notified = true;
+                s.notified10m = true;
                 updated = true;
               }
             }
@@ -312,19 +348,34 @@
       const defaultTime = getOneHourLaterString();
       if (document.getElementById('timeInputPc')) document.getElementById('timeInputPc').value = defaultTime;
       if (document.getElementById('timeInputMobile')) document.getElementById('timeInputMobile').value = defaultTime;
+      
+      updateChipHighlight('1h', 'pc');
+      updateChipHighlight('1h', 'mobile');
     }
 
-    function setQuickTime(type) {
+    /* ⚡ 빠른 마감 시간 설정 (오늘 11시, 오늘 17시, 내일 11시, 내일 17시, +1시간) */
+    function setQuickTime(type, mode = 'pc') {
       const now = new Date();
       let targetDate = new Date();
+      let chipKey = '';
 
-      if (type === 1) {
-        targetDate.setHours(now.getHours() + 1);
-      } else if (type === 'evening') {
-        targetDate.setHours(18, 0, 0, 0);
-      } else if (type === 'tomorrow') {
+      if (type === 'today11') {
+        targetDate.setHours(11, 0, 0, 0);
+        chipKey = 'today11';
+      } else if (type === 'today17') {
+        targetDate.setHours(17, 0, 0, 0);
+        chipKey = 'today17';
+      } else if (type === 'tomorrow11') {
         targetDate.setDate(now.getDate() + 1);
-        targetDate.setHours(9, 0, 0, 0);
+        targetDate.setHours(11, 0, 0, 0);
+        chipKey = 'tomorrow11';
+      } else if (type === 'tomorrow17') {
+        targetDate.setDate(now.getDate() + 1);
+        targetDate.setHours(17, 0, 0, 0);
+        chipKey = 'tomorrow17';
+      } else if (type === 1) {
+        targetDate.setHours(now.getHours() + 1);
+        chipKey = '1h';
       }
 
       const year = targetDate.getFullYear();
@@ -334,8 +385,34 @@
       const minutes = String(targetDate.getMinutes()).padStart(2, '0');
 
       const timeStr = `${year}-${month}-${day}T${hours}:${minutes}`;
-      document.getElementById('timeInputMobile').value = timeStr;
-      alert(`⏰ 마감 시간이 [${month}/${day} ${hours}:${minutes}]로 설정되었습니다.`);
+
+      if (mode === 'pc') {
+        const inputPc = document.getElementById('timeInputPc');
+        if (inputPc) inputPc.value = timeStr;
+      } else {
+        const inputMobile = document.getElementById('timeInputMobile');
+        if (inputMobile) inputMobile.value = timeStr;
+      }
+
+      updateChipHighlight(chipKey, mode);
+    }
+
+    function updateChipHighlight(activeKey, mode) {
+      const prefix = mode === 'pc' ? 'btnPc_' : 'btnMobile_';
+      const classGroup = mode === 'pc' ? '.quick-chip-pc' : '.quick-chip-mobile';
+
+      document.querySelectorAll(classGroup).forEach(btn => {
+        btn.className = mode === 'pc' 
+          ? "quick-chip-pc px-3 py-1.5 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200"
+          : "quick-chip-mobile px-3 py-1 rounded-full font-medium text-xs flex-shrink-0 transition border border-slate-200 bg-slate-100 text-slate-600 hover:bg-slate-200";
+      });
+
+      const activeBtn = document.getElementById(prefix + activeKey);
+      if (activeBtn) {
+        activeBtn.className = mode === 'pc'
+          ? "quick-chip-pc px-3 py-1.5 rounded-full font-bold text-xs flex-shrink-0 transition bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-300 border border-indigo-600"
+          : "quick-chip-mobile px-3 py-1 rounded-full font-bold text-xs flex-shrink-0 transition bg-indigo-600 text-white shadow-sm ring-2 ring-indigo-300 border border-indigo-600";
+      }
     }
 
     function updateClock() {
@@ -348,7 +425,7 @@
     }
     setInterval(updateClock, 1000);
 
-    /* --- Firebase 클라우드 동기화 제어 --- */
+    /* --- Firebase 실시간 동기화 리스너 --- */
     function setupFirebaseListener() {
       if (!window.firebaseDb || !currentUser) return;
       const userTodosRef = window.dbRef(window.firebaseDb, `todos/${currentUser}`);
@@ -521,7 +598,7 @@
       const due = mode === 'pc' ? document.getElementById('timeInputPc').value : document.getElementById('timeInputMobile').value;
       const category = mode === 'pc' ? document.getElementById('categoryInputPc').value : document.getElementById('categoryInputMobile').value;
 
-      todos.unshift({ id: Date.now(), task, due, category, completed: false, isEditing: false, isAddingSub: false, notified: false, subitems: [] });
+      todos.unshift({ id: Date.now(), task, due, category, completed: false, isEditing: false, isAddingSub: false, notified: false, notified10m: false, subitems: [] });
       
       if (mode === 'pc') document.getElementById('taskInputPc').value = '';
       else document.getElementById('taskInputMobile').value = '';
@@ -547,7 +624,7 @@
       todos = todos.map(t => {
         if (t.id === parentId) {
           if (!t.subitems) t.subitems = [];
-          t.subitems.push({ id: Date.now(), task: taskInput, due: dueInput, completed: false, isEditing: false, notified: false });
+          t.subitems.push({ id: Date.now(), task: taskInput, due: dueInput, completed: false, isEditing: false, notified: false, notified10m: false });
           t.isAddingSub = false;
         }
         return t;
@@ -563,7 +640,7 @@
       const dueInput = document.getElementById(`editDue_${id}`) ? document.getElementById(`editDue_${id}`).value : '';
 
       if (!taskInput) return;
-      todos = todos.map(t => t.id === id ? { ...t, task: taskInput, category: categoryInput, due: dueInput, notified: false, isEditing: false } : t);
+      todos = todos.map(t => t.id === id ? { ...t, task: taskInput, category: categoryInput, due: dueInput, notified: false, notified10m: false, isEditing: false } : t);
       saveAndRender();
     }
 
@@ -580,7 +657,7 @@
       const dueInput = document.getElementById(`editSubDue_${subId}`).value;
       if (!taskInput) return;
       todos = todos.map(t => {
-        if (t.id === parentId && t.subitems) t.subitems = t.subitems.map(s => s.id === subId ? { ...s, task: taskInput, due: dueInput, notified: false, isEditing: false } : s);
+        if (t.id === parentId && t.subitems) t.subitems = t.subitems.map(s => s.id === subId ? { ...s, task: taskInput, due: dueInput, notified: false, notified10m: false, isEditing: false } : s);
         return t;
       });
       saveAndRender();
