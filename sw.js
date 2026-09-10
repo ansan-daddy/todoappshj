@@ -25,6 +25,21 @@ self.addEventListener('message', (event) => {
   }
 });
 
+// 주기적 백그라운드 동기화 (지원하는 브라우저/환경에서 백그라운드 체크 수행)
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag === 'check-todo-deadline') {
+    event.waitUntil(checkDeadlinesInBackground());
+  }
+});
+
+async function checkDeadlinesInBackground() {
+  // 클라이언트(열려 있는 앱 창)에 마감 체크 요청 전송
+  const clientList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+  for (const client of clientList) {
+    client.postMessage({ type: 'TRIGGER_DUE_CHECK' });
+  }
+}
+
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil(
@@ -35,4 +50,4 @@ self.addEventListener('notificationclick', (event) => {
       if (clients.openWindow) return clients.openWindow('/');
     })
   );
-});
+})
