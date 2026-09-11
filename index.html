@@ -735,10 +735,10 @@
       let matched = false;
 
       if (text.includes('모레')) {
-        targetDate.setDate(now.getDate() + 2);
+        targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2);
         matched = true;
       } else if (text.includes('내일')) {
-        targetDate.setDate(now.getDate() + 1);
+        targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
         matched = true;
       } else if (text.includes('오늘')) {
         matched = true;
@@ -1583,7 +1583,6 @@
       renderLoginScreen();
     }
 
-    /* ✅ 수정된 initApp 함수: 로그인된 상태에서는 loginScreen에 'hidden'을 확실히 추가 */
     function initApp() {
       applyFontSize(currentFontSize);
 
@@ -1595,7 +1594,6 @@
         return;
       }
 
-      // 로그인 상태일 때는 로그인 화면을 숨기고 메인 UI만 표시
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('mainScreen').classList.remove('hidden');
       document.getElementById('mobileAddTodoContainer').classList.remove('hidden');
