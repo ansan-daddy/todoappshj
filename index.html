@@ -156,18 +156,17 @@
 
   <!-- 2. 메인 서비스 화면 -->
   <div id="mainScreen" class="hidden max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 border border-slate-200/80 dark:border-slate-700/80 flex flex-col h-[calc(100vh-160px)] min-h-[400px]">
-    <!-- 헤더 영역 -->
-    <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700 mb-3 gap-2 flex-shrink-0">
-      <div class="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-700 mb-1.5 gap-2 flex-shrink-0">
-        <div class="flex items-center gap-2 flex-wrap min-w-0">
-          <h1 class="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 flex-shrink-0"><span id="displayName"></span>님의 할 일</h1>
-          <span class="text-sm sm:text-base font-medium text-slate-400 dark:text-slate-500">|</span>
-          <span id="clock" class="text-sm sm:text-base font-medium text-slate-500 dark:text-slate-400 truncate"></span>
-        </div>
+    <!-- 헤더 영역 (여백 최적화) -->
+    <div class="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-700 mb-1.5 gap-2 flex-shrink-0">
+      <div class="flex items-center gap-2 flex-wrap min-w-0">
+        <h1 class="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 flex-shrink-0"><span id="displayName"></span>님의 할 일</h1>
+        <span class="text-sm sm:text-base font-medium text-slate-400 dark:text-slate-500">|</span>
+        <span id="clock" class="text-sm sm:text-base font-medium text-slate-500 dark:text-slate-400 truncate"></span>
+      </div>
 
       <!-- 상단 통합 세로 삼점 메뉴 -->
       <div class="relative flex-shrink-0">
-        <button onclick="toggleKebabMenu(event, 'topHeaderMenu')" title="설정 및 추가기능" class="p-1.5 px-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold transition text-lg touch-target flex items-center justify-center">
+        <button onclick="toggleKebabMenu(event, 'topHeaderMenu')" title="설정 및 추가기능" class="p-1 px-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold transition text-lg touch-target flex items-center justify-center">
           ⋮
         </button>
         <div id="topHeaderMenu" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-1.5 text-xs sm:text-sm divide-y divide-slate-100 dark:divide-slate-700">
@@ -213,14 +212,14 @@
       </div>
     </div>
 
-    <!-- 탭 메뉴 (All / Today / Routine) -->
+    <!-- 탭 메뉴 (여백 최적화) -->
     <div class="flex border-b border-slate-200 dark:border-slate-700 mb-1.5 flex-shrink-0">
-      <button id="tabAll" onclick="switchTab('all')" class="flex-1 sm:flex-initial sm:px-6 py-1 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 transition text-sm sm:text-base">All</button>
-      <button id="tabToday" onclick="switchTab('today')" class="flex-1 sm:flex-initial sm:px-6 py-1 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Today</button>
-      <button id="tabRoutine" onclick="switchTab('routine')" class="flex-1 sm:flex-initial sm:px-6 py-1 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Routine</button>
+      <button id="tabAll" onclick="switchTab('all')" class="flex-1 sm:flex-initial sm:px-6 py-1.5 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 transition text-sm sm:text-base">All</button>
+      <button id="tabToday" onclick="switchTab('today')" class="flex-1 sm:flex-initial sm:px-6 py-1.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Today</button>
+      <button id="tabRoutine" onclick="switchTab('routine')" class="flex-1 sm:flex-initial sm:px-6 py-1.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Routine</button>
     </div>
 
-    <!-- 독자 스크롤 영역 -->
+    <!-- 스크롤 영역 -->
     <div id="todoContainer" class="flex-1 min-h-0 overflow-y-auto pr-1">
       <ul id="todoList" class="space-y-0"></ul>
     </div>
@@ -325,7 +324,7 @@
       navigator.serviceWorker.register('sw.js').then(reg => { 
         swRegistration = reg;
         updateNotificationUI();
-      }).catch(err => console.warn('SW 미등록 상태로 동작합니다.'));
+      }).catch(err => console.warn('SW 미등록 상태로 작동합니다.'));
     }
 
     window.addEventListener('firebase-ready', () => {
@@ -641,14 +640,13 @@
       alert(`[${uname}] 계정이 삭제되었습니다.`);
       loadAdminUserList();
     }
-    
-    /* 모바일 웹/앱 연동 지원 Google Calendar 등록 함수 */
+
     function addToGoogleCalendar(taskTitle, category, dueString) {
       let startDateStr, endDateStr;
-    
+
       if (dueString && dueString.includes('T')) {
         const start = new Date(dueString);
-        const end = new Date(start.getTime() + 30 * 60 * 1000); // 기본 30분 일정
+        const end = new Date(start.getTime() + 30 * 60 * 1000);
         
         startDateStr = start.toISOString().replace(/-|:|\.\d{3}/g, "");
         endDateStr = end.toISOString().replace(/-|:|\.\d{3}/g, "");
@@ -661,27 +659,14 @@
         startDateStr = dateFormatted;
         endDateStr = dateFormatted;
       }
-    
+
       const titleParam = encodeURIComponent(`[${category || '할일'}] ${taskTitle}`);
-      const detailsParam = encodeURIComponent(`할 일 관리 앱에서 추가된 일정입니다.`);
+      const detailsParam = encodeURIComponent(`할 일 웹 앱에서 추가된 일정입니다.`);
       
-      // 모바일 기기(Android / iOS / Mobile UserAgent) 여부 확인
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-      let gcalUrl = '';
-    
-      if (isMobile) {
-        // 모바일 전용 구글 캘린더 이벤트 생성 렌더링 URL
-        gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titleParam}&dates=${startDateStr}/${endDateStr}&details=${detailsParam}`;
-      } else {
-        // 데스크톱 전용 URL
-        gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titleParam}&dates=${startDateStr}/${endDateStr}&details=${detailsParam}`;
-      }
-    
-      // 모바일 브라우저 및 앱 전환 팝업 허용
+      const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titleParam}&dates=${startDateStr}/${endDateStr}&details=${detailsParam}`;
       window.open(gcalUrl, '_blank');
     }
-    
+
     function updateNotificationUI() {
       const statusText = document.getElementById('notifyStatusText');
       if (!statusText) return;
@@ -1282,7 +1267,6 @@
       }
     }
 
-    /* 통합 등록 함수 (카테고리/입력창 리셋 로직 보완) */
     function addUnifiedItem(e, mode) {
       e.preventDefault();
       const taskInput = document.getElementById('taskInputMobile');
@@ -1510,8 +1494,8 @@
       const tabRoutine = document.getElementById('tabRoutine');
       const sortInMenu = document.getElementById('sortOptionInMenu');
 
-      const activeClass = "flex-1 sm:flex-initial sm:px-6 py-2 text-center font-bold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 transition text-sm sm:text-base";
-      const inactiveClass = "flex-1 sm:flex-initial sm:px-6 py-2 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base";
+      const activeClass = "flex-1 sm:flex-initial sm:px-6 py-1.5 text-center font-bold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 transition text-sm sm:text-base";
+      const inactiveClass = "flex-1 sm:flex-initial sm:px-6 py-1.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base";
 
       tabAll.className = tab === 'all' ? activeClass : inactiveClass;
       tabToday.className = tab === 'today' ? activeClass : inactiveClass;
