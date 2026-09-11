@@ -174,6 +174,9 @@
         <label class="text-sm bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg font-medium transition cursor-pointer touch-target flex items-center">
           복원 <input type="file" accept=".json" onchange="importData(event)" class="hidden">
         </label>
+        <button onclick="exportCsv()" class="text-sm bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg font-medium transition touch-target">
+          CSV
+        </button>
         <button id="notifyBtn" onclick="handleNotificationClick()" class="text-sm px-3 py-1.5 rounded-full font-medium transition flex items-center gap-1 shadow-2xs touch-target">
           알림 확인 중...
         </button>
@@ -986,6 +989,71 @@
       downloadAnchor.remove();
     }
 
+    /* 엑셀 호환 CSV 내보내기 함수 */
+    function exportCsv() {
+      if (!todos.length && !routines.length) { 
+        alert('내보낼 데이터가 없습니다.'); 
+        return; 
+      }
+
+      const rows = [
+        ['유형', '상위/그룹명', '항목명', '마감일시/주기', '완료여부']
+      ];
+
+      // 1. 할 일 & 하위 항목추출
+      todos.forEach(t => {
+        const hasSub = t.subitems && t.subitems.length > 0;
+        rows.push([
+          hasSub ? '그룹 할일' : '일반 할일',
+          '',
+          t.task,
+          t.due || '',
+          t.completed ? '완료' : '미완료'
+        ]);
+
+        if (hasSub) {
+          t.subitems.forEach(s => {
+            rows.push([
+              '하위 할일',
+              t.task,
+              s.task,
+              s.due || '',
+              s.completed ? '완료' : '미완료'
+            ]);
+          });
+        }
+      });
+
+      // 2. 루틴 항목 추출
+      routines.forEach(r => {
+        const freqDetail = r.freq + (r.dayVal ? `(${r.dayVal})` : '') + (r.dueTime ? ` ${r.dueTime}` : '');
+        rows.push([
+          '루틴',
+          '',
+          r.task,
+          freqDetail,
+          r.lastCompletedDate === getTodayString() ? '오늘 완료' : '미완료'
+        ]);
+      });
+
+      // CSV 문자열 구성 (큰따옴표 이스케이프)
+      const csvContent = rows.map(row => 
+        row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+      ).join('\n');
+
+      // UTF-8 BOM 추가하여 엑셀 한글 깨짐 방지
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `todo_export_${currentUser}_${getTodayString()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
     function importData(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1510,7 +1578,6 @@
       }).join('')}</ul>`;
     }
 
-    /* 30분 단위 타임라인 및 우측 시각 제거 최적화 렌더링 */
     function renderTodayTimelineTab(container) {
       const now = new Date();
       const currentHour = now.getHours();
@@ -1558,7 +1625,6 @@
         }
       });
 
-      // 48개의 30분 슬롯 Map 생성
       const halfHourMap = {};
       for (let h = 0; h < 24; h++) {
         halfHourMap[`${h}_0`] = [];
@@ -1630,7 +1696,6 @@
       container.innerHTML = html;
     }
 
-    /* 우측 시각 표기가 완전히 제거된 카드 템플릿 */
     function renderTimelineItemHtml(item) {
       if (item.isRoutine) {
         return `
