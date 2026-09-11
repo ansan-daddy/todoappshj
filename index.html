@@ -450,6 +450,43 @@
       }
     }
 
+    /* 프로젝트 이동 기능 */
+    function moveTodoToProject(id) {
+      const todo = todos.find(t => t.id === id);
+      if (!todo) return;
+
+      const projectOptions = projects.map((p, idx) => `${idx + 1}. ${p.name}`).join('\n');
+      const input = prompt(`이동할 프로젝트 번호를 입력하세요:\n\n${projectOptions}`);
+      if (!input) return;
+
+      const selectedIdx = parseInt(input.trim(), 10) - 1;
+      if (isNaN(selectedIdx) || selectedIdx < 0 || selectedIdx >= projects.length) {
+        alert('올바른 프로젝트 번호를 입력해주세요.');
+        return;
+      }
+
+      todo.projectId = projects[selectedIdx].id;
+      saveAndRender();
+    }
+
+    function moveRoutineToProject(id) {
+      const routine = routines.find(r => r.id === id);
+      if (!routine) return;
+
+      const projectOptions = projects.map((p, idx) => `${idx + 1}. ${p.name}`).join('\n');
+      const input = prompt(`이동할 프로젝트 번호를 입력하세요:\n\n${projectOptions}`);
+      if (!input) return;
+
+      const selectedIdx = parseInt(input.trim(), 10) - 1;
+      if (isNaN(selectedIdx) || selectedIdx < 0 || selectedIdx >= projects.length) {
+        alert('올바른 프로젝트 번호를 입력해주세요.');
+        return;
+      }
+
+      routine.projectId = projects[selectedIdx].id;
+      saveAndRender();
+    }
+
     /* 프로젝트 관리 */
     function renderProjectList() {
       const container = document.getElementById('projectList');
@@ -1887,6 +1924,9 @@
                     <button onclick="toggleEditMain(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                       수정
                     </button>
+                    <button onclick="moveTodoToProject(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
+                      프로젝트 이동
+                    </button>
                     <button onclick="setSubTaskTargetMode(${t.id}, '${t.task.replace(/'/g, "\\'")}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold">
                       하위 할일 추가
                     </button>
@@ -2200,6 +2240,9 @@
                           <div id="kebab_routine_${r.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-28 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs">
                             <button onclick="toggleEditRoutine(${r.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                               수정
+                            </button>
+                            <button onclick="moveRoutineToProject(${r.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
+                              프로젝트 이동
                             </button>
                             <button onclick="deleteRoutine(${r.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
                               삭제
