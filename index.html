@@ -156,54 +156,67 @@
 
   <!-- 2. 메인 서비스 화면 -->
   <div id="mainScreen" class="hidden max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-8 border border-slate-200/80 dark:border-slate-700/80">
-    <!-- 헤더 영역 -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3.5 border-b border-slate-100 dark:border-slate-700 mb-4 gap-3">
-      <div>
-        <div class="flex items-center gap-2">
-          <h1 class="text-xl sm:text-2xl font-bold text-indigo-600 dark:text-indigo-400"><span id="displayName"></span>님의 할 일</h1>
-          <button onclick="handleLogout()" class="text-sm text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 underline">로그아웃</button>
-        </div>
-        <p id="clock" class="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1"></p>
+    <!-- 헤더 영역 (사용자명 바로 옆 시계 및 통합 세로 삼점 메뉴) -->
+    <div class="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-slate-700 mb-4 gap-2">
+      <div class="flex items-center gap-2 flex-wrap min-w-0">
+        <h1 class="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 flex-shrink-0"><span id="displayName"></span>님의 할 일</h1>
+        <span class="text-xs sm:text-sm font-medium text-slate-400 dark:text-slate-500">|</span>
+        <span id="clock" class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 truncate"></span>
       </div>
 
-      <div class="flex items-center gap-2 self-start sm:self-auto flex-wrap">
-        <button id="darkModeBtn" onclick="toggleDarkMode()" class="text-sm bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg font-medium transition touch-target">
-          🌙 야간
+      <!-- 상단 통합 세로 삼점 메뉴 -->
+      <div class="relative flex-shrink-0">
+        <button onclick="toggleKebabMenu(event, 'topHeaderMenu')" title="설정 및 추가기능" class="p-1.5 px-2.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold transition text-lg touch-target flex items-center justify-center">
+          ⋮
         </button>
-        <button onclick="exportData()" class="text-sm bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg font-medium transition touch-target">백업</button>
-        <label class="text-sm bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg font-medium transition cursor-pointer touch-target flex items-center">
-          복원 <input type="file" accept=".json" onchange="importData(event)" class="hidden">
-        </label>
-        <button onclick="exportCsv()" class="text-sm bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg font-medium transition touch-target">
-          CSV
-        </button>
-        <button id="notifyBtn" onclick="handleNotificationClick()" class="text-sm px-3 py-1.5 rounded-full font-medium transition flex items-center gap-1 shadow-2xs touch-target">
-          알림 확인 중...
-        </button>
+        <div id="topHeaderMenu" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-1.5 text-xs sm:text-sm divide-y divide-slate-100 dark:divide-slate-700">
+          <div class="py-1">
+            <button id="darkModeBtn" onclick="toggleDarkMode()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
+              <span>테마 전환</span>
+              <span id="darkModeIcon">🌙 야간</span>
+            </button>
+            <button id="hideCompletedBtn" onclick="toggleHideCompleted()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
+              <span>완료 항목</span>
+              <span id="hideCompletedText" class="font-semibold text-indigo-600 dark:text-indigo-400">보이기</span>
+            </button>
+            <div id="sortOptionInMenu" class="px-3.5 py-2 flex items-center justify-between">
+              <span class="text-slate-600 dark:text-slate-300">정렬</span>
+              <select id="sortInput" onchange="changeSortOrder(this.value)" class="text-xs bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 font-medium focus:outline-none">
+                <option value="createdAt">최신순</option>
+                <option value="dueDate">마감순</option>
+              </select>
+            </div>
+          </div>
+          <div class="py-1">
+            <button id="notifyBtn" onclick="handleNotificationClick()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
+              <span>알림 상태</span>
+              <span id="notifyStatusText" class="text-xs font-semibold">확인 중...</span>
+            </button>
+            <button onclick="exportData()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
+              <span>📥</span> 백업 (JSON)
+            </button>
+            <label class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 cursor-pointer">
+              <span>📤</span> 복원 (JSON)
+              <input type="file" accept=".json" onchange="importData(event)" class="hidden">
+            </label>
+            <button onclick="exportCsv()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
+              <span>📊</span> CSV 내보내기
+            </button>
+          </div>
+          <div class="py-1">
+            <button onclick="handleLogout()" class="w-full text-left px-3.5 py-2 hover:bg-rose-50 dark:hover:bg-rose-950 text-rose-600 dark:text-rose-400 font-semibold flex items-center gap-2">
+              <span>🚪</span> 로그아웃
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- 탭 메뉴 (All / Today / Routine) & 컨트롤 바 -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 dark:border-slate-700 mb-4 gap-2.5">
-      <div class="flex flex-1">
-        <button id="tabAll" onclick="switchTab('all')" class="flex-1 sm:flex-initial sm:px-6 py-2.5 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 transition text-sm sm:text-base">All</button>
-        <button id="tabToday" onclick="switchTab('today')" class="flex-1 sm:flex-initial sm:px-6 py-2.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Today</button>
-        <button id="tabRoutine" onclick="switchTab('routine')" class="flex-1 sm:flex-initial sm:px-6 py-2.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Routine</button>
-      </div>
-
-      <div class="flex items-center justify-between sm:justify-end gap-3 pb-2 sm:pb-0">
-        <button id="hideCompletedBtn" onclick="toggleHideCompleted()" class="text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 px-3 py-1.5 rounded-lg font-medium transition touch-target flex items-center">
-          완료 숨기기
-        </button>
-
-        <div id="sortContainer" class="flex items-center gap-2">
-          <span class="text-sm text-slate-400">정렬:</span>
-          <select id="sortInput" onchange="changeSortOrder(this.value)" class="text-sm bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-1.5 text-slate-600 dark:text-slate-200 font-medium focus:outline-none touch-target">
-            <option value="createdAt">최신순</option>
-            <option value="dueDate">마감순</option>
-          </select>
-        </div>
-      </div>
+    <!-- 탭 메뉴 (All / Today / Routine) -->
+    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-4">
+      <button id="tabAll" onclick="switchTab('all')" class="flex-1 sm:flex-initial sm:px-6 py-2.5 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 transition text-sm sm:text-base">All</button>
+      <button id="tabToday" onclick="switchTab('today')" class="flex-1 sm:flex-initial sm:px-6 py-2.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Today</button>
+      <button id="tabRoutine" onclick="switchTab('routine')" class="flex-1 sm:flex-initial sm:px-6 py-2.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Routine</button>
     </div>
 
     <!-- 할 일 / 루틴 목록 렌더링 영역 -->
@@ -212,8 +225,8 @@
     </div>
   </div>
 
-  <!-- 통합 하단 입력 바 -->
-  <div id="mobileAddTodoContainer" class="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-2xl p-3 z-40">
+  <!-- 통합 하단 입력 바 (로그아웃 시 숨겨짐) -->
+  <div id="mobileAddTodoContainer" class="hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-2xl p-3 z-40">
     <div class="max-w-4xl mx-auto">
       <form id="todoFormMobile" onsubmit="addUnifiedItem(event, 'mobile')" class="space-y-2.5">
         <div id="mobileMoreOptions" class="hidden space-y-2.5 pt-1 border-b border-slate-100 dark:border-slate-700 pb-2.5">
@@ -298,12 +311,12 @@
     }
 
     function updateDarkModeBtnUI() {
-      const btn = document.getElementById('darkModeBtn');
-      if (!btn) return;
+      const icon = document.getElementById('darkModeIcon');
+      if (!icon) return;
       if (document.documentElement.classList.contains('dark')) {
-        btn.innerHTML = "☀️ 주간";
+        icon.innerText = "☀️ 주간";
       } else {
-        btn.innerHTML = "🌙 야간";
+        icon.innerText = "🌙 야간";
       }
     }
 
@@ -540,6 +553,7 @@
       const input = prompt("관리자 비밀번호를 입력하세요:");
       if (input === "전선홍관리자") {
         document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('mobileAddTodoContainer').classList.add('hidden');
         document.getElementById('adminScreen').classList.remove('hidden');
         loadAdminUserList();
       } else if (input !== null) {
@@ -654,24 +668,24 @@
     }
 
     function updateNotificationUI() {
-      const btn = document.getElementById('notifyBtn');
-      if (!btn) return;
+      const statusText = document.getElementById('notifyStatusText');
+      if (!statusText) return;
 
       if (!('Notification' in window)) {
-        btn.className = "text-sm px-3 py-1.5 rounded-full font-medium bg-slate-100 text-slate-400";
-        btn.innerText = "알림 미지원";
+        statusText.innerText = "미지원";
+        statusText.className = "text-xs font-semibold text-slate-400";
         return;
       }
 
       if (Notification.permission === 'granted') {
-        btn.className = "text-sm px-3 py-1.5 rounded-full font-medium bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800";
-        btn.innerText = "알림 켜짐";
+        statusText.innerText = "켜짐";
+        statusText.className = "text-xs font-semibold text-emerald-600 dark:text-emerald-400";
       } else if (Notification.permission === 'denied') {
-        btn.className = "text-sm px-3 py-1.5 rounded-full font-medium bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800";
-        btn.innerText = "알림 차단됨";
+        statusText.innerText = "차단됨";
+        statusText.className = "text-xs font-semibold text-rose-500";
       } else {
-        btn.className = "text-sm px-3 py-1.5 rounded-full font-medium bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 animate-pulse";
-        btn.innerText = "알림 설정 필요";
+        statusText.innerText = "설정 필요";
+        statusText.className = "text-xs font-semibold text-amber-500";
       }
     }
 
@@ -1012,7 +1026,6 @@
         ['유형', '상위/그룹명', '항목명', '마감일시/주기', '완료여부']
       ];
 
-      // 1. 할 일 & 하위 항목추출
       todos.forEach(t => {
         const hasSub = t.subitems && t.subitems.length > 0;
         rows.push([
@@ -1036,7 +1049,6 @@
         }
       });
 
-      // 2. 루틴 항목 추출
       routines.forEach(r => {
         const freqDetail = r.freq + (r.dayVal ? `(${r.dayVal})` : '') + (r.dueTime ? ` ${r.dueTime}` : '');
         rows.push([
@@ -1048,12 +1060,10 @@
         ]);
       });
 
-      // CSV 문자열 구성 (큰따옴표 이스케이프)
       const csvContent = rows.map(row => 
         row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')
       ).join('\n');
 
-      // UTF-8 BOM 추가하여 엑셀 한글 깨짐 방지
       const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       
@@ -1136,6 +1146,7 @@
       localStorage.removeItem('sunhong_todo_user');
       document.getElementById('loginScreen').classList.remove('hidden');
       document.getElementById('mainScreen').classList.add('hidden');
+      document.getElementById('mobileAddTodoContainer').classList.add('hidden'); // 로그아웃 시 하단 입력 바 숨김
       renderLoginScreen();
     }
 
@@ -1143,12 +1154,14 @@
       if (!currentUser) {
         document.getElementById('loginScreen').classList.remove('hidden');
         document.getElementById('mainScreen').classList.add('hidden');
+        document.getElementById('mobileAddTodoContainer').classList.add('hidden'); // 비로그인 시 입력 바 숨김
         renderLoginScreen();
         return;
       }
 
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('mainScreen').classList.remove('hidden');
+      document.getElementById('mobileAddTodoContainer').classList.remove('hidden'); // 로그인 성공 시 입력 바 표시
       document.getElementById('displayName').innerText = currentUser;
 
       const savedData = localStorage.getItem(`sunhong_todos_${currentUser}`);
@@ -1184,14 +1197,14 @@
     }
 
     function updateHideCompletedBtnUI() {
-      const btn = document.getElementById('hideCompletedBtn');
-      if (!btn) return;
+      const textElem = document.getElementById('hideCompletedText');
+      if (!textElem) return;
       if (hideCompleted) {
-        btn.className = "text-sm text-white bg-indigo-600 hover:bg-indigo-700 px-3.5 py-1.5 rounded-lg font-medium transition touch-target flex items-center";
-        btn.innerHTML = "완료 숨김 적용 중";
+        textElem.innerText = "숨김 중";
+        textElem.className = "font-semibold text-rose-500";
       } else {
-        btn.className = "text-sm text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 px-3.5 py-1.5 rounded-lg font-medium transition touch-target flex items-center";
-        btn.innerHTML = "완료 숨기기";
+        textElem.innerText = "보이기";
+        textElem.className = "font-semibold text-indigo-600 dark:text-indigo-400";
       }
     }
 
@@ -1208,7 +1221,7 @@
       } else {
         if (timeInput) timeInput.classList.remove('hidden');
         if (chipsContainer) chipsContainer.classList.remove('hidden');
-        if (routineOpts) routineOpts.add('hidden');
+        if (routineOpts) routineOpts.classList.add('hidden');
       }
     }
 
@@ -1446,7 +1459,7 @@
       const tabAll = document.getElementById('tabAll');
       const tabToday = document.getElementById('tabToday');
       const tabRoutine = document.getElementById('tabRoutine');
-      const sortContainer = document.getElementById('sortContainer');
+      const sortInMenu = document.getElementById('sortOptionInMenu');
 
       const activeClass = "flex-1 sm:flex-initial sm:px-6 py-2.5 text-center font-bold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 transition text-sm sm:text-base";
       const inactiveClass = "flex-1 sm:flex-initial sm:px-6 py-2.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base";
@@ -1455,8 +1468,10 @@
       tabToday.className = tab === 'today' ? activeClass : inactiveClass;
       tabRoutine.className = tab === 'routine' ? activeClass : inactiveClass;
 
-      if (tab === 'all') sortContainer.classList.remove('hidden');
-      else sortContainer.classList.add('hidden');
+      if (sortInMenu) {
+        if (tab === 'all') sortInMenu.classList.remove('hidden');
+        else sortInMenu.classList.add('hidden');
+      }
 
       render();
     }
@@ -1524,12 +1539,13 @@
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-1.5 flex-wrap">
                       <span class="font-semibold ${t.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100'} text-sm sm:text-base break-words">${t.task}</span>
-                      ${hasSub ? `<span class="text-[9px] leading-none font-semibold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-1 py-0.5 rounded">그룹</span>` : ''}
+                      ${hasSub ? `
+                        <span class="text-[9px] leading-none font-semibold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-1 py-0.5 rounded">그룹</span>
+                        <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400">${prog}% (${compSub}/${totalSub})</span>
+                      ` : ''}
                       ${!t.completed && !hasSub && t.due ? getDDayTag(t.due) : ''}
                       ${!hasSub && t.due ? `<span class="text-xs text-slate-400 ml-1">${formatSimpleDue(t.due)}</span>` : ''}
                     </div>
-                    ${hasSub ? `<div class="flex items-center gap-2 mt-0.5"><span class="text-xs font-medium text-indigo-600 dark:text-indigo-400">${prog}% (${compSub}/${totalSub})</span>
-                      <div class="w-16 sm:w-24 bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden"><div class="bg-indigo-600 dark:bg-indigo-400 h-1.5" style="width: ${prog}%"></div></div></div>` : ''}
                   </div>
                 </div>
                 
