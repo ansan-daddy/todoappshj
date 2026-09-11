@@ -65,7 +65,8 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-100 p-3 sm:p-5 pb-28 transition-colors duration-200 text-sm sm:text-base">
+<!-- pb-40 으로 하단 여백을 충분히 늘려 스크롤 시 등록 바에 가려지지 않게 처리 -->
+<body class="bg-slate-100 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-100 p-3 sm:p-5 pb-40 transition-colors duration-200 text-sm sm:text-base">
 
   <!-- 1. 로그인 / 회원가입 / 관리자 진입 화면 -->
   <div id="loginScreen" class="max-w-lg mx-auto mt-8 sm:mt-12 bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 sm:p-7 border border-slate-200 dark:border-slate-700">
@@ -219,8 +220,8 @@
       <button id="tabRoutine" onclick="switchTab('routine')" class="flex-1 sm:flex-initial sm:px-6 py-2.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Routine</button>
     </div>
 
-    <!-- 할 일 / 루틴 목록 렌더링 영역 -->
-    <div id="todoContainer">
+    <!-- 할 일 / 루틴 목록 렌더링 영역 (mb-12 추가하여 하단 등록 바와의 간격 확보) -->
+    <div id="todoContainer" class="mb-12">
       <ul id="todoList" class="space-y-0"></ul>
     </div>
   </div>
@@ -1146,7 +1147,7 @@
       localStorage.removeItem('sunhong_todo_user');
       document.getElementById('loginScreen').classList.remove('hidden');
       document.getElementById('mainScreen').classList.add('hidden');
-      document.getElementById('mobileAddTodoContainer').classList.add('hidden'); // 로그아웃 시 하단 입력 바 숨김
+      document.getElementById('mobileAddTodoContainer').classList.add('hidden');
       renderLoginScreen();
     }
 
@@ -1154,14 +1155,14 @@
       if (!currentUser) {
         document.getElementById('loginScreen').classList.remove('hidden');
         document.getElementById('mainScreen').classList.add('hidden');
-        document.getElementById('mobileAddTodoContainer').classList.add('hidden'); // 비로그인 시 입력 바 숨김
+        document.getElementById('mobileAddTodoContainer').classList.add('hidden');
         renderLoginScreen();
         return;
       }
 
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('mainScreen').classList.remove('hidden');
-      document.getElementById('mobileAddTodoContainer').classList.remove('hidden'); // 로그인 성공 시 입력 바 표시
+      document.getElementById('mobileAddTodoContainer').classList.remove('hidden');
       document.getElementById('displayName').innerText = currentUser;
 
       const savedData = localStorage.getItem(`sunhong_todos_${currentUser}`);
