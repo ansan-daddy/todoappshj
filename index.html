@@ -67,13 +67,13 @@
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-100 p-3 sm:p-5 pb-36 transition-colors duration-200 text-sm sm:text-base">
 
-  <!-- 사이드바 오버레이 (모바일/배경 클릭시 닫힘) -->
+  <!-- 사이드바 오버레이 -->
   <div id="sidebarOverlay" onclick="closeSidebar()" class="hidden fixed inset-0 bg-slate-900/40 dark:bg-slate-950/60 z-40 backdrop-blur-xs transition-opacity"></div>
 
   <!-- 좌측 사이드바 -->
-  <div id="sidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 shadow-2xl z-50 transform -translate-x-full transition-transform duration-200 flex flex-col">
+  <div id="sidebar" class="fixed top-0 left-0 bottom-0 w-72 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 shadow-2xl z-50 transform -translate-x-full transition-transform duration-200 flex flex-col">
     <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
-      <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg">메뉴</h2>
+      <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg">메뉴 및 설정</h2>
       <button onclick="closeSidebar()" class="p-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold text-sm">✕</button>
     </div>
 
@@ -82,7 +82,7 @@
       <div>
         <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 mb-2 px-2">기본 뷰</p>
         <div class="space-y-1">
-          <button id="sideNav_global_all" onclick="selectGlobalView('all')" class="w-full text-left px-3 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-between bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400">
+          <button id="sideNav_global_all" onclick="selectGlobalView('all')" class="w-full text-left px-3 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-between text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
             <span>전체</span>
           </button>
           <button id="sideNav_global_today" onclick="selectGlobalView('today')" class="w-full text-left px-3 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-between text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
@@ -105,6 +105,65 @@
           </button>
         </div>
         <div id="projectList" class="space-y-1"></div>
+      </div>
+
+      <hr class="border-slate-100 dark:border-slate-700">
+
+      <!-- 3. 환경 설정 및 고급 기능 (통합 섹션) -->
+      <div>
+        <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 mb-2 px-2">설정 및 기능</p>
+        <div class="space-y-1 text-xs sm:text-sm">
+          <button id="darkModeBtn" onclick="toggleDarkMode()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between text-slate-700 dark:text-slate-200">
+            <span>테마 전환</span>
+            <span id="darkModeIcon" class="font-semibold text-indigo-600 dark:text-indigo-400">야간</span>
+          </button>
+
+          <button id="hideCompletedBtn" onclick="toggleHideCompleted()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between text-slate-700 dark:text-slate-200">
+            <span>완료 항목</span>
+            <span id="hideCompletedText" class="font-semibold text-indigo-600 dark:text-indigo-400">보이기</span>
+          </button>
+
+          <div class="px-3 py-2 flex items-center justify-between text-slate-700 dark:text-slate-200">
+            <span>글자 크기</span>
+            <select id="fontSizeInput" onchange="changeFontSize(this.value)" class="text-xs bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-1.5 py-1 font-medium focus:outline-none">
+              <option value="90%">90%</option>
+              <option value="95%">95%</option>
+              <option value="100%">100%</option>
+              <option value="110%">110%</option>
+              <option value="120%">120%</option>
+            </select>
+          </div>
+
+          <div id="sortOptionInMenu" class="px-3 py-2 flex items-center justify-between text-slate-700 dark:text-slate-200">
+            <span>정렬 기준</span>
+            <select id="sortInput" onchange="changeSortOrder(this.value)" class="text-xs bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 font-medium focus:outline-none">
+              <option value="createdAt">최신순</option>
+              <option value="dueDate">마감순</option>
+            </select>
+          </div>
+
+          <button id="notifyBtn" onclick="handleNotificationClick()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between text-slate-700 dark:text-slate-200">
+            <span>알림 상태</span>
+            <span id="notifyStatusText" class="text-xs font-semibold">확인 중...</span>
+          </button>
+
+          <button onclick="exportData()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200">
+            <span>백업 (JSON)</span>
+          </button>
+
+          <label class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between cursor-pointer text-slate-700 dark:text-slate-200">
+            <span>복원 (JSON)</span>
+            <input type="file" accept=".json" onchange="importData(event)" class="hidden">
+          </label>
+
+          <button onclick="exportCsv()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200">
+            <span>CSV 내보내기</span>
+          </button>
+
+          <button onclick="handleLogout()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950 text-rose-600 dark:text-rose-400 font-semibold">
+            <span>로그아웃</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -202,70 +261,13 @@
     <div class="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-700 mb-1.5 gap-2 flex-shrink-0">
       <div class="flex items-center gap-2.5 flex-wrap min-w-0">
         <!-- 햄버거 메뉴 버튼 -->
-        <button onclick="openSidebar()" title="사이드바 열기" class="p-1 px-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold transition text-lg touch-target flex items-center justify-center">
+        <button onclick="openSidebar()" title="메뉴 및 설정 열기" class="p-1 px-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold transition text-lg touch-target flex items-center justify-center">
           ☰
         </button>
         <h1 class="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 flex-shrink-0"><span id="displayName"></span>님의 할 일</h1>
         <span class="text-sm sm:text-base font-medium text-slate-400 dark:text-slate-500">|</span>
         <span id="currentScopeTitle" class="text-xs sm:text-sm font-semibold bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-2 py-0.5 rounded">전체</span>
         <span id="clock" class="text-sm sm:text-base font-medium text-slate-500 dark:text-slate-400 truncate"></span>
-      </div>
-
-      <!-- 상단 통합 세로 삼점 메뉴 -->
-      <div class="relative flex-shrink-0">
-        <button onclick="toggleKebabMenu(event, 'topHeaderMenu')" title="설정 및 추가기능" class="p-1 px-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold transition text-lg touch-target flex items-center justify-center">
-          ⋮
-        </button>
-        <div id="topHeaderMenu" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-52 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-1.5 text-xs sm:text-sm divide-y divide-slate-100 dark:divide-slate-700">
-          <div class="py-1">
-            <button id="darkModeBtn" onclick="toggleDarkMode()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
-              <span>테마 전환</span>
-              <span id="darkModeIcon">야간</span>
-            </button>
-            <button id="hideCompletedBtn" onclick="toggleHideCompleted()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
-              <span>완료 항목</span>
-              <span id="hideCompletedText" class="font-semibold text-indigo-600 dark:text-indigo-400">보이기</span>
-            </button>
-            <div id="fontSizeOptionInMenu" onclick="event.stopPropagation()" class="px-3.5 py-2 flex items-center justify-between">
-              <span class="text-slate-600 dark:text-slate-300">글자 크기</span>
-              <select id="fontSizeInput" onchange="changeFontSize(this.value)" class="text-xs bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-1.5 py-1 font-medium focus:outline-none">
-                <option value="90%">90%</option>
-                <option value="95%">95%</option>
-                <option value="100%">100%</option>
-                <option value="110%">110%</option>
-                <option value="120%">120%</option>
-              </select>
-            </div>
-            <div id="sortOptionInMenu" onclick="event.stopPropagation()" class="px-3.5 py-2 flex items-center justify-between">
-              <span class="text-slate-600 dark:text-slate-300">정렬</span>
-              <select id="sortInput" onchange="changeSortOrder(this.value)" class="text-xs bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 font-medium focus:outline-none">
-                <option value="createdAt">최신순</option>
-                <option value="dueDate">마감순</option>
-              </select>
-            </div>
-          </div>
-          <div class="py-1">
-            <button id="notifyBtn" onclick="handleNotificationClick()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
-              <span>알림 상태</span>
-              <span id="notifyStatusText" class="text-xs font-semibold">확인 중...</span>
-            </button>
-            <button onclick="exportData()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
-              <span>백업 (JSON)</span>
-            </button>
-            <label class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between cursor-pointer">
-              <span>복원 (JSON)</span>
-              <input type="file" accept=".json" onchange="importData(event)" class="hidden">
-            </label>
-            <button onclick="exportCsv()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
-              <span>CSV 내보내기</span>
-            </button>
-          </div>
-          <div class="py-1">
-            <button onclick="handleLogout()" class="w-full text-left px-3.5 py-2 hover:bg-rose-50 dark:hover:bg-rose-950 text-rose-600 dark:text-rose-400 font-semibold flex items-center justify-between">
-              <span>로그아웃</span>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -411,10 +413,11 @@
       }
     }
 
-    /* 사이드바 제어 */
+    /* 사이드바 제어 및 선택 상태 동기화 */
     function openSidebar() {
       document.getElementById('sidebar').classList.remove('-translate-x-full');
       document.getElementById('sidebarOverlay').classList.remove('hidden');
+      updateSidebarHighlightUI();
     }
 
     function closeSidebar() {
@@ -422,11 +425,27 @@
       document.getElementById('sidebarOverlay').classList.add('hidden');
     }
 
+    function updateSidebarHighlightUI() {
+      const globalAll = document.getElementById('sideNav_global_all');
+      const globalToday = document.getElementById('sideNav_global_today');
+      const globalRoutine = document.getElementById('sideNav_global_routine');
+
+      const activeClass = "w-full text-left px-3 py-2 rounded-lg font-bold text-sm transition flex items-center justify-between bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400";
+      const inactiveClass = "w-full text-left px-3 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-between text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700";
+
+      if (globalAll) globalAll.className = (currentScope === 'global' && currentTab === 'all') ? activeClass : inactiveClass;
+      if (globalToday) globalToday.className = (currentScope === 'global' && currentTab === 'today') ? activeClass : inactiveClass;
+      if (globalRoutine) globalRoutine.className = (currentScope === 'global' && currentTab === 'routine') ? activeClass : inactiveClass;
+
+      renderProjectList();
+    }
+
     function selectGlobalView(viewTab) {
       currentScope = 'global';
       currentTab = viewTab;
       closeSidebar();
       updateScopeTitleUI();
+      updateSidebarHighlightUI();
       switchTab(viewTab);
     }
 
@@ -435,6 +454,11 @@
       currentProjectId = projId;
       closeSidebar();
       updateScopeTitleUI();
+      updateSidebarHighlightUI();
+
+      const targetSelect = document.getElementById('projectTargetSelectMobile');
+      if (targetSelect) targetSelect.value = projId;
+
       render();
     }
 
@@ -450,40 +474,14 @@
       }
     }
 
-    /* 프로젝트 이동 기능 */
-    function moveTodoToProject(id) {
-      const todo = todos.find(t => t.id === id);
-      if (!todo) return;
-
-      const projectOptions = projects.map((p, idx) => `${idx + 1}. ${p.name}`).join('\n');
-      const input = prompt(`이동할 프로젝트 번호를 입력하세요:\n\n${projectOptions}`);
-      if (!input) return;
-
-      const selectedIdx = parseInt(input.trim(), 10) - 1;
-      if (isNaN(selectedIdx) || selectedIdx < 0 || selectedIdx >= projects.length) {
-        alert('올바른 프로젝트 번호를 입력해주세요.');
-        return;
-      }
-
-      todo.projectId = projects[selectedIdx].id;
+    /* 프로젝트 직접 이동 */
+    function moveTodoToProjectDirect(todoId, targetProjId) {
+      todos = todos.map(t => t.id === todoId ? { ...t, projectId: targetProjId } : t);
       saveAndRender();
     }
 
-    function moveRoutineToProject(id) {
-      const routine = routines.find(r => r.id === id);
-      if (!routine) return;
-
-      const projectOptions = projects.map((p, idx) => `${idx + 1}. ${p.name}`).join('\n');
-      const input = prompt(`이동할 프로젝트 번호를 입력하세요:\n\n${projectOptions}`);
-      if (!input) return;
-
-      const selectedIdx = parseInt(input.trim(), 10) - 1;
-      if (isNaN(selectedIdx) || selectedIdx < 0 || selectedIdx >= projects.length) {
-        alert('올바른 프로젝트 번호를 입력해주세요.');
-        return;
-      }
-
-      routine.projectId = projects[selectedIdx].id;
+    function moveRoutineToProjectDirect(routineId, targetProjId) {
+      routines = routines.map(r => r.id === routineId ? { ...r, projectId: targetProjId } : r);
       saveAndRender();
     }
 
@@ -1257,7 +1255,7 @@
           projects = [{ id: 'default', name: '기본' }];
         }
         localStorage.setItem(`sunhong_projects_${currentUser}`, JSON.stringify(projects));
-        renderProjectList();
+        updateSidebarHighlightUI();
         updateScopeTitleUI();
       });
 
@@ -1292,7 +1290,7 @@
         localStorage.setItem(`sunhong_routines_${currentUser}`, JSON.stringify(routines));
         syncToFirebase();
       }
-      renderProjectList();
+      updateSidebarHighlightUI();
       render();
     }
 
@@ -1437,6 +1435,7 @@
     function handleLogout() {
       currentUser = '';
       localStorage.removeItem('sunhong_todo_user');
+      closeSidebar();
       document.getElementById('loginScreen').classList.remove('hidden');
       document.getElementById('mainScreen').classList.add('hidden');
       document.getElementById('mobileAddTodoContainer').classList.add('hidden');
@@ -1480,7 +1479,7 @@
       updateNotificationUI();
       setupFirebaseListener();
       
-      renderProjectList();
+      updateSidebarHighlightUI();
       updateScopeTitleUI();
       render();
     }
@@ -1882,7 +1881,8 @@
         const compSub = hasSub ? t.subitems.filter(s => s.completed).length : 0;
         const prog = hasSub ? Math.round((compSub / totalSub) * 100) : 0;
 
-        const projName = (projects.find(p => p.id === (t.projectId || 'default')) || { name: '기본' }).name;
+        const currentProjId = t.projectId || 'default';
+        const projName = (projects.find(p => p.id === currentProjId) || { name: '기본' }).name;
 
         return `
           <li class="bg-slate-50 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-md p-0.5 shadow-2xs transition ${t.completed ? 'opacity-60 bg-slate-100/50 dark:bg-slate-900/40' : ''}">
@@ -1917,16 +1917,24 @@
                   <button onclick="toggleKebabMenu(event, 'kebab_main_${t.id}')" title="더보기" class="p-1 px-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded font-bold transition text-base touch-target">
                     ⋮
                   </button>
-                  <div id="kebab_main_${t.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs">
+                  <div id="kebab_main_${t.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs">
                     <button onclick="addToGoogleCalendar('${t.task.replace(/'/g, "\\'")}', '할일', '${t.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                       캘린더 추가
                     </button>
                     <button onclick="toggleEditMain(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                       수정
                     </button>
-                    <button onclick="moveTodoToProject(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
-                      프로젝트 이동
-                    </button>
+                    
+                    <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                    <div class="px-3 py-1 text-[10px] font-bold text-slate-400">프로젝트 이동:</div>
+                    ${projects.map(p => `
+                      <button onclick="moveTodoToProjectDirect(${t.id}, '${p.id}')" class="w-full text-left px-4 py-1 hover:bg-indigo-50 dark:hover:bg-indigo-950 flex items-center justify-between ${p.id === currentProjId ? 'text-indigo-600 dark:text-indigo-400 font-bold' : ''}">
+                        <span class="truncate">${p.name}</span>
+                        ${p.id === currentProjId ? '<span class="text-[10px]">✓</span>' : ''}
+                      </button>
+                    `).join('')}
+
+                    <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
                     <button onclick="setSubTaskTargetMode(${t.id}, '${t.task.replace(/'/g, "\\'")}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold">
                       하위 할일 추가
                     </button>
@@ -2173,6 +2181,7 @@
               ${filteredRoutines.map(r => {
                 const isDoneToday = r.lastCompletedDate === todayStr;
                 const isDueToday = isRoutineDueToday(r);
+                const currentProjId = r.projectId || 'default';
 
                 let dayLabel = '';
                 if (r.freq === '매주') {
@@ -2237,13 +2246,21 @@
                           <button onclick="toggleKebabMenu(event, 'kebab_routine_${r.id}')" title="더보기" class="p-1 px-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded font-bold transition text-base touch-target">
                             ⋮
                           </button>
-                          <div id="kebab_routine_${r.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-28 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs">
+                          <div id="kebab_routine_${r.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs">
                             <button onclick="toggleEditRoutine(${r.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                               수정
                             </button>
-                            <button onclick="moveRoutineToProject(${r.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
-                              프로젝트 이동
-                            </button>
+                            
+                            <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                            <div class="px-3 py-1 text-[10px] font-bold text-slate-400">프로젝트 이동:</div>
+                            ${projects.map(p => `
+                              <button onclick="moveRoutineToProjectDirect(${r.id}, '${p.id}')" class="w-full text-left px-4 py-1 hover:bg-indigo-50 dark:hover:bg-indigo-950 flex items-center justify-between ${p.id === currentProjId ? 'text-indigo-600 dark:text-indigo-400 font-bold' : ''}">
+                                <span class="truncate">${p.name}</span>
+                                ${p.id === currentProjId ? '<span class="text-[10px]">✓</span>' : ''}
+                              </button>
+                            `).join('')}
+
+                            <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
                             <button onclick="deleteRoutine(${r.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
                               삭제
                             </button>
