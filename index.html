@@ -109,10 +109,15 @@
 
       <hr class="border-slate-100 dark:border-slate-700">
 
-      <!-- 3. 환경 설정 및 고급 기능 (통합 섹션) -->
+      <!-- 3. 환경 설정 및 보관소/고급 기능 -->
       <div>
-        <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 mb-2 px-2">설정 및 기능</p>
+        <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 mb-2 px-2">설정 및 관리</p>
         <div class="space-y-1 text-xs sm:text-sm">
+          <button onclick="openArchiveModal()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-950/60 flex items-center justify-between text-indigo-600 dark:text-indigo-400 font-semibold">
+            <span>완료 항목 보관소</span>
+            <span id="archiveCountBadge" class="text-xs bg-indigo-100 dark:bg-indigo-900 px-2 py-0.5 rounded-full font-bold">0</span>
+          </button>
+
           <button id="darkModeBtn" onclick="toggleDarkMode()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between text-slate-700 dark:text-slate-200">
             <span>테마 전환</span>
             <span id="darkModeIcon" class="font-semibold text-indigo-600 dark:text-indigo-400">야간</span>
@@ -164,6 +169,31 @@
             <span>로그아웃</span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 완료 항목 보관소 모달 -->
+  <div id="archiveModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col border border-slate-200 dark:border-slate-700">
+      <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">완료 항목 보관소</h3>
+          <p class="text-xs text-slate-400 mt-0.5">완료 처리되어 보관된 할 일들을 확인하고 복원하거나 정리합니다.</p>
+        </div>
+        <button onclick="closeArchiveModal()" class="p-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold text-sm">✕</button>
+      </div>
+
+      <div class="p-3 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-800/50">
+        <button onclick="archiveAllCompleted()" class="px-3 py-1.5 bg-indigo-600 text-white rounded-lg font-semibold text-xs hover:bg-indigo-700 transition">
+          현재 완료된 모든 항목 보관함으로 옮기기
+        </button>
+        <button onclick="clearAllArchive()" class="px-3 py-1.5 bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 rounded-lg font-semibold text-xs hover:bg-rose-100 dark:hover:bg-rose-900 transition">
+          보관소 전체 비우기
+        </button>
+      </div>
+
+      <div id="archiveListContainer" class="flex-1 overflow-y-auto p-4 space-y-2">
       </div>
     </div>
   </div>
@@ -362,9 +392,10 @@
     let projects = [];
     let todos = [];
     let routines = [];
+    let archivedTodos = [];
     
     let currentTab = localStorage.getItem('sunhong_todo_current_tab') || 'all';
-    let currentScope = localStorage.getItem('sunhong_todo_current_scope') || 'global'; // 'global' 또는 'project'
+    let currentScope = localStorage.getItem('sunhong_todo_current_scope') || 'global';
     let currentProjectId = localStorage.getItem('sunhong_todo_current_proj') || 'default';
 
     let currentSort = localStorage.getItem('sunhong_todo_sort') || 'createdAt';
@@ -413,7 +444,7 @@
       }
     }
 
-    /* 사이드바 제어 및 선택 상태 동기화 */
+    /* 사이드바 제어 */
     function openSidebar() {
       document.getElementById('sidebar').classList.remove('-translate-x-full');
       document.getElementById('sidebarOverlay').classList.remove('hidden');
@@ -438,6 +469,7 @@
       if (globalRoutine) globalRoutine.className = (currentScope === 'global' && currentTab === 'routine') ? activeClass : inactiveClass;
 
       renderProjectList();
+      updateArchiveBadge();
     }
 
     function selectGlobalView(viewTab) {
@@ -478,7 +510,98 @@
       }
     }
 
-    /* 프로젝트 직접 이동 */
+    /* 보관소 기능 */
+    function updateArchiveBadge() {
+      const badge = document.getElementById('archiveCountBadge');
+      if (badge) badge.innerText = archivedTodos.length;
+    }
+
+    function openArchiveModal() {
+      closeSidebar();
+      document.getElementById('archiveModal').classList.remove('hidden');
+      renderArchiveList();
+    }
+
+    function closeArchiveModal() {
+      document.getElementById('archiveModal').classList.add('hidden');
+    }
+
+    function archiveAllCompleted() {
+      const completedToMove = todos.filter(t => t.completed);
+      if (completedToMove.length === 0) {
+        alert("현재 완료 처리된 할 일이 없습니다.");
+        return;
+      }
+
+      todos = todos.filter(t => !t.completed);
+      archivedTodos = [...completedToMove, ...archivedTodos];
+      saveAndRender();
+      renderArchiveList();
+    }
+
+    function restoreFromArchive(id) {
+      const itemToRestore = archivedTodos.find(t => t.id === id);
+      if (!itemToRestore) return;
+
+      archivedTodos = archivedTodos.filter(t => t.id !== id);
+      todos.unshift(itemToRestore);
+      saveAndRender();
+      renderArchiveList();
+    }
+
+    function deleteFromArchive(id) {
+      archivedTodos = archivedTodos.filter(t => t.id !== id);
+      saveAndRender();
+      renderArchiveList();
+    }
+
+    function clearAllArchive() {
+      if (archivedTodos.length === 0) return;
+      if (!confirm("보관소의 모든 항목을 완전히 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다.")) return;
+
+      archivedTodos = [];
+      saveAndRender();
+      renderArchiveList();
+    }
+
+    function renderArchiveList() {
+      const container = document.getElementById('archiveListContainer');
+      if (!container) return;
+
+      if (archivedTodos.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-slate-400 text-sm">
+            보관된 완료 항목이 없습니다.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = archivedTodos.map(item => {
+        const projName = (projects.find(p => p.id === (item.projectId || 'default')) || { name: '기본' }).name;
+        return `
+          <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200/80 dark:border-slate-700">
+            <div class="flex flex-col min-w-0 pr-2">
+              <div class="flex items-center gap-2">
+                <span class="text-xs bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-1.5 py-0.5 rounded font-semibold flex-shrink-0">${projName}</span>
+                <span class="font-semibold text-slate-700 dark:text-slate-200 text-sm line-through truncate">${item.task}</span>
+              </div>
+              ${item.due ? `<span class="text-xs text-slate-400 mt-0.5">마감일: ${formatSimpleDue(item.due)}</span>` : ''}
+            </div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <button onclick="restoreFromArchive(${item.id})" class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 rounded-lg text-xs font-bold hover:bg-indigo-100 transition">
+                복원
+              </button>
+              <button onclick="deleteFromArchive(${item.id})" class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-bold hover:bg-rose-100 transition">
+                삭제
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* 프로젝트 이동 */
     function moveTodoToProjectDirect(todoId, targetProjId) {
       todos = todos.map(t => t.id === todoId ? { ...t, projectId: targetProjId } : t);
       saveAndRender();
@@ -489,7 +612,6 @@
       saveAndRender();
     }
 
-    /* 프로젝트 관리 */
     function renderProjectList() {
       const container = document.getElementById('projectList');
       const selectElem = document.getElementById('projectTargetSelectMobile');
@@ -561,6 +683,7 @@
 
       todos = todos.map(t => t.projectId === id ? { ...t, projectId: 'default' } : t);
       routines = routines.map(r => r.projectId === id ? { ...r, projectId: 'default' } : r);
+      archivedTodos = archivedTodos.map(a => a.projectId === id ? { ...a, projectId: 'default' } : a);
       projects = projects.filter(p => p.id !== id);
 
       if (currentProjectId === id) {
@@ -877,10 +1000,12 @@
         const userTodosRef = window.dbRef(window.firebaseDb, `todos/${uname}`);
         const userRoutinesRef = window.dbRef(window.firebaseDb, `routines/${uname}`);
         const userProjectsRef = window.dbRef(window.firebaseDb, `projects/${uname}`);
+        const userArchiveRef = window.dbRef(window.firebaseDb, `archive/${uname}`);
         await window.dbRemove(userRef);
         await window.dbRemove(userTodosRef);
         await window.dbRemove(userRoutinesRef);
         await window.dbRemove(userProjectsRef);
+        await window.dbRemove(userArchiveRef);
       } else {
         delete localUsers[uname];
         localStorage.setItem('sunhong_todo_user_db', JSON.stringify(localUsers));
@@ -1278,6 +1403,14 @@
         localStorage.setItem(`sunhong_routines_${currentUser}`, JSON.stringify(routines));
         render();
       });
+
+      const userArchiveRef = window.dbRef(window.firebaseDb, `archive/${currentUser}`);
+      window.dbOnValue(userArchiveRef, (snapshot) => {
+        const data = snapshot.val();
+        archivedTodos = extractAllTodos(data);
+        localStorage.setItem(`sunhong_archive_${currentUser}`, JSON.stringify(archivedTodos));
+        updateArchiveBadge();
+      });
     }
 
     function syncToFirebase() {
@@ -1285,6 +1418,7 @@
       window.dbSet(window.dbRef(window.firebaseDb, `projects/${currentUser}`), projects);
       window.dbSet(window.dbRef(window.firebaseDb, `todos/${currentUser}`), todos);
       window.dbSet(window.dbRef(window.firebaseDb, `routines/${currentUser}`), routines);
+      window.dbSet(window.dbRef(window.firebaseDb, `archive/${currentUser}`), archivedTodos);
     }
 
     function saveAndRender() {
@@ -1292,6 +1426,7 @@
         localStorage.setItem(`sunhong_projects_${currentUser}`, JSON.stringify(projects));
         localStorage.setItem(`sunhong_todos_${currentUser}`, JSON.stringify(todos));
         localStorage.setItem(`sunhong_routines_${currentUser}`, JSON.stringify(routines));
+        localStorage.setItem(`sunhong_archive_${currentUser}`, JSON.stringify(archivedTodos));
         syncToFirebase();
       }
       updateSidebarHighlightUI();
@@ -1299,8 +1434,8 @@
     }
 
     function exportData() {
-      if (!todos.length && !routines.length) { alert('백업할 데이터가 없습니다.'); return; }
-      const payload = { projects, todos, routines };
+      if (!todos.length && !routines.length && !archivedTodos.length) { alert('백업할 데이터가 없습니다.'); return; }
+      const payload = { projects, todos, routines, archivedTodos };
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
@@ -1311,7 +1446,7 @@
     }
 
     function exportCsv() {
-      if (!todos.length && !routines.length) { 
+      if (!todos.length && !routines.length && !archivedTodos.length) { 
         alert('내보낼 데이터가 없습니다.'); 
         return; 
       }
@@ -1386,6 +1521,7 @@
           if (imported.projects) projects = imported.projects;
           if (imported.todos) todos = extractAllTodos(imported.todos);
           if (imported.routines) routines = extractAllRoutines(imported.routines);
+          if (imported.archivedTodos) archivedTodos = extractAllTodos(imported.archivedTodos);
           
           saveAndRender();
           alert('데이터가 성공적으로 복원되었습니다.');
@@ -1458,7 +1594,7 @@
         return;
       }
 
-      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('loginScreen').classList.remove('hidden');
       document.getElementById('mainScreen').classList.remove('hidden');
       document.getElementById('mobileAddTodoContainer').classList.remove('hidden');
       document.getElementById('displayName').innerText = currentUser;
@@ -1471,6 +1607,9 @@
 
       const savedRoutines = localStorage.getItem(`sunhong_routines_${currentUser}`);
       routines = savedRoutines ? extractAllRoutines(JSON.parse(savedRoutines)) : [];
+
+      const savedArchive = localStorage.getItem(`sunhong_archive_${currentUser}`);
+      archivedTodos = savedArchive ? extractAllTodos(JSON.parse(savedArchive)) : [];
 
       const sortSelect = document.getElementById('sortInput');
       if (sortSelect) sortSelect.value = currentSort;
@@ -1882,7 +2021,6 @@
         const hasSub = t.subitems && t.subitems.length > 0;
         
         const visibleSubitems = hasSub ? (hideCompleted ? t.subitems.filter(s => !s.completed) : t.subitems) : [];
-        const hasVisibleSub = visibleSubitems.length > 0;
 
         const totalSub = hasSub ? t.subitems.length : 0;
         const compSub = hasSub ? t.subitems.filter(s => s.completed).length : 0;
@@ -1953,7 +2091,7 @@
               </div>
             `}
 
-            ${hasVisibleSub ? `
+            ${visibleSubitems.length > 0 ? `
               <ul class="mt-0.5 pl-2 sm:pl-4 border-l-2 border-indigo-100 dark:border-indigo-900 space-y-0">
                 ${visibleSubitems.map(s => `
                   <li class="py-0">
