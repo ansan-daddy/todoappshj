@@ -67,6 +67,48 @@
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-100 p-3 sm:p-5 pb-36 transition-colors duration-200 text-sm sm:text-base">
 
+  <!-- 사이드바 오버레이 (모바일/배경 클릭시 닫힘) -->
+  <div id="sidebarOverlay" onclick="closeSidebar()" class="hidden fixed inset-0 bg-slate-900/40 dark:bg-slate-950/60 z-40 backdrop-blur-xs transition-opacity"></div>
+
+  <!-- 좌측 사이드바 -->
+  <div id="sidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 shadow-2xl z-50 transform -translate-x-full transition-transform duration-200 flex flex-col">
+    <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+      <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg">메뉴</h2>
+      <button onclick="closeSidebar()" class="p-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold text-sm">✕</button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-3 space-y-5">
+      <!-- 1. 글로벌 뷰 -->
+      <div>
+        <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 mb-2 px-2">기본 뷰</p>
+        <div class="space-y-1">
+          <button id="sideNav_global_all" onclick="selectGlobalView('all')" class="w-full text-left px-3 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-between bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400">
+            <span>전체</span>
+          </button>
+          <button id="sideNav_global_today" onclick="selectGlobalView('today')" class="w-full text-left px-3 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-between text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+            <span>Today</span>
+          </button>
+          <button id="sideNav_global_routine" onclick="selectGlobalView('routine')" class="w-full text-left px-3 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-between text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+            <span>루틴</span>
+          </button>
+        </div>
+      </div>
+
+      <hr class="border-slate-100 dark:border-slate-700">
+
+      <!-- 2. 프로젝트 리스트 -->
+      <div>
+        <div class="flex items-center justify-between mb-2 px-2">
+          <p class="text-xs font-semibold text-slate-400 dark:text-slate-500">프로젝트</p>
+          <button onclick="addNewProject()" title="프로젝트 추가" class="px-2 py-0.5 text-xs bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 rounded font-bold transition">
+            + 추가
+          </button>
+        </div>
+        <div id="projectList" class="space-y-1"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- 1. 로그인 / 회원가입 / 관리자 진입 화면 -->
   <div id="loginScreen" class="max-w-lg mx-auto mt-8 sm:mt-12 bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 sm:p-7 border border-slate-200 dark:border-slate-700">
     <div class="text-center mb-5">
@@ -158,9 +200,14 @@
   <div id="mainScreen" class="hidden max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 border border-slate-200/80 dark:border-slate-700/80 flex flex-col h-[calc(100vh-160px)] min-h-[400px]">
     <!-- 헤더 영역 -->
     <div class="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-700 mb-1.5 gap-2 flex-shrink-0">
-      <div class="flex items-center gap-2 flex-wrap min-w-0">
+      <div class="flex items-center gap-2.5 flex-wrap min-w-0">
+        <!-- 햄버거 메뉴 버튼 -->
+        <button onclick="openSidebar()" title="사이드바 열기" class="p-1 px-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold transition text-lg touch-target flex items-center justify-center">
+          ☰
+        </button>
         <h1 class="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 flex-shrink-0"><span id="displayName"></span>님의 할 일</h1>
         <span class="text-sm sm:text-base font-medium text-slate-400 dark:text-slate-500">|</span>
+        <span id="currentScopeTitle" class="text-xs sm:text-sm font-semibold bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-2 py-0.5 rounded">전체</span>
         <span id="clock" class="text-sm sm:text-base font-medium text-slate-500 dark:text-slate-400 truncate"></span>
       </div>
 
@@ -173,7 +220,7 @@
           <div class="py-1">
             <button id="darkModeBtn" onclick="toggleDarkMode()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
               <span>테마 전환</span>
-              <span id="darkModeIcon">🌙 야간</span>
+              <span id="darkModeIcon">야간</span>
             </button>
             <button id="hideCompletedBtn" onclick="toggleHideCompleted()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
               <span>완료 항목</span>
@@ -202,20 +249,20 @@
               <span>알림 상태</span>
               <span id="notifyStatusText" class="text-xs font-semibold">확인 중...</span>
             </button>
-            <button onclick="exportData()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
-              <span>📥</span> 백업 (JSON)
+            <button onclick="exportData()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
+              <span>백업 (JSON)</span>
             </button>
-            <label class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2 cursor-pointer">
-              <span>📤</span> 복원 (JSON)
+            <label class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between cursor-pointer">
+              <span>복원 (JSON)</span>
               <input type="file" accept=".json" onchange="importData(event)" class="hidden">
             </label>
-            <button onclick="exportCsv()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
-              <span>📊</span> CSV 내보내기
+            <button onclick="exportCsv()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
+              <span>CSV 내보내기</span>
             </button>
           </div>
           <div class="py-1">
-            <button onclick="handleLogout()" class="w-full text-left px-3.5 py-2 hover:bg-rose-50 dark:hover:bg-rose-950 text-rose-600 dark:text-rose-400 font-semibold flex items-center gap-2">
-              <span>🚪</span> 로그아웃
+            <button onclick="handleLogout()" class="w-full text-left px-3.5 py-2 hover:bg-rose-50 dark:hover:bg-rose-950 text-rose-600 dark:text-rose-400 font-semibold flex items-center justify-between">
+              <span>로그아웃</span>
             </button>
           </div>
         </div>
@@ -242,7 +289,7 @@
       <!-- 하위 할일 타겟 모드 가이드 바 -->
       <div id="subTaskTargetBar" class="hidden flex items-center justify-between bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 px-3 py-1.5 rounded-lg mb-2 text-xs sm:text-sm">
         <div class="flex items-center gap-1.5 min-w-0">
-          <span class="font-bold text-indigo-600 dark:text-indigo-400 flex-shrink-0">📂 하위 할일 작성:</span>
+          <span class="font-bold text-indigo-600 dark:text-indigo-400 flex-shrink-0">하위 할일 작성:</span>
           <span id="subTaskTargetTitle" class="truncate font-semibold text-slate-700 dark:text-slate-200"></span>
         </div>
         <button type="button" onclick="cancelSubTaskTargetMode()" class="text-rose-500 font-bold hover:underline ml-2 flex-shrink-0 touch-target">
@@ -265,6 +312,9 @@
             <select id="categoryInputMobile" onchange="handleCategoryChange(this.value, 'mobile')" class="px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 font-bold text-indigo-600 dark:text-indigo-400 touch-target">
               <option value="할일">할 일</option>
               <option value="routine">루틴</option>
+            </select>
+
+            <select id="projectTargetSelectMobile" class="px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 font-semibold text-slate-700 dark:text-slate-200 touch-target">
             </select>
 
             <input type="datetime-local" id="timeInputMobile" step="60" class="flex-1 px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 touch-target">
@@ -291,7 +341,7 @@
                  class="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 touch-target">
           
           <button type="button" onclick="toggleMobileOptions()" class="p-3 text-slate-500 hover:text-slate-700 text-base font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 touch-target flex items-center justify-center">
-            ⚙️
+            설정
           </button>
 
           <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-3 rounded-xl text-base shadow-2xs touch-target flex-shrink-0">
@@ -306,16 +356,20 @@
     let currentUser = localStorage.getItem('sunhong_todo_user') || '';
     let savedAccounts = JSON.parse(localStorage.getItem('sunhong_todo_accounts') || '[]');
     let localUsers = JSON.parse(localStorage.getItem('sunhong_todo_user_db') || '{}');
+    
+    let projects = [];
     let todos = [];
     let routines = [];
-    let currentTab = 'all';
     
+    let currentTab = 'all';
+    let currentScope = 'global'; // 'global' 또는 'project'
+    let currentProjectId = 'default';
+
     let currentSort = localStorage.getItem('sunhong_todo_sort') || 'createdAt';
     let hideCompleted = localStorage.getItem('sunhong_todo_hide_completed') === 'true';
     let currentFontSize = localStorage.getItem('sunhong_todo_font_size') || '100%';
 
     let targetParentId = null;
-
     let swRegistration = null;
 
     if (localStorage.getItem('sunhong_theme') === 'dark' || (!('sunhong_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -351,9 +405,129 @@
       const icon = document.getElementById('darkModeIcon');
       if (!icon) return;
       if (document.documentElement.classList.contains('dark')) {
-        icon.innerText = "☀️ 주간";
+        icon.innerText = "주간";
       } else {
-        icon.innerText = "🌙 야간";
+        icon.innerText = "야간";
+      }
+    }
+
+    /* 사이드바 제어 */
+    function openSidebar() {
+      document.getElementById('sidebar').classList.remove('-translate-x-full');
+      document.getElementById('sidebarOverlay').classList.remove('hidden');
+    }
+
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('sidebarOverlay').classList.add('hidden');
+    }
+
+    function selectGlobalView(viewTab) {
+      currentScope = 'global';
+      currentTab = viewTab;
+      closeSidebar();
+      updateScopeTitleUI();
+      switchTab(viewTab);
+    }
+
+    function selectProjectView(projId) {
+      currentScope = 'project';
+      currentProjectId = projId;
+      closeSidebar();
+      updateScopeTitleUI();
+      render();
+    }
+
+    function updateScopeTitleUI() {
+      const titleElem = document.getElementById('currentScopeTitle');
+      if (!titleElem) return;
+
+      if (currentScope === 'global') {
+        titleElem.innerText = "전체";
+      } else {
+        const proj = projects.find(p => p.id === currentProjectId);
+        titleElem.innerText = proj ? proj.name : "프로젝트";
+      }
+    }
+
+    /* 프로젝트 관리 */
+    function renderProjectList() {
+      const container = document.getElementById('projectList');
+      const selectElem = document.getElementById('projectTargetSelectMobile');
+      if (!container) return;
+
+      container.innerHTML = projects.map(p => {
+        const isSelected = currentScope === 'project' && currentProjectId === p.id;
+        const isDefault = p.id === 'default';
+
+        return `
+          <div class="flex items-center justify-between p-2 rounded-lg transition ${isSelected ? 'bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}">
+            <button onclick="selectProjectView('${p.id}')" class="flex-1 text-left truncate text-sm">
+              ${p.name}
+            </button>
+            <div class="relative flex-shrink-0">
+              <button onclick="toggleKebabMenu(event, 'kebab_proj_${p.id}')" class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold text-xs">
+                ⋮
+              </button>
+              <div id="kebab_proj_${p.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-28 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs font-normal">
+                <button onclick="editProjectName('${p.id}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
+                  이름 수정
+                </button>
+                ${!isDefault ? `
+                  <button onclick="deleteProject('${p.id}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
+                    삭제
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (selectElem) {
+        selectElem.innerHTML = projects.map(p => `
+          <option value="${p.id}" ${p.id === currentProjectId ? 'selected' : ''}>${p.name}</option>
+        `).join('');
+      }
+    }
+
+    function addNewProject() {
+      const name = prompt("새 프로젝트 카테고리 이름을 입력하세요:");
+      if (!name || !name.trim()) return;
+
+      const newId = 'proj_' + Date.now();
+      projects.push({ id: newId, name: name.trim() });
+      saveAndRender();
+      selectProjectView(newId);
+    }
+
+    function editProjectName(id) {
+      const proj = projects.find(p => p.id === id);
+      if (!proj) return;
+
+      const newName = prompt("프로젝트 이름을 수정하세요:", proj.name);
+      if (!newName || !newName.trim() || newName.trim() === proj.name) return;
+
+      proj.name = newName.trim();
+      saveAndRender();
+      updateScopeTitleUI();
+    }
+
+    function deleteProject(id) {
+      if (id === 'default') {
+        alert('기본 프로젝트는 삭제할 수 없습니다.');
+        return;
+      }
+      if (!confirm('이 프로젝트를 삭제하시겠습니까? 속한 할 일은 기본 프로젝트로 이동됩니다.')) return;
+
+      todos = todos.map(t => t.projectId === id ? { ...t, projectId: 'default' } : t);
+      routines = routines.map(r => r.projectId === id ? { ...r, projectId: 'default' } : r);
+      projects = projects.filter(p => p.id !== id);
+
+      if (currentProjectId === id) {
+        selectProjectView('default');
+      } else {
+        saveAndRender();
       }
     }
 
@@ -663,9 +837,11 @@
         const userRef = window.dbRef(window.firebaseDb, `users/${uname}`);
         const userTodosRef = window.dbRef(window.firebaseDb, `todos/${uname}`);
         const userRoutinesRef = window.dbRef(window.firebaseDb, `routines/${uname}`);
+        const userProjectsRef = window.dbRef(window.firebaseDb, `projects/${uname}`);
         await window.dbRemove(userRef);
         await window.dbRemove(userTodosRef);
         await window.dbRemove(userRoutinesRef);
+        await window.dbRemove(userProjectsRef);
       } else {
         delete localUsers[uname];
         localStorage.setItem('sunhong_todo_user_db', JSON.stringify(localUsers));
@@ -980,6 +1156,7 @@
 
             extracted.push({
               id: val.id || Date.now() + Math.random(),
+              projectId: val.projectId || 'default',
               task: val.task || val.text || val.title || '내용 없음',
               due: subList.length > 0 ? '' : (val.due || val.dueDate || val.date || ''),
               category: val.category || '할일',
@@ -1011,6 +1188,7 @@
           if (val.task || val.text || val.title) {
             extracted.push({
               id: val.id || Date.now() + Math.random(),
+              projectId: val.projectId || 'default',
               task: val.task || val.text || val.title || '',
               freq: val.freq || '매일',
               dayVal: val.dayVal || '',
@@ -1033,6 +1211,19 @@
     function setupFirebaseListener() {
       if (!window.firebaseDb || !currentUser) return;
       
+      const userProjectsRef = window.dbRef(window.firebaseDb, `projects/${currentUser}`);
+      window.dbOnValue(userProjectsRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data && Array.isArray(data) && data.length > 0) {
+          projects = data;
+        } else {
+          projects = [{ id: 'default', name: '기본' }];
+        }
+        localStorage.setItem(`sunhong_projects_${currentUser}`, JSON.stringify(projects));
+        renderProjectList();
+        updateScopeTitleUI();
+      });
+
       const userTodosRef = window.dbRef(window.firebaseDb, `todos/${currentUser}`);
       window.dbOnValue(userTodosRef, (snapshot) => {
         const data = snapshot.val();
@@ -1052,22 +1243,25 @@
 
     function syncToFirebase() {
       if (!window.firebaseDb || !currentUser) return;
+      window.dbSet(window.dbRef(window.firebaseDb, `projects/${currentUser}`), projects);
       window.dbSet(window.dbRef(window.firebaseDb, `todos/${currentUser}`), todos);
       window.dbSet(window.dbRef(window.firebaseDb, `routines/${currentUser}`), routines);
     }
 
     function saveAndRender() {
       if (currentUser) {
+        localStorage.setItem(`sunhong_projects_${currentUser}`, JSON.stringify(projects));
         localStorage.setItem(`sunhong_todos_${currentUser}`, JSON.stringify(todos));
         localStorage.setItem(`sunhong_routines_${currentUser}`, JSON.stringify(routines));
         syncToFirebase();
       }
+      renderProjectList();
       render();
     }
 
     function exportData() {
       if (!todos.length && !routines.length) { alert('백업할 데이터가 없습니다.'); return; }
-      const payload = { todos, routines };
+      const payload = { projects, todos, routines };
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", dataStr);
@@ -1084,13 +1278,15 @@
       }
 
       const rows = [
-        ['유형', '상위/그룹명', '항목명', '마감일시/주기', '완료여부']
+        ['유형', '프로젝트', '상위/그룹명', '항목명', '마감일시/주기', '완료여부']
       ];
 
       todos.forEach(t => {
         const hasSub = t.subitems && t.subitems.length > 0;
+        const projName = (projects.find(p => p.id === t.projectId) || { name: '기본' }).name;
         rows.push([
           hasSub ? '그룹 할일' : '일반 할일',
+          projName,
           '',
           t.task,
           t.due || '',
@@ -1101,6 +1297,7 @@
           t.subitems.forEach(s => {
             rows.push([
               '하위 할일',
+              projName,
               t.task,
               s.task,
               s.due || '',
@@ -1111,9 +1308,11 @@
       });
 
       routines.forEach(r => {
+        const projName = (projects.find(p => p.id === r.projectId) || { name: '기본' }).name;
         const freqDetail = r.freq + (r.dayVal ? `(${r.dayVal})` : '') + (r.dueTime ? ` ${r.dueTime}` : '');
         rows.push([
           '루틴',
+          projName,
           '',
           r.task,
           freqDetail,
@@ -1145,14 +1344,10 @@
       reader.onload = function(e) {
         try {
           const imported = JSON.parse(e.target.result);
-          if (Array.isArray(imported)) {
-            todos = extractAllTodos(imported);
-          } else if (imported.todos || imported.routines) {
-            todos = extractAllTodos(imported.todos);
-            routines = extractAllRoutines(imported.routines);
-          } else {
-            todos = extractAllTodos(imported);
-          }
+          if (imported.projects) projects = imported.projects;
+          if (imported.todos) todos = extractAllTodos(imported.todos);
+          if (imported.routines) routines = extractAllRoutines(imported.routines);
+          
           saveAndRender();
           alert('데이터가 성공적으로 복원되었습니다.');
         } catch (err) {
@@ -1228,6 +1423,9 @@
       document.getElementById('mobileAddTodoContainer').classList.remove('hidden');
       document.getElementById('displayName').innerText = currentUser;
 
+      const savedProjects = localStorage.getItem(`sunhong_projects_${currentUser}`);
+      projects = savedProjects ? JSON.parse(savedProjects) : [{ id: 'default', name: '기본' }];
+
       const savedData = localStorage.getItem(`sunhong_todos_${currentUser}`);
       todos = savedData ? extractAllTodos(JSON.parse(savedData)) : [];
 
@@ -1244,6 +1442,9 @@
       setDefaultTimeInputs();
       updateNotificationUI();
       setupFirebaseListener();
+      
+      renderProjectList();
+      updateScopeTitleUI();
       render();
     }
 
@@ -1350,8 +1551,11 @@
       e.preventDefault();
       const taskInput = document.getElementById('taskInputMobile');
       const categorySelect = document.getElementById('categoryInputMobile');
+      const targetProjSelect = document.getElementById('projectTargetSelectMobile');
+      
       const task = taskInput.value.trim();
       const category = categorySelect.value;
+      const selectedProjId = targetProjSelect ? targetProjSelect.value : (currentScope === 'project' ? currentProjectId : 'default');
 
       if (!task) return;
 
@@ -1368,6 +1572,7 @@
 
         routines.unshift({
           id: Date.now(),
+          projectId: selectedProjId,
           task: task,
           freq: freq,
           dayVal: dayVal,
@@ -1399,7 +1604,7 @@
         cancelSubTaskTargetMode();
       } else {
         const due = document.getElementById('timeInputMobile').value;
-        todos.unshift({ id: Date.now(), task, due, category: '할일', completed: false, isEditing: false, notified: false, notified10m: false, subitems: [] });
+        todos.unshift({ id: Date.now(), projectId: selectedProjId, task, due, category: '할일', completed: false, isEditing: false, notified: false, notified10m: false, subitems: [] });
       }
 
       taskInput.value = '';
@@ -1614,6 +1819,10 @@
     function renderAllTab(container) {
       let filteredTodos = [...todos];
 
+      if (currentScope === 'project') {
+        filteredTodos = filteredTodos.filter(t => (t.projectId || 'default') === currentProjectId);
+      }
+
       if (hideCompleted) {
         filteredTodos = filteredTodos.filter(t => !t.completed);
       }
@@ -1636,6 +1845,8 @@
         const compSub = hasSub ? t.subitems.filter(s => s.completed).length : 0;
         const prog = hasSub ? Math.round((compSub / totalSub) * 100) : 0;
 
+        const projName = (projects.find(p => p.id === (t.projectId || 'default')) || { name: '기본' }).name;
+
         return `
           <li class="bg-slate-50 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-md p-0.5 shadow-2xs transition ${t.completed ? 'opacity-60 bg-slate-100/50 dark:bg-slate-900/40' : ''}">
             ${t.isEditing ? `
@@ -1654,6 +1865,7 @@
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-1.5 flex-wrap">
                       <span class="font-semibold ${t.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100'} text-sm sm:text-base break-words">${t.task}</span>
+                      ${currentScope === 'global' ? `<span class="text-[9px] leading-none bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-1 py-0.5 rounded">${projName}</span>` : ''}
                       ${hasSub ? `
                         <span class="text-[9px] leading-none font-semibold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-1 py-0.5 rounded">그룹</span>
                         <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400">${prog}% (${compSub}/${totalSub})</span>
@@ -1669,17 +1881,17 @@
                     ⋮
                   </button>
                   <div id="kebab_main_${t.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs">
-                    <button onclick="addToGoogleCalendar('${t.task.replace(/'/g, "\\'")}', '할일', '${t.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
-                      <span>📅</span> 캘린더 추가
+                    <button onclick="addToGoogleCalendar('${t.task.replace(/'/g, "\\'")}', '할일', '${t.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
+                      캘린더 추가
                     </button>
-                    <button onclick="toggleEditMain(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
-                      <span>✏️</span> 수정
+                    <button onclick="toggleEditMain(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
+                      수정
                     </button>
-                    <button onclick="setSubTaskTargetMode(${t.id}, '${t.task.replace(/'/g, "\\'")}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-2">
-                      <span>➕</span> 하위 할일 추가
+                    <button onclick="setSubTaskTargetMode(${t.id}, '${t.task.replace(/'/g, "\\'")}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold">
+                      하위 할일 추가
                     </button>
-                    <button onclick="deleteTodo(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold flex items-center gap-2">
-                      <span>✕</span> 삭제
+                    <button onclick="deleteTodo(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
+                      삭제
                     </button>
                   </div>
                 </div>
@@ -1711,14 +1923,14 @@
                             ⋮
                           </button>
                           <div id="kebab_sub_${s.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-32 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs">
-                            <button onclick="addToGoogleCalendar('${s.task.replace(/'/g, "\\'")}', '하위할일', '${s.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
-                              <span>📅</span> 캘린더 추가
+                            <button onclick="addToGoogleCalendar('${s.task.replace(/'/g, "\\'")}', '하위할일', '${s.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
+                              캘린더 추가
                             </button>
-                            <button onclick="toggleEditSub(${t.id}, ${s.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
-                              <span>✏️</span> 수정
+                            <button onclick="toggleEditSub(${t.id}, ${s.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
+                              수정
                             </button>
-                            <button onclick="deleteSubitem(${t.id}, ${s.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold flex items-center gap-2">
-                              <span>✕</span> 삭제
+                            <button onclick="deleteSubitem(${t.id}, ${s.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
+                              삭제
                             </button>
                           </div>
                         </div>
@@ -1742,6 +1954,8 @@
       let todayItems = [];
 
       todos.forEach(t => {
+        if (currentScope === 'project' && (t.projectId || 'default') !== currentProjectId) return;
+
         const hasSub = t.subitems && t.subitems.length > 0;
 
         if (!hasSub && isToday(t.due)) {
@@ -1762,6 +1976,8 @@
       });
 
       routines.forEach(r => {
+        if (currentScope === 'project' && (r.projectId || 'default') !== currentProjectId) return;
+
         if (isRoutineDueToday(r)) {
           const isDone = r.lastCompletedDate === todayStr;
           if (!hideCompleted || !isDone) {
@@ -1873,7 +2089,7 @@
               <div id="${tooltipId}" class="relative inline-block has-tooltip cursor-pointer" onclick="toggleSubTooltip(event, '${tooltipId}')">
                 <span class="text-[10px] leading-none bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-1 py-0.5 rounded font-semibold border border-indigo-100 dark:border-indigo-800">하위</span>
                 <div class="tooltip-box bg-slate-800 dark:bg-slate-900 text-white text-xs px-2 py-0.5 rounded shadow-lg border border-slate-700">
-                  📂 그룹: ${item.parentTask || '상위 그룹'}
+                  그룹: ${item.parentTask || '상위 그룹'}
                 </div>
               </div>
             </div>
@@ -1900,16 +2116,21 @@
         { val: '4', label: '목' }, { val: '5', label: '금' }, { val: '6', label: '토' }, { val: '0', label: '일' }
       ];
 
+      let filteredRoutines = [...routines];
+      if (currentScope === 'project') {
+        filteredRoutines = filteredRoutines.filter(r => (r.projectId || 'default') === currentProjectId);
+      }
+
       container.innerHTML = `
         <div class="space-y-0.5">
-          ${routines.length === 0 ? `
+          ${filteredRoutines.length === 0 ? `
             <div class="text-center py-8 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 rounded-lg">
               <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">등록된 습관/반복 루틴이 없습니다.</p>
               <p class="text-slate-400 dark:text-slate-500 text-xs mt-1">하단 입력창에서 카테고리를 <strong class="text-indigo-600 dark:text-indigo-400">[루틴]</strong>으로 선택하여 등록하세요.</p>
             </div>
           ` : `
             <ul class="space-y-0">
-              ${routines.map(r => {
+              ${filteredRoutines.map(r => {
                 const isDoneToday = r.lastCompletedDate === todayStr;
                 const isDueToday = isRoutineDueToday(r);
 
@@ -1966,7 +2187,7 @@
                             <div class="flex items-center gap-2 mt-0.5">
                               <span class="text-xs bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.2 rounded font-medium">${r.freq}${dayLabel}</span>
                               <span class="text-xs ${isDoneToday ? 'text-emerald-600 dark:text-emerald-400 font-bold' : isDueToday ? 'text-amber-600 font-medium' : 'text-slate-400'}">
-                                ${isDoneToday ? '✓ 오늘 달성 완료!' : isDueToday ? '오늘 수행 대상' : '오늘 비대상'}
+                                ${isDoneToday ? '오늘 달성 완료!' : isDueToday ? '오늘 수행 대상' : '오늘 비대상'}
                               </span>
                             </div>
                           </div>
@@ -1977,11 +2198,11 @@
                             ⋮
                           </button>
                           <div id="kebab_routine_${r.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-28 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs">
-                            <button onclick="toggleEditRoutine(${r.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
-                              <span>✏️</span> 수정
+                            <button onclick="toggleEditRoutine(${r.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
+                              수정
                             </button>
-                            <button onclick="deleteRoutine(${r.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold flex items-center gap-2">
-                              <span>✕</span> 삭제
+                            <button onclick="deleteRoutine(${r.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
+                              삭제
                             </button>
                           </div>
                         </div>
