@@ -640,14 +640,14 @@
       alert(`[${uname}] 계정이 삭제되었습니다.`);
       loadAdminUserList();
     }
-
-    /* Google Calendar 연동 안전 보완 함수 */
+    
+    /* 모바일 웹/앱 연동 지원 Google Calendar 등록 함수 */
     function addToGoogleCalendar(taskTitle, category, dueString) {
       let startDateStr, endDateStr;
-
+    
       if (dueString && dueString.includes('T')) {
         const start = new Date(dueString);
-        const end = new Date(start.getTime() + 30 * 60 * 1000);
+        const end = new Date(start.getTime() + 30 * 60 * 1000); // 기본 30분 일정
         
         startDateStr = start.toISOString().replace(/-|:|\.\d{3}/g, "");
         endDateStr = end.toISOString().replace(/-|:|\.\d{3}/g, "");
@@ -660,14 +660,27 @@
         startDateStr = dateFormatted;
         endDateStr = dateFormatted;
       }
-
+    
       const titleParam = encodeURIComponent(`[${category || '할일'}] ${taskTitle}`);
       const detailsParam = encodeURIComponent(`할 일 관리 앱에서 추가된 일정입니다.`);
       
-      const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titleParam}&dates=${startDateStr}/${endDateStr}&details=${detailsParam}`;
+      // 모바일 기기(Android / iOS / Mobile UserAgent) 여부 확인
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+      let gcalUrl = '';
+    
+      if (isMobile) {
+        // 모바일 전용 구글 캘린더 이벤트 생성 렌더링 URL
+        gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titleParam}&dates=${startDateStr}/${endDateStr}&details=${detailsParam}`;
+      } else {
+        // 데스크톱 전용 URL
+        gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titleParam}&dates=${startDateStr}/${endDateStr}&details=${detailsParam}`;
+      }
+    
+      // 모바일 브라우저 및 앱 전환 팝업 허용
       window.open(gcalUrl, '_blank');
     }
-
+    
     function updateNotificationUI() {
       const statusText = document.getElementById('notifyStatusText');
       if (!statusText) return;
