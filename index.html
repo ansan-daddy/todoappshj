@@ -156,7 +156,7 @@
 
   <!-- 2. 메인 서비스 화면 -->
   <div id="mainScreen" class="hidden max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 border border-slate-200/80 dark:border-slate-700/80 flex flex-col h-[calc(100vh-160px)] min-h-[400px]">
-    <!-- 헤더 영역 (여백 최적화) -->
+    <!-- 헤더 영역 -->
     <div class="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-700 mb-1.5 gap-2 flex-shrink-0">
       <div class="flex items-center gap-2 flex-wrap min-w-0">
         <h1 class="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 flex-shrink-0"><span id="displayName"></span>님의 할 일</h1>
@@ -212,7 +212,7 @@
       </div>
     </div>
 
-    <!-- 탭 메뉴 (여백 최적화) -->
+    <!-- 탭 메뉴 -->
     <div class="flex border-b border-slate-200 dark:border-slate-700 mb-1.5 flex-shrink-0">
       <button id="tabAll" onclick="switchTab('all')" class="flex-1 sm:flex-initial sm:px-6 py-1.5 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 transition text-sm sm:text-base">All</button>
       <button id="tabToday" onclick="switchTab('today')" class="flex-1 sm:flex-initial sm:px-6 py-1.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Today</button>
@@ -228,6 +228,18 @@
   <!-- 통합 하단 입력 바 -->
   <div id="mobileAddTodoContainer" class="hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-2xl p-3 z-40">
     <div class="max-w-4xl mx-auto">
+      
+      <!-- 하위 할일 타겟 모드 가이드 바 -->
+      <div id="subTaskTargetBar" class="hidden flex items-center justify-between bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 px-3 py-1.5 rounded-lg mb-2 text-xs sm:text-sm">
+        <div class="flex items-center gap-1.5 min-w-0">
+          <span class="font-bold text-indigo-600 dark:text-indigo-400 flex-shrink-0">📂 하위 할일 작성:</span>
+          <span id="subTaskTargetTitle" class="truncate font-semibold text-slate-700 dark:text-slate-200"></span>
+        </div>
+        <button type="button" onclick="cancelSubTaskTargetMode()" class="text-rose-500 font-bold hover:underline ml-2 flex-shrink-0 touch-target">
+          취소 ✕
+        </button>
+      </div>
+
       <form id="todoFormMobile" onsubmit="addUnifiedItem(event, 'mobile')" class="space-y-2.5">
         <div id="mobileMoreOptions" class="hidden space-y-2.5 pt-1 border-b border-slate-100 dark:border-slate-700 pb-2.5">
           <div id="mobileQuickChipsContainer" class="flex items-center gap-1.5 overflow-x-auto pb-1 text-sm font-medium">
@@ -290,6 +302,9 @@
     
     let currentSort = localStorage.getItem('sunhong_todo_sort') || 'createdAt';
     let hideCompleted = localStorage.getItem('sunhong_todo_hide_completed') === 'true';
+
+    // 하위 할일 타겟 모드 관리 변수
+    let targetParentId = null;
 
     let swRegistration = null;
 
@@ -948,7 +963,6 @@
               category: val.category || '할일',
               completed: !!val.completed,
               isEditing: false,
-              isAddingSub: false,
               notified: !!val.notified,
               notified10m: !!val.notified10m,
               subitems: subList
@@ -1172,6 +1186,7 @@
       document.getElementById('loginScreen').classList.remove('hidden');
       document.getElementById('mainScreen').classList.add('hidden');
       document.getElementById('mobileAddTodoContainer').classList.add('hidden');
+      cancelSubTaskTargetMode();
       renderLoginScreen();
     }
 
@@ -1240,6 +1255,7 @@
       const chipsContainer = document.getElementById('mobileQuickChipsContainer');
 
       if (isRoutine) {
+        cancelSubTaskTargetMode(); // 루틴 선택 시 하위 할일 타겟 모드 자동 해제
         if (timeInput) timeInput.classList.add('hidden');
         if (chipsContainer) chipsContainer.classList.add('hidden');
         if (routineOpts) routineOpts.classList.remove('hidden');
@@ -1267,6 +1283,48 @@
       }
     }
 
+    /* 하위 할일 타겟 모드 활성화 함수 */
+    function setSubTaskTargetMode(parentId, parentTaskTitle) {
+      targetParentId = parentId;
+      const targetBar = document.getElementById('subTaskTargetBar');
+      const targetTitleElem = document.getElementById('subTaskTargetTitle');
+      const categorySelect = document.getElementById('categoryInputMobile');
+      const taskInput = document.getElementById('taskInputMobile');
+
+      if (targetBar && targetTitleElem) {
+        targetTitleElem.innerText = parentTaskTitle;
+        targetBar.classList.remove('hidden');
+      }
+
+      if (categorySelect) {
+        categorySelect.value = '할일';
+        handleCategoryChange('할일', 'mobile');
+      }
+
+      toggleMobileOptions(true);
+
+      if (taskInput) {
+        taskInput.placeholder = `'${parentTaskTitle}'의 하위 할 일 입력...`;
+        taskInput.focus();
+      }
+    }
+
+    /* 하위 할일 타겟 모드 취소 함수 */
+    function cancelSubTaskTargetMode() {
+      targetParentId = null;
+      const targetBar = document.getElementById('subTaskTargetBar');
+      const taskInput = document.getElementById('taskInputMobile');
+
+      if (targetBar) {
+        targetBar.classList.add('hidden');
+      }
+
+      if (taskInput) {
+        taskInput.placeholder = "할 일 또는 루틴 입력 (예: '내일 오후 3시 보고서')...";
+      }
+    }
+
+    /* 통합 등록 함수 (하위 할일 타겟 모드 처리 지원) */
     function addUnifiedItem(e, mode) {
       e.preventDefault();
       const taskInput = document.getElementById('taskInputMobile');
@@ -1298,9 +1356,31 @@
           notified10m: false
         });
 
-      } else {
+      } else if (targetParentId !== null) {
+        // 하위 할일 추가 처리
         const due = document.getElementById('timeInputMobile').value;
-        todos.unshift({ id: Date.now(), task, due, category: '할일', completed: false, isEditing: false, isAddingSub: false, notified: false, notified10m: false, subitems: [] });
+        todos = todos.map(t => {
+          if (t.id === targetParentId) {
+            if (!t.subitems) t.subitems = [];
+            t.subitems.push({
+              id: Date.now(),
+              task: task,
+              due: due,
+              completed: false,
+              isEditing: false,
+              notified: false,
+              notified10m: false
+            });
+            t.due = ''; // 그룹 항목 마감시간 초기화
+          }
+          return t;
+        });
+
+        cancelSubTaskTargetMode();
+      } else {
+        // 일반 할일 추가 처리
+        const due = document.getElementById('timeInputMobile').value;
+        todos.unshift({ id: Date.now(), task, due, category: '할일', completed: false, isEditing: false, notified: false, notified10m: false, subitems: [] });
       }
 
       taskInput.value = '';
@@ -1387,32 +1467,6 @@
       return false;
     }
 
-    function toggleAddSubForm(parentId) {
-      todos = todos.map(t => t.id === parentId ? { ...t, isAddingSub: !t.isAddingSub } : t);
-      render();
-      if (document.getElementById(`subTaskInput_${parentId}`)) {
-        document.getElementById(`subTaskInput_${parentId}`).focus();
-        document.getElementById(`subDueInput_${parentId}`).value = getOneHourLaterString();
-      }
-    }
-
-    function saveInlineSubitem(parentId) {
-      const taskInput = document.getElementById(`subTaskInput_${parentId}`).value.trim();
-      const dueInput = document.getElementById(`subDueInput_${parentId}`).value;
-      if (!taskInput) return;
-
-      todos = todos.map(t => {
-        if (t.id === parentId) {
-          if (!t.subitems) t.subitems = [];
-          t.subitems.push({ id: Date.now(), task: taskInput, due: dueInput, completed: false, isEditing: false, notified: false, notified10m: false });
-          t.due = '';
-          t.isAddingSub = false;
-        }
-        return t;
-      });
-      saveAndRender();
-    }
-
     function toggleEditMain(id) { todos = todos.map(t => t.id === id ? { ...t, isEditing: !t.isEditing } : t); render(); }
 
     function saveEditMain(id) {
@@ -1466,7 +1520,12 @@
       saveAndRender();
     }
 
-    function deleteTodo(id) { todos = todos.filter(t => t.id !== id); saveAndRender(); }
+    function deleteTodo(id) { 
+      if (targetParentId === id) cancelSubTaskTargetMode();
+      todos = todos.filter(t => t.id !== id); 
+      saveAndRender(); 
+    }
+
     function deleteSubitem(parentId, subId) {
       todos = todos.map(t => { if (t.id === parentId && t.subitems) t.subitems = t.subitems.filter(s => s.id !== subId); return t; });
       saveAndRender();
@@ -1593,7 +1652,7 @@
                     <button onclick="toggleEditMain(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2">
                       <span>✏️</span> 수정
                     </button>
-                    <button onclick="toggleAddSubForm(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-2">
+                    <button onclick="setSubTaskTargetMode(${t.id}, '${t.task.replace(/'/g, "\\'")}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-2">
                       <span>➕</span> 하위 할일 추가
                     </button>
                     <button onclick="deleteTodo(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold flex items-center gap-2">
@@ -1603,18 +1662,6 @@
                 </div>
               </div>
             `}
-
-            ${t.isAddingSub ? `
-              <div class="mt-1 sm:ml-4 p-1 bg-indigo-50/60 dark:bg-indigo-950/40 rounded border border-indigo-100 dark:border-indigo-900 space-y-1">
-                <input type="text" id="subTaskInput_${t.id}" placeholder="하위 할 일 내용" onkeydown="if(event.key==='Enter') saveInlineSubitem(${t.id})"
-                       class="w-full px-2 py-1 text-sm sm:text-base border border-indigo-200 dark:border-indigo-800 rounded bg-white dark:bg-slate-800">
-                <div class="flex gap-1.5">
-                  <input type="datetime-local" id="subDueInput_${t.id}" step="60" class="flex-1 px-2 py-1 text-xs border border-indigo-200 dark:border-indigo-800 rounded bg-white dark:bg-slate-800">
-                  <button onclick="saveInlineSubitem(${t.id})" class="px-2.5 py-1 bg-indigo-600 text-white text-xs rounded touch-target">추가</button>
-                  <button onclick="toggleAddSubForm(${t.id})" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded touch-target">취소</button>
-                </div>
-              </div>
-            ` : ''}
 
             ${hasSub ? `
               <ul class="mt-0.5 pl-2 sm:pl-4 border-l-2 border-indigo-100 dark:border-indigo-900 space-y-0">
