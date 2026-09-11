@@ -342,8 +342,8 @@
           <input type="text" id="taskInputMobile" placeholder="할 일 또는 루틴 입력 (예: '내일 오후 3시 보고서')..." required onfocus="toggleMobileOptions(true)" oninput="handleNaturalLanguageInput('mobile')"
                  class="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 touch-target">
           
-          <button type="button" onclick="toggleMobileOptions()" class="p-3 text-slate-500 hover:text-slate-700 text-base font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 touch-target flex items-center justify-center">
-            설정
+          <button type="button" onclick="toggleMobileOptions()" title="상세 설정" class="p-3 text-slate-500 hover:text-slate-700 text-lg font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 touch-target flex items-center justify-center">
+            ⚙
           </button>
 
           <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 py-3 rounded-xl text-base shadow-2xs touch-target flex-shrink-0">
@@ -363,9 +363,9 @@
     let todos = [];
     let routines = [];
     
-    let currentTab = 'all';
-    let currentScope = 'global'; // 'global' 또는 'project'
-    let currentProjectId = 'default';
+    let currentTab = localStorage.getItem('sunhong_todo_current_tab') || 'all';
+    let currentScope = localStorage.getItem('sunhong_todo_current_scope') || 'global'; // 'global' 또는 'project'
+    let currentProjectId = localStorage.getItem('sunhong_todo_current_proj') || 'default';
 
     let currentSort = localStorage.getItem('sunhong_todo_sort') || 'createdAt';
     let hideCompleted = localStorage.getItem('sunhong_todo_hide_completed') === 'true';
@@ -443,6 +443,8 @@
     function selectGlobalView(viewTab) {
       currentScope = 'global';
       currentTab = viewTab;
+      localStorage.setItem('sunhong_todo_current_scope', currentScope);
+      localStorage.setItem('sunhong_todo_current_tab', currentTab);
       closeSidebar();
       updateScopeTitleUI();
       updateSidebarHighlightUI();
@@ -452,6 +454,8 @@
     function selectProjectView(projId) {
       currentScope = 'project';
       currentProjectId = projId;
+      localStorage.setItem('sunhong_todo_current_scope', currentScope);
+      localStorage.setItem('sunhong_todo_current_proj', currentProjectId);
       closeSidebar();
       updateScopeTitleUI();
       updateSidebarHighlightUI();
@@ -1479,6 +1483,7 @@
       updateNotificationUI();
       setupFirebaseListener();
       
+      switchTab(currentTab);
       updateSidebarHighlightUI();
       updateScopeTitleUI();
       render();
@@ -1808,6 +1813,8 @@
 
     function switchTab(tab) {
       currentTab = tab;
+      localStorage.setItem('sunhong_todo_current_tab', currentTab);
+
       const tabAll = document.getElementById('tabAll');
       const tabToday = document.getElementById('tabToday');
       const tabRoutine = document.getElementById('tabRoutine');
@@ -1816,9 +1823,9 @@
       const activeClass = "flex-1 sm:flex-initial sm:px-6 py-1.5 text-center font-bold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 transition text-sm sm:text-base";
       const inactiveClass = "flex-1 sm:flex-initial sm:px-6 py-1.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base";
 
-      tabAll.className = tab === 'all' ? activeClass : inactiveClass;
-      tabToday.className = tab === 'today' ? activeClass : inactiveClass;
-      tabRoutine.className = tab === 'routine' ? activeClass : inactiveClass;
+      if (tabAll) tabAll.className = tab === 'all' ? activeClass : inactiveClass;
+      if (tabToday) tabToday.className = tab === 'today' ? activeClass : inactiveClass;
+      if (tabRoutine) tabRoutine.className = tab === 'routine' ? activeClass : inactiveClass;
 
       if (sortInMenu) {
         if (tab === 'all') sortInMenu.classList.remove('hidden');
