@@ -65,8 +65,7 @@
     }
   </style>
 </head>
-<!-- pb-40 으로 하단 여백을 충분히 늘려 스크롤 시 등록 바에 가려지지 않게 처리 -->
-<body class="bg-slate-100 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-100 p-3 sm:p-5 pb-40 transition-colors duration-200 text-sm sm:text-base">
+<body class="bg-slate-100 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-100 p-3 sm:p-5 pb-36 transition-colors duration-200 text-sm sm:text-base">
 
   <!-- 1. 로그인 / 회원가입 / 관리자 진입 화면 -->
   <div id="loginScreen" class="max-w-lg mx-auto mt-8 sm:mt-12 bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 sm:p-7 border border-slate-200 dark:border-slate-700">
@@ -155,14 +154,14 @@
     </div>
   </div>
 
-  <!-- 2. 메인 서비스 화면 -->
-  <div id="mainScreen" class="hidden max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-8 border border-slate-200/80 dark:border-slate-700/80">
-    <!-- 헤더 영역 (사용자명 바로 옆 시계 및 통합 세로 삼점 메뉴) -->
-    <div class="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-slate-700 mb-4 gap-2">
+  <!-- 2. 메인 서비스 화면 (Flex 수직 구조로 독립 스크롤 최적화) -->
+  <div id="mainScreen" class="hidden max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 border border-slate-200/80 dark:border-slate-700/80 flex flex-col h-[calc(100vh-160px)] min-h-[400px]">
+    <!-- 헤더 영역 -->
+    <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700 mb-3 gap-2 flex-shrink-0">
       <div class="flex items-center gap-2 flex-wrap min-w-0">
         <h1 class="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 flex-shrink-0"><span id="displayName"></span>님의 할 일</h1>
-        <span class="text-xs sm:text-sm font-medium text-slate-400 dark:text-slate-500">|</span>
-        <span id="clock" class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 truncate"></span>
+        <span class="text-sm sm:text-base font-medium text-slate-400 dark:text-slate-500">|</span>
+        <span id="clock" class="text-sm sm:text-base font-medium text-slate-500 dark:text-slate-400 truncate"></span>
       </div>
 
       <!-- 상단 통합 세로 삼점 메뉴 -->
@@ -180,7 +179,7 @@
               <span>완료 항목</span>
               <span id="hideCompletedText" class="font-semibold text-indigo-600 dark:text-indigo-400">보이기</span>
             </button>
-            <div id="sortOptionInMenu" class="px-3.5 py-2 flex items-center justify-between">
+            <div id="sortOptionInMenu" onclick="event.stopPropagation()" class="px-3.5 py-2 flex items-center justify-between">
               <span class="text-slate-600 dark:text-slate-300">정렬</span>
               <select id="sortInput" onchange="changeSortOrder(this.value)" class="text-xs bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 font-medium focus:outline-none">
                 <option value="createdAt">최신순</option>
@@ -214,14 +213,14 @@
     </div>
 
     <!-- 탭 메뉴 (All / Today / Routine) -->
-    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-4">
-      <button id="tabAll" onclick="switchTab('all')" class="flex-1 sm:flex-initial sm:px-6 py-2.5 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 transition text-sm sm:text-base">All</button>
-      <button id="tabToday" onclick="switchTab('today')" class="flex-1 sm:flex-initial sm:px-6 py-2.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Today</button>
-      <button id="tabRoutine" onclick="switchTab('routine')" class="flex-1 sm:flex-initial sm:px-6 py-2.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Routine</button>
+    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-3 flex-shrink-0">
+      <button id="tabAll" onclick="switchTab('all')" class="flex-1 sm:flex-initial sm:px-6 py-2 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 transition text-sm sm:text-base">All</button>
+      <button id="tabToday" onclick="switchTab('today')" class="flex-1 sm:flex-initial sm:px-6 py-2 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Today</button>
+      <button id="tabRoutine" onclick="switchTab('routine')" class="flex-1 sm:flex-initial sm:px-6 py-2 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Routine</button>
     </div>
 
-    <!-- 할 일 / 루틴 목록 렌더링 영역 (mb-12 추가하여 하단 등록 바와의 간격 확보) -->
-    <div id="todoContainer" class="mb-12">
+    <!-- 3개 탭 아래만 독자적으로 스크롤되는 영역 (flex-1 min-h-0 사용) -->
+    <div id="todoContainer" class="flex-1 min-h-0 overflow-y-auto pr-1">
       <ul id="todoList" class="space-y-0"></ul>
     </div>
   </div>
@@ -243,7 +242,7 @@
           <div class="flex flex-wrap items-center gap-2">
             <select id="categoryInputMobile" onchange="handleCategoryChange(this.value, 'mobile')" class="px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 font-bold text-indigo-600 dark:text-indigo-400 touch-target">
               <option value="할일">할 일</option>
-              <option value="routine">루틴 (반복)</option>
+              <option value="routine">루틴</option>
             </select>
 
             <input type="datetime-local" id="timeInputMobile" step="60" class="flex-1 px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 touch-target">
@@ -729,54 +728,84 @@
       }
     }
 
+    /* 알림 체크 함수 (안전 대책 강화) */
     function checkDueNotifications() {
-      if (Notification.permission !== 'granted' || !todos.length) return;
+      if (Notification.permission !== 'granted') return;
 
       const now = new Date();
+      const todayStr = getTodayString();
       let updated = false;
 
-      todos.forEach(t => {
-        const hasSub = t.subitems && t.subitems.length > 0;
-        if (!hasSub && !t.completed && t.due) {
-          const dueTime = new Date(t.due);
-          const diffMinutes = (dueTime - now) / (1000 * 60);
+      // 1. 일반 할 일 및 하위 할 일 알림
+      if (todos.length) {
+        todos.forEach(t => {
+          const hasSub = t.subitems && t.subitems.length > 0;
+          if (!hasSub && !t.completed && t.due) {
+            const dueTime = new Date(t.due);
+            const diffMinutes = (dueTime - now) / (1000 * 60);
 
-          if (diffMinutes > 0 && diffMinutes <= 10 && !t.notified10m) {
-            triggerNotification("마감 10분 전!", `[${t.category || '할일'}] ${t.task} 마감 10분 전입니다.`);
-            t.notified10m = true;
-            updated = true;
+            if (diffMinutes > 0 && diffMinutes <= 10 && !t.notified10m) {
+              triggerNotification("마감 10분 전!", `[${t.category || '할일'}] ${t.task} 마감 10분 전입니다.`);
+              t.notified10m = true;
+              updated = true;
+            }
+
+            if (now >= dueTime && (now - dueTime) < 10 * 60 * 1000 && !t.notified) {
+              triggerNotification("마감 시간이 되었습니다!", `[${t.category || '할일'}] ${t.task} 마감 시각이 되었습니다.`);
+              t.notified = true;
+              t.notified10m = true;
+              updated = true;
+            }
           }
 
-          if (now >= dueTime && (now - dueTime) < 10 * 60 * 1000 && !t.notified) {
-            triggerNotification("마감 시간이 되었습니다!", `[${t.category || '할일'}] ${t.task} 마감 시각이 되었습니다.`);
-            t.notified = true;
-            t.notified10m = true;
-            updated = true;
+          if (hasSub) {
+            t.subitems.forEach(s => {
+              if (!s.completed && s.due) {
+                const subDueTime = new Date(s.due);
+                const subDiffMinutes = (subDueTime - now) / (1000 * 60);
+
+                if (subDiffMinutes > 0 && subDiffMinutes <= 10 && !s.notified10m) {
+                  triggerNotification("하위 할 일 10분 전!", `[하위] ${s.task} 마감 10분 전입니다.`);
+                  s.notified10m = true;
+                  updated = true;
+                }
+
+                if (now >= subDueTime && (now - subDueTime) < 10 * 60 * 1000 && !s.notified) {
+                  triggerNotification("하위 할 일 마감!", `[하위] ${s.task} 마감 시각이 되었습니다.`);
+                  s.notified = true;
+                  s.notified10m = true;
+                  updated = true;
+                }
+              }
+            });
           }
-        }
+        });
+      }
 
-        if (hasSub) {
-          t.subitems.forEach(s => {
-            if (!s.completed && s.due) {
-              const subDueTime = new Date(s.due);
-              const subDiffMinutes = (subDueTime - now) / (1000 * 60);
+      // 2. 루틴 아이템 알림 (유효성 강화)
+      if (routines.length) {
+        routines.forEach(r => {
+          if (isRoutineDueToday(r) && r.lastCompletedDate !== todayStr && r.dueTime && r.dueTime.includes(':')) {
+            const routineDueTime = new Date(`${todayStr}T${r.dueTime}`);
+            if (!isNaN(routineDueTime.getTime())) {
+              const diffMinutes = (routineDueTime - now) / (1000 * 60);
 
-              if (subDiffMinutes > 0 && subDiffMinutes <= 10 && !s.notified10m) {
-                triggerNotification("하위 할 일 10분 전!", `[하위] ${s.task} 마감 10분 전입니다.`);
-                s.notified10m = true;
+              if (diffMinutes > 0 && diffMinutes <= 10 && !r.notified10m) {
+                triggerNotification("루틴 수행 10분 전!", `[루틴] ${r.task} 수행 10분 전입니다.`);
+                r.notified10m = true;
                 updated = true;
               }
 
-              if (now >= subDueTime && (now - subDueTime) < 10 * 60 * 1000 && !s.notified) {
-                triggerNotification("하위 할 일 마감!", `[하위] ${s.task} 마감 시각이 되었습니다.`);
-                s.notified = true;
-                s.notified10m = true;
+              if (now >= routineDueTime && (now - routineDueTime) < 10 * 60 * 1000 && !r.notified) {
+                triggerNotification("루틴 수행 시간입니다!", `[루틴] ${r.task} 수행 시각이 되었습니다.`);
+                r.notified = true;
+                r.notified10m = true;
                 updated = true;
               }
             }
-          });
-        }
-      });
+          }
+        });
+      }
 
       if (updated) {
         saveAndRender();
@@ -956,6 +985,8 @@
               dayVal: val.dayVal || '',
               dueTime: val.dueTime || val.time || '',
               lastCompletedDate: val.lastCompletedDate || null,
+              notified: !!val.notified,
+              notified10m: !!val.notified10m,
               isEditing: false
             });
           } else {
@@ -1267,7 +1298,9 @@
           freq: freq,
           dayVal: dayVal,
           dueTime: dueTime,
-          lastCompletedDate: null
+          lastCompletedDate: null,
+          notified: false,
+          notified10m: false
         });
 
       } else {
@@ -1318,6 +1351,8 @@
         freq: freqInput,
         dayVal: dayVal,
         dueTime: dueTimeInput,
+        notified: false,
+        notified10m: false,
         isEditing: false
       } : r);
 
@@ -1462,8 +1497,8 @@
       const tabRoutine = document.getElementById('tabRoutine');
       const sortInMenu = document.getElementById('sortOptionInMenu');
 
-      const activeClass = "flex-1 sm:flex-initial sm:px-6 py-2.5 text-center font-bold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 transition text-sm sm:text-base";
-      const inactiveClass = "flex-1 sm:flex-initial sm:px-6 py-2.5 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base";
+      const activeClass = "flex-1 sm:flex-initial sm:px-6 py-2 text-center font-bold text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 transition text-sm sm:text-base";
+      const inactiveClass = "flex-1 sm:flex-initial sm:px-6 py-2 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base";
 
       tabAll.className = tab === 'all' ? activeClass : inactiveClass;
       tabToday.className = tab === 'today' ? activeClass : inactiveClass;
