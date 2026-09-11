@@ -154,7 +154,7 @@
     </div>
   </div>
 
-  <!-- 2. 메인 서비스 화면 (Flex 수직 구조로 독립 스크롤 최적화) -->
+  <!-- 2. 메인 서비스 화면 -->
   <div id="mainScreen" class="hidden max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 border border-slate-200/80 dark:border-slate-700/80 flex flex-col h-[calc(100vh-160px)] min-h-[400px]">
     <!-- 헤더 영역 -->
     <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700 mb-3 gap-2 flex-shrink-0">
@@ -219,13 +219,13 @@
       <button id="tabRoutine" onclick="switchTab('routine')" class="flex-1 sm:flex-initial sm:px-6 py-2 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Routine</button>
     </div>
 
-    <!-- 3개 탭 아래만 독자적으로 스크롤되는 영역 (flex-1 min-h-0 사용) -->
+    <!-- 독자 스크롤 영역 -->
     <div id="todoContainer" class="flex-1 min-h-0 overflow-y-auto pr-1">
       <ul id="todoList" class="space-y-0"></ul>
     </div>
   </div>
 
-  <!-- 통합 하단 입력 바 (로그아웃 시 숨겨짐) -->
+  <!-- 통합 하단 입력 바 -->
   <div id="mobileAddTodoContainer" class="hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-2xl p-3 z-40">
     <div class="max-w-4xl mx-auto">
       <form id="todoFormMobile" onsubmit="addUnifiedItem(event, 'mobile')" class="space-y-2.5">
@@ -324,7 +324,7 @@
       navigator.serviceWorker.register('sw.js').then(reg => { 
         swRegistration = reg;
         updateNotificationUI();
-      }).catch(err => console.log('SW 등록 실패:', err));
+      }).catch(err => console.warn('SW 미등록 상태로 동작합니다.'));
     }
 
     window.addEventListener('firebase-ready', () => {
@@ -641,6 +641,7 @@
       loadAdminUserList();
     }
 
+    /* Google Calendar 연동 안전 보완 함수 */
     function addToGoogleCalendar(taskTitle, category, dueString) {
       let startDateStr, endDateStr;
 
@@ -648,8 +649,8 @@
         const start = new Date(dueString);
         const end = new Date(start.getTime() + 30 * 60 * 1000);
         
-        startDateStr = start.toISOString().replace(/-|:|\.\d\d\d/g, "");
-        endDateStr = end.toISOString().replace(/-|:|\.\d\d\d/g, "");
+        startDateStr = start.toISOString().replace(/-|:|\.\d{3}/g, "");
+        endDateStr = end.toISOString().replace(/-|:|\.\d{3}/g, "");
       } else {
         const now = new Date();
         const year = now.getFullYear();
@@ -661,7 +662,7 @@
       }
 
       const titleParam = encodeURIComponent(`[${category || '할일'}] ${taskTitle}`);
-      const detailsParam = encodeURIComponent(`할 일 웹 앱에서 추가된 일정입니다.`);
+      const detailsParam = encodeURIComponent(`할 일 관리 앱에서 추가된 일정입니다.`);
       
       const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titleParam}&dates=${startDateStr}/${endDateStr}&details=${detailsParam}`;
       window.open(gcalUrl, '_blank');
@@ -728,7 +729,6 @@
       }
     }
 
-    /* 알림 체크 함수 (안전 대책 강화) */
     function checkDueNotifications() {
       if (Notification.permission !== 'granted') return;
 
@@ -736,7 +736,6 @@
       const todayStr = getTodayString();
       let updated = false;
 
-      // 1. 일반 할 일 및 하위 할 일 알림
       if (todos.length) {
         todos.forEach(t => {
           const hasSub = t.subitems && t.subitems.length > 0;
@@ -782,7 +781,6 @@
         });
       }
 
-      // 2. 루틴 아이템 알림 (유효성 강화)
       if (routines.length) {
         routines.forEach(r => {
           if (isRoutineDueToday(r) && r.lastCompletedDate !== todayStr && r.dueTime && r.dueTime.includes(':')) {
@@ -840,7 +838,6 @@
     function setDefaultTimeInputs() {
       const defaultTime = getOneHourLaterString();
       if (document.getElementById('timeInputMobile')) document.getElementById('timeInputMobile').value = defaultTime;
-      
       updateChipHighlight('1h', 'mobile');
     }
 
@@ -925,7 +922,6 @@
     }
     setInterval(updateClock, 1000);
 
-    /* --- 데이터 하위 호환 안전 수집 함수 --- */
     function extractAllTodos(rawData) {
       if (!rawData) return [];
       let extracted = [];
@@ -999,7 +995,6 @@
       return extracted;
     }
 
-    /* --- Firebase 실시간 동기화 --- */
     function setupFirebaseListener() {
       if (!window.firebaseDb || !currentUser) return;
       
@@ -1047,7 +1042,6 @@
       downloadAnchor.remove();
     }
 
-    /* 엑셀 호환 CSV 내보내기 함수 */
     function exportCsv() {
       if (!todos.length && !routines.length) { 
         alert('내보낼 데이터가 없습니다.'); 
@@ -1274,10 +1268,13 @@
       }
     }
 
+    /* 통합 등록 함수 (카테고리/입력창 리셋 로직 보완) */
     function addUnifiedItem(e, mode) {
       e.preventDefault();
-      const task = document.getElementById('taskInputMobile').value.trim();
-      const category = document.getElementById('categoryInputMobile').value;
+      const taskInput = document.getElementById('taskInputMobile');
+      const categorySelect = document.getElementById('categoryInputMobile');
+      const task = taskInput.value.trim();
+      const category = categorySelect.value;
 
       if (!task) return;
 
@@ -1308,7 +1305,9 @@
         todos.unshift({ id: Date.now(), task, due, category: '할일', completed: false, isEditing: false, isAddingSub: false, notified: false, notified10m: false, subitems: [] });
       }
 
-      document.getElementById('taskInputMobile').value = '';
+      taskInput.value = '';
+      categorySelect.value = '할일';
+      handleCategoryChange('할일', 'mobile');
       toggleMobileOptions(false);
 
       setDefaultTimeInputs();
@@ -1585,7 +1584,6 @@
                   </div>
                 </div>
                 
-                <!-- 세로 삼점 메뉴 버튼 -->
                 <div class="relative flex-shrink-0">
                   <button onclick="toggleKebabMenu(event, 'kebab_main_${t.id}')" title="더보기" class="p-1 px-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded font-bold transition text-base touch-target">
                     ⋮
@@ -1640,7 +1638,6 @@
                           ${s.due ? `<span class="text-xs text-slate-400 ml-1 flex-shrink-0">${formatSimpleDue(s.due)}</span>` : ''}
                         </div>
                         
-                        <!-- 하위 항목 세로 삼점 메뉴 -->
                         <div class="relative flex-shrink-0">
                           <button onclick="toggleKebabMenu(event, 'kebab_sub_${s.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">
                             ⋮
@@ -1771,7 +1768,7 @@
               <div class="flex items-start gap-1 p-0.5 rounded-lg border transition ${isCurrentSlot ? 'bg-blue-50/60 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700 ring-1 ring-blue-200 dark:ring-blue-800' : 'bg-slate-50/70 dark:bg-slate-800/60 border-slate-200/70 dark:border-slate-700/70'}">
                 <div class="w-10 sm:w-12 text-xs font-bold ${isCurrentSlot ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'} flex flex-col items-start pt-0.5 flex-shrink-0">
                   <span>${timeLabel}</span>
-                  ${isCurrentSlot ? `<span class="text-[8px] leading-tight bg-blue-600 text-white px-1 py-0.2 rounded mt-0.5">LIVE</span>` : ''}
+                  ${isCurrentSlot ? `<span class="text-[8px] leading-tight bg-blue-600 text-white px-1 py-0.5 rounded mt-0.5">LIVE</span>` : ''}
                 </div>
                 <div class="flex-1 min-h-[22px] space-y-0">
                   ${items.length > 0 ? items.map(item => renderTimelineItemHtml(item)).join('') : `<span class="text-xs text-slate-300 dark:text-slate-600 italic leading-5">일정 없음</span>`}
@@ -1907,7 +1904,6 @@
                           </div>
                         </div>
 
-                        <!-- 루틴 세로 삼점 메뉴 -->
                         <div class="relative flex-shrink-0">
                           <button onclick="toggleKebabMenu(event, 'kebab_routine_${r.id}')" title="더보기" class="p-1 px-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded font-bold transition text-base touch-target">
                             ⋮
