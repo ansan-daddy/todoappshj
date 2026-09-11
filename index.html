@@ -158,11 +158,12 @@
   <div id="mainScreen" class="hidden max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 border border-slate-200/80 dark:border-slate-700/80 flex flex-col h-[calc(100vh-160px)] min-h-[400px]">
     <!-- 헤더 영역 -->
     <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700 mb-3 gap-2 flex-shrink-0">
-      <div class="flex items-center gap-2 flex-wrap min-w-0">
-        <h1 class="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 flex-shrink-0"><span id="displayName"></span>님의 할 일</h1>
-        <span class="text-sm sm:text-base font-medium text-slate-400 dark:text-slate-500">|</span>
-        <span id="clock" class="text-sm sm:text-base font-medium text-slate-500 dark:text-slate-400 truncate"></span>
-      </div>
+      <div class="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-700 mb-1.5 gap-2 flex-shrink-0">
+        <div class="flex items-center gap-2 flex-wrap min-w-0">
+          <h1 class="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 flex-shrink-0"><span id="displayName"></span>님의 할 일</h1>
+          <span class="text-sm sm:text-base font-medium text-slate-400 dark:text-slate-500">|</span>
+          <span id="clock" class="text-sm sm:text-base font-medium text-slate-500 dark:text-slate-400 truncate"></span>
+        </div>
 
       <!-- 상단 통합 세로 삼점 메뉴 -->
       <div class="relative flex-shrink-0">
@@ -213,10 +214,10 @@
     </div>
 
     <!-- 탭 메뉴 (All / Today / Routine) -->
-    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-3 flex-shrink-0">
-      <button id="tabAll" onclick="switchTab('all')" class="flex-1 sm:flex-initial sm:px-6 py-2 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 transition text-sm sm:text-base">All</button>
-      <button id="tabToday" onclick="switchTab('today')" class="flex-1 sm:flex-initial sm:px-6 py-2 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Today</button>
-      <button id="tabRoutine" onclick="switchTab('routine')" class="flex-1 sm:flex-initial sm:px-6 py-2 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Routine</button>
+    <div class="flex border-b border-slate-200 dark:border-slate-700 mb-1.5 flex-shrink-0">
+      <button id="tabAll" onclick="switchTab('all')" class="flex-1 sm:flex-initial sm:px-6 py-1 text-center font-bold text-indigo-600 border-b-2 border-indigo-600 transition text-sm sm:text-base">All</button>
+      <button id="tabToday" onclick="switchTab('today')" class="flex-1 sm:flex-initial sm:px-6 py-1 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Today</button>
+      <button id="tabRoutine" onclick="switchTab('routine')" class="flex-1 sm:flex-initial sm:px-6 py-1 text-center font-bold text-slate-400 border-b-2 border-transparent hover:text-slate-600 transition text-sm sm:text-base">Routine</button>
     </div>
 
     <!-- 독자 스크롤 영역 -->
