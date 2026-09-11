@@ -169,7 +169,7 @@
         <button onclick="toggleKebabMenu(event, 'topHeaderMenu')" title="설정 및 추가기능" class="p-1 px-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold transition text-lg touch-target flex items-center justify-center">
           ⋮
         </button>
-        <div id="topHeaderMenu" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-48 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-1.5 text-xs sm:text-sm divide-y divide-slate-100 dark:divide-slate-700">
+        <div id="topHeaderMenu" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-52 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl z-50 py-1.5 text-xs sm:text-sm divide-y divide-slate-100 dark:divide-slate-700">
           <div class="py-1">
             <button id="darkModeBtn" onclick="toggleDarkMode()" class="w-full text-left px-3.5 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between">
               <span>테마 전환</span>
@@ -179,6 +179,16 @@
               <span>완료 항목</span>
               <span id="hideCompletedText" class="font-semibold text-indigo-600 dark:text-indigo-400">보이기</span>
             </button>
+            <div id="fontSizeOptionInMenu" onclick="event.stopPropagation()" class="px-3.5 py-2 flex items-center justify-between">
+              <span class="text-slate-600 dark:text-slate-300">글자 크기</span>
+              <select id="fontSizeInput" onchange="changeFontSize(this.value)" class="text-xs bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-1.5 py-1 font-medium focus:outline-none">
+                <option value="90%">90%</option>
+                <option value="95%">95%</option>
+                <option value="100%">100%</option>
+                <option value="110%">110%</option>
+                <option value="120%">120%</option>
+              </select>
+            </div>
             <div id="sortOptionInMenu" onclick="event.stopPropagation()" class="px-3.5 py-2 flex items-center justify-between">
               <span class="text-slate-600 dark:text-slate-300">정렬</span>
               <select id="sortInput" onchange="changeSortOrder(this.value)" class="text-xs bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded px-2 py-1 font-medium focus:outline-none">
@@ -302,8 +312,8 @@
     
     let currentSort = localStorage.getItem('sunhong_todo_sort') || 'createdAt';
     let hideCompleted = localStorage.getItem('sunhong_todo_hide_completed') === 'true';
+    let currentFontSize = localStorage.getItem('sunhong_todo_font_size') || '100%';
 
-    // 하위 할일 타겟 모드 관리 변수
     let targetParentId = null;
 
     let swRegistration = null;
@@ -312,6 +322,18 @@
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
+    }
+
+    function applyFontSize(size) {
+      document.documentElement.style.fontSize = size;
+      const fontSizeSelect = document.getElementById('fontSizeInput');
+      if (fontSizeSelect) fontSizeSelect.value = size;
+    }
+
+    function changeFontSize(size) {
+      currentFontSize = size;
+      localStorage.setItem('sunhong_todo_font_size', currentFontSize);
+      applyFontSize(currentFontSize);
     }
 
     function toggleDarkMode() {
@@ -1191,6 +1213,8 @@
     }
 
     function initApp() {
+      applyFontSize(currentFontSize);
+
       if (!currentUser) {
         document.getElementById('loginScreen').classList.remove('hidden');
         document.getElementById('mainScreen').classList.add('hidden');
@@ -1255,7 +1279,7 @@
       const chipsContainer = document.getElementById('mobileQuickChipsContainer');
 
       if (isRoutine) {
-        cancelSubTaskTargetMode(); // 루틴 선택 시 하위 할일 타겟 모드 자동 해제
+        cancelSubTaskTargetMode();
         if (timeInput) timeInput.classList.add('hidden');
         if (chipsContainer) chipsContainer.classList.add('hidden');
         if (routineOpts) routineOpts.classList.remove('hidden');
@@ -1283,7 +1307,6 @@
       }
     }
 
-    /* 하위 할일 타겟 모드 활성화 함수 */
     function setSubTaskTargetMode(parentId, parentTaskTitle) {
       targetParentId = parentId;
       const targetBar = document.getElementById('subTaskTargetBar');
@@ -1309,7 +1332,6 @@
       }
     }
 
-    /* 하위 할일 타겟 모드 취소 함수 */
     function cancelSubTaskTargetMode() {
       targetParentId = null;
       const targetBar = document.getElementById('subTaskTargetBar');
@@ -1324,7 +1346,6 @@
       }
     }
 
-    /* 통합 등록 함수 (하위 할일 타겟 모드 처리 지원) */
     function addUnifiedItem(e, mode) {
       e.preventDefault();
       const taskInput = document.getElementById('taskInputMobile');
@@ -1357,7 +1378,6 @@
         });
 
       } else if (targetParentId !== null) {
-        // 하위 할일 추가 처리
         const due = document.getElementById('timeInputMobile').value;
         todos = todos.map(t => {
           if (t.id === targetParentId) {
@@ -1371,14 +1391,13 @@
               notified: false,
               notified10m: false
             });
-            t.due = ''; // 그룹 항목 마감시간 초기화
+            t.due = '';
           }
           return t;
         });
 
         cancelSubTaskTargetMode();
       } else {
-        // 일반 할일 추가 처리
         const due = document.getElementById('timeInputMobile').value;
         todos.unshift({ id: Date.now(), task, due, category: '할일', completed: false, isEditing: false, notified: false, notified10m: false, subitems: [] });
       }
@@ -1609,6 +1628,10 @@
 
       container.innerHTML = `<ul class="space-y-0">${filteredTodos.map(t => {
         const hasSub = t.subitems && t.subitems.length > 0;
+        
+        const visibleSubitems = hasSub ? (hideCompleted ? t.subitems.filter(s => !s.completed) : t.subitems) : [];
+        const hasVisibleSub = visibleSubitems.length > 0;
+
         const totalSub = hasSub ? t.subitems.length : 0;
         const compSub = hasSub ? t.subitems.filter(s => s.completed).length : 0;
         const prog = hasSub ? Math.round((compSub / totalSub) * 100) : 0;
@@ -1663,10 +1686,10 @@
               </div>
             `}
 
-            ${hasSub ? `
+            ${hasVisibleSub ? `
               <ul class="mt-0.5 pl-2 sm:pl-4 border-l-2 border-indigo-100 dark:border-indigo-900 space-y-0">
-                ${t.subitems.map(s => `
-                  <li class="py-0.5">
+                ${visibleSubitems.map(s => `
+                  <li class="py-0">
                     ${s.isEditing ? `
                       <div class="flex items-center gap-1.5 bg-white dark:bg-slate-800 p-0.5 rounded border border-indigo-200 dark:border-indigo-800">
                         <input type="text" id="editSubTask_${s.id}" value="${s.task}" class="flex-1 px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
