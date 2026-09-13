@@ -77,43 +77,34 @@
   <!-- 좌측 사이드바 -->
   <div id="sidebar" class="fixed top-0 left-0 bottom-0 w-72 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 shadow-2xl z-50 transform -translate-x-full transition-transform duration-200 flex flex-col">
     <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
-      <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg">메뉴 및 설정</h2>
+      <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base sm:text-lg">메뉴 및 범위 선택</h2>
       <button onclick="closeSidebar()" class="p-1.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold text-sm">✕</button>
     </div>
 
     <div class="flex-1 overflow-y-auto p-3 space-y-5">
-      <!-- 1. 글로벌 뷰 -->
-      <div>
-        <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 mb-2 px-2">기본 뷰</p>
-        <div class="space-y-1">
-          <button id="sideNav_global_all" onclick="selectGlobalView('all')" class="w-full text-left px-3 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-between text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
-            <span>전체</span>
-          </button>
-          <button id="sideNav_global_today" onclick="selectGlobalView('today')" class="w-full text-left px-3 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-between text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
-            <span>Today</span>
-          </button>
-          <button id="sideNav_global_routine" onclick="selectGlobalView('routine')" class="w-full text-left px-3 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-between text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
-            <span>루틴</span>
-          </button>
-        </div>
-      </div>
-
-      <hr class="border-slate-100 dark:border-slate-700">
-
-      <!-- 2. 프로젝트 리스트 -->
+      <!-- 1. 조회 범위 (전체 & 프로젝트) -->
       <div>
         <div class="flex items-center justify-between mb-2 px-2">
-          <p class="text-xs font-semibold text-slate-400 dark:text-slate-500">프로젝트</p>
+          <p class="text-xs font-semibold text-slate-400 dark:text-slate-500">조회 범위</p>
           <button onclick="addNewProject()" title="프로젝트 추가" class="px-2 py-0.5 text-xs bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 rounded font-bold transition">
-            + 추가
+            + 프로젝트 추가
           </button>
         </div>
+        
+        <!-- 전체 프로젝트 버튼 -->
+        <button id="sideNav_global_all" onclick="selectGlobalView()" class="w-full text-left px-3 py-2.5 rounded-lg font-semibold text-sm transition flex items-center justify-between mb-1.5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
+          <span class="flex items-center gap-2">🌐 <span>전체 (All)</span></span>
+        </button>
+
+        <hr class="border-slate-100 dark:border-slate-700 my-2">
+
+        <!-- 프로젝트 리스트 -->
         <div id="projectList" class="space-y-1"></div>
       </div>
 
       <hr class="border-slate-100 dark:border-slate-700">
 
-      <!-- 3. 환경 설정 및 보관소/고급 기능 -->
+      <!-- 2. 환경 설정 및 보관소/고급 기능 -->
       <div>
         <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 mb-2 px-2">설정 및 관리</p>
         <div class="space-y-1 text-xs sm:text-sm">
@@ -295,7 +286,7 @@
     <div class="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-700 mb-1.5 gap-2 flex-shrink-0">
       <div class="flex items-center gap-2.5 flex-wrap min-w-0">
         <!-- 햄버거 메뉴 버튼 -->
-        <button onclick="openSidebar()" title="메뉴 및 설정 열기" class="p-1 px-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold transition text-lg touch-target flex items-center justify-center">
+        <button onclick="openSidebar()" title="메뉴 및 범위 선택 열기" class="p-1 px-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold transition text-lg touch-target flex items-center justify-center">
           ☰
         </button>
         <h1 class="text-lg sm:text-xl font-bold text-indigo-600 dark:text-indigo-400 flex-shrink-0"><span id="displayName"></span>님의 할 일</h1>
@@ -462,29 +453,23 @@
 
     function updateSidebarHighlightUI() {
       const globalAll = document.getElementById('sideNav_global_all');
-      const globalToday = document.getElementById('sideNav_global_today');
-      const globalRoutine = document.getElementById('sideNav_global_routine');
 
-      const activeClass = "w-full text-left px-3 py-2 rounded-lg font-bold text-sm transition flex items-center justify-between bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400";
-      const inactiveClass = "w-full text-left px-3 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-between text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700";
+      const activeClass = "w-full text-left px-3 py-2.5 rounded-lg font-bold text-sm transition flex items-center justify-between mb-1.5 bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800";
+      const inactiveClass = "w-full text-left px-3 py-2.5 rounded-lg font-semibold text-sm transition flex items-center justify-between mb-1.5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700";
 
-      if (globalAll) globalAll.className = (currentScope === 'global' && currentTab === 'all') ? activeClass : inactiveClass;
-      if (globalToday) globalToday.className = (currentScope === 'global' && currentTab === 'today') ? activeClass : inactiveClass;
-      if (globalRoutine) globalRoutine.className = (currentScope === 'global' && currentTab === 'routine') ? activeClass : inactiveClass;
+      if (globalAll) globalAll.className = (currentScope === 'global') ? activeClass : inactiveClass;
 
       renderProjectList();
       updateArchiveBadge();
     }
 
-    function selectGlobalView(viewTab) {
+    function selectGlobalView() {
       currentScope = 'global';
-      currentTab = viewTab;
       localStorage.setItem('sunhong_todo_current_scope', currentScope);
-      localStorage.setItem('sunhong_todo_current_tab', currentTab);
       closeSidebar();
       updateScopeTitleUI();
       updateSidebarHighlightUI();
-      switchTab(viewTab);
+      render();
     }
 
     function selectProjectView(projId) {
@@ -507,10 +492,10 @@
       if (!titleElem) return;
 
       if (currentScope === 'global') {
-        titleElem.innerText = "전체";
+        titleElem.innerText = "전체 (All Projects)";
       } else {
         const proj = projects.find(p => p.id === currentProjectId);
-        titleElem.innerText = proj ? proj.name : "프로젝트";
+        titleElem.innerText = proj ? `📁 ${proj.name}` : "프로젝트";
       }
     }
 
@@ -627,8 +612,9 @@
 
         return `
           <div class="flex items-center justify-between p-2 rounded-lg transition ${isSelected ? 'bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'}">
-            <button onclick="selectProjectView('${p.id}')" class="flex-1 text-left truncate text-sm">
-              ${p.name}
+            <button onclick="selectProjectView('${p.id}')" class="flex-1 text-left truncate text-sm flex items-center gap-1.5">
+              <span>📁</span>
+              <span class="truncate">${p.name}</span>
             </button>
             <div class="relative flex-shrink-0">
               <button onclick="toggleKebabMenu(event, 'kebab_proj_${p.id}')" class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold text-xs">
@@ -1049,7 +1035,6 @@
       window.open(gcalUrl, '_blank');
     }
 
-    // FCM 토큰 발급 및 진단 팝업 추가 함수
     async function registerFcmToken() {
       if (!window.firebaseMessaging || !currentUser) {
         return;
@@ -1610,6 +1595,30 @@
       renderLoginScreen();
     }
 
+    function checkUrlDeepLink() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const itemId = urlParams.get('itemId');
+      const tab = urlParams.get('tab') || 'all';
+
+      if (itemId) {
+        switchTab(tab);
+        setTimeout(() => {
+          scrollToAndHighlightItem(itemId);
+        }, 500);
+      }
+    }
+
+    function scrollToAndHighlightItem(itemId) {
+      const targetElem = document.getElementById(`item_elem_${itemId}`);
+      if (targetElem) {
+        targetElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        targetElem.classList.add('ring-2', 'ring-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-950');
+        setTimeout(() => {
+          targetElem.classList.remove('ring-2', 'ring-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-950');
+        }, 3000);
+      }
+    }
+
     function initApp() {
       applyFontSize(currentFontSize);
 
@@ -1653,6 +1662,8 @@
       updateSidebarHighlightUI();
       updateScopeTitleUI();
       render();
+
+      checkUrlDeepLink();
     }
 
     function changeSortOrder(order) { 
@@ -2057,7 +2068,7 @@
         const projName = (projects.find(p => p.id === currentProjId) || { name: '기본' }).name;
 
         return `
-          <li class="bg-slate-50 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-md p-0.5 shadow-2xs transition ${t.completed ? 'opacity-60 bg-slate-100/50 dark:bg-slate-900/40' : ''}">
+          <li id="item_elem_${t.id}" class="bg-slate-50 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80 rounded-md p-0.5 shadow-2xs transition ${t.completed ? 'opacity-60 bg-slate-100/50 dark:bg-slate-900/40' : ''}">
             ${t.isEditing ? `
               <div class="space-y-1 bg-white dark:bg-slate-800 p-1 rounded border border-indigo-200 dark:border-indigo-800">
                 <input type="text" id="editTask_${t.id}" value="${t.task}" class="w-full px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
@@ -2121,7 +2132,7 @@
             ${visibleSubitems.length > 0 ? `
               <ul class="mt-0.5 pl-2 sm:pl-4 border-l-2 border-indigo-100 dark:border-indigo-900 space-y-0">
                 ${visibleSubitems.map(s => `
-                  <li class="py-0">
+                  <li id="item_elem_${s.id}" class="py-0">
                     ${s.isEditing ? `
                       <div class="flex items-center gap-1.5 bg-white dark:bg-slate-800 p-0.5 rounded border border-indigo-200 dark:border-indigo-800">
                         <input type="text" id="editSubTask_${s.id}" value="${s.task}" class="flex-1 px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
@@ -2240,7 +2251,7 @@
       if (todayItems.length === 0) {
         container.innerHTML = `
           <div class="text-center py-12 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700 rounded-xl">
-            <p class="text-slate-400 text-sm">오늘 예정된 일정 및 루틴이 없습니다.</p>
+            <p class="text-slate-400 text-sm">현재 영역에 오늘 예정된 일정 및 루틴이 없습니다.</p>
           </div>
         `;
         return;
@@ -2290,7 +2301,7 @@
     function renderTimelineItemHtml(item) {
       if (item.isRoutine) {
         return `
-          <div class="flex items-center justify-between text-sm sm:text-base bg-emerald-50/60 dark:bg-emerald-950/30 p-0.5 px-1 rounded border border-emerald-200 dark:border-emerald-800/60 shadow-2xs">
+          <div id="item_elem_${item.id}" class="flex items-center justify-between text-sm sm:text-base bg-emerald-50/60 dark:bg-emerald-950/30 p-0.5 px-1 rounded border border-emerald-200 dark:border-emerald-800/60 shadow-2xs">
             <div class="flex items-center gap-1.5">
               <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleRoutineToday(${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-emerald-600 rounded cursor-pointer touch-target">
               <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100 font-semibold'} text-sm sm:text-base break-words">${item.task}</span>
@@ -2301,7 +2312,7 @@
       } else if (item.isSub) {
         const tooltipId = `tooltip_sub_${item.id}`;
         return `
-          <div class="flex items-center justify-between text-sm sm:text-base bg-white dark:bg-slate-800 p-0.5 px-1 rounded border border-slate-200 dark:border-slate-700 shadow-2xs">
+          <div id="item_elem_${item.id}" class="flex items-center justify-between text-sm sm:text-base bg-white dark:bg-slate-800 p-0.5 px-1 rounded border border-slate-200 dark:border-slate-700 shadow-2xs">
             <div class="flex items-center gap-1.5">
               <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleSubitem(${item.parentId}, ${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target">
               <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-200 font-medium'} text-sm sm:text-base break-words">${item.task}</span>
@@ -2317,7 +2328,7 @@
         `;
       } else {
         return `
-          <div class="flex items-center justify-between text-sm sm:text-base bg-white dark:bg-slate-800 p-0.5 px-1 rounded border border-slate-200 dark:border-slate-700 shadow-2xs">
+          <div id="item_elem_${item.id}" class="flex items-center justify-between text-sm sm:text-base bg-white dark:bg-slate-800 p-0.5 px-1 rounded border border-slate-200 dark:border-slate-700 shadow-2xs">
             <div class="flex items-center gap-1.5">
               <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleComplete(${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target">
               <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100 font-semibold'} text-sm sm:text-base break-words">${item.task}</span>
@@ -2345,7 +2356,7 @@
         <div class="space-y-0.5">
           ${filteredRoutines.length === 0 ? `
             <div class="text-center py-8 bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 rounded-lg">
-              <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">등록된 습관/반복 루틴이 없습니다.</p>
+              <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">현재 영역에 등록된 습관/반복 루틴이 없습니다.</p>
               <p class="text-slate-400 dark:text-slate-500 text-xs mt-1">하단 입력창에서 카테고리를 <strong class="text-indigo-600 dark:text-indigo-400">[루틴]</strong>으로 선택하여 등록하세요.</p>
             </div>
           ` : `
@@ -2364,7 +2375,7 @@
                 }
 
                 return `
-                  <li class="bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-md p-0.5 shadow-2xs ${!isDueToday ? 'opacity-50' : ''}">
+                  <li id="item_elem_${r.id}" class="bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-md p-0.5 shadow-2xs ${!isDueToday ? 'opacity-50' : ''}">
                     ${r.isEditing ? `
                       <div class="space-y-1 bg-white dark:bg-slate-800 p-1 rounded border border-indigo-200 dark:border-indigo-800">
                         <input type="text" id="editRoutineTask_${r.id}" value="${r.task}" class="w-full px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
