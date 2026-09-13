@@ -1,6 +1,5 @@
 const admin = require('firebase-admin');
 
-// GitHub Secrets에서 인증 키를 가져와 Firebase 관리자 초기화
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 
 admin.initializeApp({
@@ -33,12 +32,10 @@ async function checkAndSendNotifications() {
     for (const todo of Object.values(userTodos)) {
       const hasSub = todo.subitems && todo.subitems.length > 0;
       
-      // 단일 할 일 마감 체크
       if (!hasSub && !todo.completed && todo.due) {
         await processItemDue(todo, userFcmToken, username, `todos/${username}/${todo.id}`, now);
       }
       
-      // 하위 할 일 마감 체크
       if (hasSub) {
         for (const sub of Object.values(todo.subitems)) {
           if (!sub.completed && sub.due) {
@@ -57,10 +54,10 @@ async function checkAndSendNotifications() {
       const diffMinutes = (routineTime - now) / (1000 * 60);
 
       if (diffMinutes > 0 && diffMinutes <= 15 && !routine.notified10m) {
-        await sendFcmNotification(userFcmToken, '⏰ 루틴 수행 10분 전!', `[루틴] ${routine.task} 수행 10분 전입니다.`);
+        await sendFcmNotification(userFcmToken, '⏰ 루틴 수행 10분 전!', `[루틴] ${routine.task} 수행 10분 전입니다.`, routine.id, 'routine');
         await db.ref(`routines/${username}/${routine.id}/notified10m`).set(true);
       } else if (diffMinutes <= 0 && diffMinutes >= -15 && !routine.notified) {
-        await sendFcmNotification(userFcmToken, '🚨 루틴 수행 시간입니다!', `[루틴] ${routine.task} 수행 시각이 되었습니다.`);
+        await sendFcmNotification(userFcmToken, '🚨 루틴 수행 시간입니다!', `[루틴] ${routine.task} 수행 시각이 되었습니다.`, routine.id, 'routine');
         await db.ref(`routines/${username}/${routine.id}/notified`).set(true);
       }
     }
@@ -70,23 +67,26 @@ async function checkAndSendNotifications() {
 async function processItemDue(item, token, username, dbPath, now, isSub = false) {
   const dueTime = new Date(item.due);
   const diffMinutes = (dueTime - now) / (1000 * 60);
-
   const prefix = isSub ? '[하위]' : `[${item.category || '할일'}]`;
 
   if (diffMinutes > 0 && diffMinutes <= 15 && !item.notified10m) {
-    await sendFcmNotification(token, '⏰ 마감 10분 전!', `${prefix} ${item.task} 마감 10분 전입니다.`);
+    await sendFcmNotification(token, '⏰ 마감 10분 전!', `${prefix} ${item.task} 마감 10분 전입니다.`, item.id, 'all');
     await db.ref(`${dbPath}/notified10m`).set(true);
   } else if (diffMinutes <= 0 && diffMinutes >= -15 && !item.notified) {
-    await sendFcmNotification(token, '🚨 마감 시간이 되었습니다!', `${prefix} ${item.task} 마감 시각이 되었습니다.`);
+    await sendFcmNotification(token, '🚨 마감 시간이 되었습니다!', `${prefix} ${item.task} 마감 시각이 되었습니다.`, item.id, 'all');
     await db.ref(`${dbPath}/notified`).set(true);
   }
 }
 
-async function sendFcmNotification(token, title, body) {
+async function sendFcmNotification(token, title, body, itemId, tab) {
   try {
     await admin.messaging().send({
       token: token,
       notification: { title, body },
+      data: {
+        itemId: String(itemId),
+        tab: String(tab)
+      },
       webpush: {
         notification: {
           icon: 'https://cdn-icons-png.flaticon.com/512/906/906334.png'
