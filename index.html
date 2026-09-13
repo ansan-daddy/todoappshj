@@ -1058,7 +1058,7 @@
       try {
         const registration = await navigator.serviceWorker.register('sw.js');
         const token = await window.getFcmToken(window.firebaseMessaging, {
-          vapidKey: 'YOUR_VAPID_KEY', // 👈 1번째 VAPID Key 입력 위치
+          vapidKey: 'BCAJlcTXnmq95VqAmhWCegVFYiidhHHMBs4H5C4lwMUpvGI9N_8jCnY_VufkdtuEBR3iiKaUEV7GObH3zVkcel8', // 👈 1번째 VAPID Key 입력 위치
           serviceWorkerRegistration: registration
         });
         
