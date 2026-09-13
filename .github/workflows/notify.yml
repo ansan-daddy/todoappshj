@@ -1,0 +1,26 @@
+name: Scheduled Todo Notifications
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # 15분마다 체크
+  workflow_dispatch:        # GitHub 웹에서 수동 실행 버튼 제공
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install firebase-admin
+
+      - name: Run notification script
+        env:
+          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+        run: node scripts/send-notifications.js
