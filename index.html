@@ -12,10 +12,11 @@
     }
   </script>
   
-  <!-- Firebase SDK 모듈 -->
+  <!-- Firebase SDK 및 FCM 연동 모듈 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, get, remove, child, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDYTzXhT0nEBFGaKy_RylkGJ28rmhsPqoc",
@@ -32,8 +33,11 @@
       if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY") {
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const messaging = getMessaging(app);
 
         window.firebaseDb = db;
+        window.firebaseMessaging = messaging;
+        window.getFcmToken = getToken;
         window.dbRef = ref;
         window.dbSet = set;
         window.dbGet = get;
@@ -912,6 +916,7 @@
         currentUser = username;
         localStorage.setItem('sunhong_todo_user', currentUser);
         initApp();
+        registerFcmToken();
       } catch (err) {
         alert('로그인 시도 중 오류가 발생했습니다: ' + err.message);
       }
@@ -1044,6 +1049,22 @@
       window.open(gcalUrl, '_blank');
     }
 
+    async function registerFcmToken() {
+      if (!window.firebaseMessaging || !currentUser || Notification.permission !== 'granted') return;
+
+      try {
+        const token = await window.getFcmToken(window.firebaseMessaging, {
+          vapidKey: 'YOUR_VAPID_KEY' // Firebase 콘솔에서 발급받은 Public VAPID Key 입력
+        });
+        if (token) {
+          await window.dbSet(window.dbRef(window.firebaseDb, `users/${currentUser}/fcmToken`), token);
+          console.log('FCM 토큰 DB 등록 성공');
+        }
+      } catch (err) {
+        console.warn('FCM 토큰 등록 오류:', err);
+      }
+    }
+
     function updateNotificationUI() {
       const statusText = document.getElementById('notifyStatusText');
       if (!statusText) return;
@@ -1055,7 +1076,7 @@
       }
 
       if (Notification.permission === 'granted') {
-        statusText.innerText = "켜짐";
+        statusText.innerText = "켜짐 (FCM 연동)";
         statusText.className = "text-xs font-semibold text-emerald-600 dark:text-emerald-400";
       } else if (Notification.permission === 'denied') {
         statusText.innerText = "차단됨";
@@ -1073,6 +1094,7 @@
       }
 
       if (Notification.permission === 'granted') {
+        registerFcmToken();
         triggerNotification("알림 테스트", "선홍님의 푸시 알림이 정상적으로 작동하고 있습니다!");
       } else if (Notification.permission === 'denied') {
         alert('브라우저 설정에서 알림 권한을 [허용]으로 변경해 주셔야 합니다.');
@@ -1080,6 +1102,7 @@
         Notification.requestPermission().then(permission => {
           updateNotificationUI();
           if (permission === 'granted') {
+            registerFcmToken();
             triggerNotification("알림 활성화 완료", "이제 마감 10분 전 및 마감 정시에 알림이 발송됩니다.");
           }
         });
@@ -2420,6 +2443,22 @@
           `}
         </div>
       `;
+    }
+
+    async function registerFcmToken() {
+      if (!window.firebaseMessaging || !currentUser || Notification.permission !== 'granted') return;
+
+      try {
+        const token = await window.getFcmToken(window.firebaseMessaging, {
+          vapidKey: 'YOUR_VAPID_KEY' // Firebase 콘솔에서 발급받은 Public VAPID Key 입력
+        });
+        if (token) {
+          await window.dbSet(window.dbRef(window.firebaseDb, `users/${currentUser}/fcmToken`), token);
+          console.log('FCM 토큰 DB 등록 성공');
+        }
+      } catch (err) {
+        console.warn('FCM 토큰 등록 오류:', err);
+      }
     }
 
     initApp();
