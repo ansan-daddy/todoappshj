@@ -1054,7 +1054,7 @@
 
       try {
         const token = await window.getFcmToken(window.firebaseMessaging, {
-          vapidKey: 'YOUR_VAPID_KEY' // Firebase 콘솔에서 발급받은 Public VAPID Key 입력
+          vapidKey: 'BCAJlcTXnmq95VqAmhWCegVFYiidhHHMBs4H5C4lwMUpvGI9N_8jCnY_VufkdtuEBR3iiKaUEV7GObH3zVkcel8' // Firebase 콘솔에서 발급받은 Public VAPID Key 입력
         });
         if (token) {
           await window.dbSet(window.dbRef(window.firebaseDb, `users/${currentUser}/fcmToken`), token);
@@ -2450,7 +2450,7 @@
 
       try {
         const token = await window.getFcmToken(window.firebaseMessaging, {
-          vapidKey: 'YOUR_VAPID_KEY' // Firebase 콘솔에서 발급받은 Public VAPID Key 입력
+          vapidKey: 'BCAJlcTXnmq95VqAmhWCegVFYiidhHHMBs4H5C4lwMUpvGI9N_8jCnY_VufkdtuEBR3iiKaUEV7GObH3zVkcel8' // Firebase 콘솔에서 발급받은 Public VAPID Key 입력
         });
         if (token) {
           await window.dbSet(window.dbRef(window.firebaseDb, `users/${currentUser}/fcmToken`), token);
