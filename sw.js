@@ -1,53 +1,25 @@
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
+importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+  apiKey: "AIzaSyDYTzXhT0nEBFGaKy_RylkGJ28rmhsPqoc",
+  authDomain: "sunhong-todo.firebaseapp.com",
+  databaseURL: "https://sunhong-todo-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "sunhong-todo",
+  storageBucket: "sunhong-todo.firebasestorage.app",
+  messagingSenderId: "382912248399",
+  appId: "1:382912248399:web:1294528d4a9e52f47a083a"
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(clients.claim());
+const messaging = firebase.messaging();
+
+// 백그라운드 상태 수신 리스너
+messaging.onBackgroundMessage((payload) => {
+  const notificationTitle = payload.notification.title;
+  const notificationOptions = {
+    body: payload.notification.body,
+    icon: payload.notification.icon || 'https://cdn-icons-png.flaticon.com/512/906/906334.png'
+  };
+
+  self.registration.showNotification(notificationTitle, notificationOptions);
 });
-
-// 백그라운드 푸시 알림 메시지 수신 및 발송
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
-    const title = event.data.title || '알림';
-    const options = {
-      body: event.data.body || '',
-      icon: 'https://cdn-icons-png.flaticon.com/512/906/906334.png',
-      badge: 'https://cdn-icons-png.flaticon.com/512/906/906334.png',
-      vibrate: [200, 100, 200],
-      tag: 'todo-notification',
-      renotify: true
-    };
-
-    event.waitUntil(
-      self.registration.showNotification(title, options)
-    );
-  }
-});
-
-// 주기적 백그라운드 동기화 (지원하는 브라우저/환경에서 백그라운드 체크 수행)
-self.addEventListener('periodicsync', (event) => {
-  if (event.tag === 'check-todo-deadline') {
-    event.waitUntil(checkDeadlinesInBackground());
-  }
-});
-
-async function checkDeadlinesInBackground() {
-  // 클라이언트(열려 있는 앱 창)에 마감 체크 요청 전송
-  const clientList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
-  for (const client of clientList) {
-    client.postMessage({ type: 'TRIGGER_DUE_CHECK' });
-  }
-}
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      for (const client of clientList) {
-        if (client.url && 'focus' in client) return client.focus();
-      }
-      if (clients.openWindow) return clients.openWindow('/');
-    })
-  );
-})
