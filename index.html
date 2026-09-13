@@ -152,7 +152,7 @@
           </div>
 
           <button id="notifyBtn" onclick="handleNotificationClick()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-between text-slate-700 dark:text-slate-200">
-            <span>알림 상태</span>
+            <span>알림 상태 (터치하여 토큰 재등록)</span>
             <span id="notifyStatusText" class="text-xs font-semibold">확인 중...</span>
           </button>
 
@@ -1049,19 +1049,29 @@
       window.open(gcalUrl, '_blank');
     }
 
+    // FCM 토큰 발급 및 진단 팝업 추가 함수
     async function registerFcmToken() {
-      if (!window.firebaseMessaging || !currentUser || Notification.permission !== 'granted') return;
+      if (!window.firebaseMessaging || !currentUser) {
+        return;
+      }
 
       try {
+        const registration = await navigator.serviceWorker.register('sw.js');
         const token = await window.getFcmToken(window.firebaseMessaging, {
-          vapidKey: 'BCAJlcTXnmq95VqAmhWCegVFYiidhHHMBs4H5C4lwMUpvGI9N_8jCnY_VufkdtuEBR3iiKaUEV7GObH3zVkcel8' // Firebase 콘솔에서 발급받은 Public VAPID Key 입력
+          vapidKey: 'YOUR_VAPID_KEY', // 👈 1번째 VAPID Key 입력 위치
+          serviceWorkerRegistration: registration
         });
+        
         if (token) {
           await window.dbSet(window.dbRef(window.firebaseDb, `users/${currentUser}/fcmToken`), token);
-          console.log('FCM 토큰 DB 등록 성공');
+          alert("🎉 FCM 토큰이 DB에 성공적으로 등록되었습니다!\n토큰: " + token.slice(0, 15) + "...");
+          updateNotificationUI();
+        } else {
+          alert("토큰 발급에 실패했습니다. 권한 설정을 확인해 주세요.");
         }
       } catch (err) {
-        console.warn('FCM 토큰 등록 오류:', err);
+        console.error('FCM 토큰 발급 오류:', err);
+        alert("❌ 토큰 발급 실패 에러:\n" + err.message);
       }
     }
 
@@ -1076,7 +1086,7 @@
       }
 
       if (Notification.permission === 'granted') {
-        statusText.innerText = "켜짐 (FCM 연동)";
+        statusText.innerText = "켜짐 (FCM 연동 완료)";
         statusText.className = "text-xs font-semibold text-emerald-600 dark:text-emerald-400";
       } else if (Notification.permission === 'denied') {
         statusText.innerText = "차단됨";
@@ -1093,20 +1103,14 @@
         return;
       }
 
-      if (Notification.permission === 'granted') {
-        registerFcmToken();
-        triggerNotification("알림 테스트", "선홍님의 푸시 알림이 정상적으로 작동하고 있습니다!");
-      } else if (Notification.permission === 'denied') {
-        alert('브라우저 설정에서 알림 권한을 [허용]으로 변경해 주셔야 합니다.');
-      } else {
-        Notification.requestPermission().then(permission => {
-          updateNotificationUI();
-          if (permission === 'granted') {
-            registerFcmToken();
-            triggerNotification("알림 활성화 완료", "이제 마감 10분 전 및 마감 정시에 알림이 발송됩니다.");
-          }
-        });
-      }
+      Notification.requestPermission().then(permission => {
+        updateNotificationUI();
+        if (permission === 'granted') {
+          registerFcmToken();
+        } else if (permission === 'denied') {
+          alert('브라우저 설정에서 알림 권한을 [허용]으로 변경해 주셔야 합니다.');
+        }
+      });
     }
 
     function triggerNotification(title, body) {
@@ -2446,18 +2450,27 @@
     }
 
     async function registerFcmToken() {
-      if (!window.firebaseMessaging || !currentUser || Notification.permission !== 'granted') return;
+      if (!window.firebaseMessaging || !currentUser) {
+        return;
+      }
 
       try {
+        const registration = await navigator.serviceWorker.register('sw.js');
         const token = await window.getFcmToken(window.firebaseMessaging, {
-          vapidKey: 'BCAJlcTXnmq95VqAmhWCegVFYiidhHHMBs4H5C4lwMUpvGI9N_8jCnY_VufkdtuEBR3iiKaUEV7GObH3zVkcel8' // Firebase 콘솔에서 발급받은 Public VAPID Key 입력
+          vapidKey: 'BCAJlcTXnmq95VqAmhWCegVFYiidhHHMBs4H5C4lwMUpvGI9N_8jCnY_VufkdtuEBR3iiKaUEV7GObH3zVkcel8', // 👈 2번째 VAPID Key 입력 위치
+          serviceWorkerRegistration: registration
         });
+        
         if (token) {
           await window.dbSet(window.dbRef(window.firebaseDb, `users/${currentUser}/fcmToken`), token);
-          console.log('FCM 토큰 DB 등록 성공');
+          alert("🎉 FCM 토큰이 DB에 성공적으로 등록되었습니다!\n토큰: " + token.slice(0, 15) + "...");
+          updateNotificationUI();
+        } else {
+          alert("토큰 발급에 실패했습니다. 권한 설정을 확인해 주세요.");
         }
       } catch (err) {
-        console.warn('FCM 토큰 등록 오류:', err);
+        console.error('FCM 토큰 발급 오류:', err);
+        alert("❌ 토큰 발급 실패 에러:\n" + err.message);
       }
     }
 
