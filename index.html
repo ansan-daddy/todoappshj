@@ -402,22 +402,19 @@
       document.documentElement.classList.remove('dark');
     }
 
-    /* 한국 시간대(+09:00) 명시적 파싱 함수 */
+    /* KST 로컬 시각 기준 숫자로 안전 파싱 (모바일 13시간 차이 오차 원천 수정) */
     function parseKstDate(dateStr) {
       if (!dateStr) return null;
       if (typeof dateStr !== 'string') return new Date(dateStr);
-  
-      // "YYYY-MM-DDTHH:mm" 또는 "YYYY-MM-DD HH:mm" 형태 분해
+      
       const [datePart, timePart] = dateStr.includes('T') ? dateStr.split('T') : dateStr.split(' ');
       if (!datePart || !timePart) return new Date(dateStr);
 
       const [year, month, day] = datePart.split('-').map(Number);
       const [hours, minutes] = timePart.split(':').map(Number);
 
-      // 숫자로 직접 지정하여 로컬 타임존 시각으로 정확하게 생성
       return new Date(year, month - 1, day, hours, minutes, 0);
     }
-
 
     /* 프로젝트별 자동 색상 배지 생성 */
     const colorPalette = [
@@ -1182,7 +1179,7 @@
       }
     }
 
-    /* 알림 감지 로직 (KST 타임존 적용) */
+    /* 알림 감지 로직 (최적화: 30초 주기 동작) */
     function checkDueNotifications() {
       if (Notification.permission !== 'granted') return;
 
@@ -1263,7 +1260,9 @@
         saveAndRender();
       }
     }
-    setInterval(checkDueNotifications, 3000);
+
+    // ⚡ 리소스 최적화: 3초 -> 30초 주기 완화
+    setInterval(checkDueNotifications, 30000);
 
     function getTodayString() {
       const now = new Date();
@@ -1366,7 +1365,7 @@
       const now = new Date();
       const days = ['일', '월', '화', '수', '목', '금', '토'];
       const dateStr = `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일 (${days[now.getDay()]})`;
-      const timeStr = now.toLocaleTimeString('ko-KR', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const timeStr = now.toLocaleTimeString('ko-KR', { hour12: true, hour: '2-digit', minute: '2-digit' });
       const clockElem = document.getElementById('clock');
       if (clockElem) clockElem.innerText = `${dateStr} ${timeStr}`;
 
@@ -1374,7 +1373,9 @@
         render();
       }
     }
-    setInterval(updateClock, 1000);
+
+    // ⚡ 리소스 최적화: 시계 갱신 주기 10초 완화 (DOM 점유 최소화)
+    setInterval(updateClock, 10000);
 
     function extractAllTodos(rawData) {
       if (!rawData) return [];
@@ -1875,7 +1876,6 @@
           if (t.id === targetParentId) {
             if (!t.subitems) t.subitems = [];
             
-            /* 상위 그룹이 중요 지정 상태이면 새로 생성되는 하위 할 일도 별표 자동 상속 */
             t.subitems.push({
               id: Date.now(),
               task: task,
@@ -2119,7 +2119,6 @@
         filteredTodos = filteredTodos.filter(t => !t.completed);
       }
 
-      /* 중요(★) 상위 항목 최상단 정렬 */
       filteredTodos.sort((a, b) => {
         if (a.isImportant !== b.isImportant) {
           return a.isImportant ? -1 : 1;
@@ -2139,7 +2138,6 @@
         const hasSub = t.subitems && t.subitems.length > 0;
         let visibleSubitems = hasSub ? (hideCompleted ? t.subitems.filter(s => !s.completed) : t.subitems) : [];
 
-        /* 하위 할일 목록 내에서도 중요(★) 지정 항목 상단 배치 정렬 */
         if (visibleSubitems.length > 0) {
           visibleSubitems.sort((a, b) => (b.isImportant ? 1 : 0) - (a.isImportant ? 1 : 0));
         }
@@ -2186,33 +2184,23 @@
                   </div>
                 </div>
                 
-                <!-- 케밥 메뉴: 1.수정 -> 2.하위할일 -> 3.중요지정 -> 4.캘린더 -> 5.프로젝트이동 -> 6.삭제 순 -->
                 <div class="relative flex-shrink-0">
                   <button onclick="toggleKebabMenu(event, 'kebab_main_${t.id}')" title="더보기" class="p-1 px-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded font-bold transition text-base touch-target">
                     ⋮
                   </button>
                   <div id="kebab_main_${t.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs">
-                    <!-- 1. 수정 -->
                     <button onclick="toggleEditMain(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                       수정
                     </button>
-
-                    <!-- 2. 하위할일 추가 -->
                     <button onclick="setSubTaskTargetMode(${t.id}, '${t.task.replace(/'/g, "\\'")}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold">
                       하위 할일 추가
                     </button>
-
-                    <!-- 3. 중요 지정 (별표 ★) -->
                     <button onclick="toggleImportant(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-semibold">
                       ${t.isImportant ? '★ 중요 해제' : '☆ 중요 지정'}
                     </button>
-
-                    <!-- 4. 캘린더 추가 -->
                     <button onclick="addToGoogleCalendar('${t.task.replace(/'/g, "\\'")}', '할일', '${t.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                       캘린더 추가
                     </button>
-
-                    <!-- 5. 프로젝트 이동 -->
                     <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
                     <div class="px-3 py-1 text-[10px] font-bold text-slate-400">프로젝트 이동:</div>
                     ${projects.map(p => `
@@ -2221,8 +2209,6 @@
                         ${p.id === currentProjId ? '<span class="text-[10px]">✓</span>' : ''}
                       </button>
                     `).join('')}
-
-                    <!-- 6. 삭제 -->
                     <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
                     <button onclick="deleteTodo(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
                       삭제
@@ -2258,7 +2244,6 @@
                           ${s.due ? `<span class="text-xs text-slate-400 ml-1 flex-shrink-0">${formatSimpleDue(s.due)}</span>` : ''}
                         </div>
                         
-                        <!-- 하위 할일 케밥 메뉴: 1.수정 -> 3.중요지정 -> 4.캘린더 -> 6.삭제 순 -->
                         <div class="relative flex-shrink-0">
                           <button onclick="toggleKebabMenu(event, 'kebab_sub_${s.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">
                             ⋮
@@ -2514,22 +2499,15 @@
                 ⋮
               </button>
               <div id="kebab_today_main_${item.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs font-normal">
-                <!-- 1. 수정 -->
                 <button onclick="toggleEditMain(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                   수정
                 </button>
-
-                <!-- 3. 중요 지정 (별표 ★) -->
                 <button onclick="toggleImportant(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-semibold">
                   ${item.isImportant ? '★ 중요 해제' : '☆ 중요 지정'}
                 </button>
-                
-                <!-- 4. 캘린더 추가 -->
                 <button onclick="addToGoogleCalendar('${item.task.replace(/'/g, "\\'")}', '할일', '${item.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                   캘린더 추가
                 </button>
-
-                <!-- 5. 프로젝트 이동 -->
                 <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
                 <div class="px-3 py-1 text-[10px] font-bold text-slate-400">프로젝트 이동:</div>
                 ${projects.map(p => `
@@ -2538,8 +2516,6 @@
                     ${p.id === currentProjId ? '<span class="text-[10px]">✓</span>' : ''}
                   </button>
                 `).join('')}
-
-                <!-- 6. 삭제 -->
                 <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
                 <button onclick="deleteTodo(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
                   삭제
@@ -2638,7 +2614,6 @@
                           </div>
                         </div>
 
-                        <!-- 루틴 케밥 메뉴: 수정 -> 프로젝트이동 -> 삭제 순 -->
                         <div class="relative flex-shrink-0">
                           <button onclick="toggleKebabMenu(event, 'kebab_routine_${r.id}')" title="더보기" class="p-1 px-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded font-bold transition text-base touch-target">
                             ⋮
