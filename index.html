@@ -629,11 +629,16 @@
       }).join('');
     }
 
-    /* 중요 (별표/고정) 기능 토글 - 상위 및 하위 할일 개별 지원 */
+    /* 중요 (별표/고정) 기능 토글 - 그룹 및 하위 연동 처리 */
     function toggleImportant(id) {
       todos = todos.map(t => {
         if (t.id === id) {
-          return { ...t, isImportant: !t.isImportant };
+          const newStatus = !t.isImportant;
+          const updatedSubitems = (t.subitems && t.subitems.length > 0)
+            ? t.subitems.map(s => ({ ...s, isImportant: newStatus }))
+            : t.subitems;
+
+          return { ...t, isImportant: newStatus, subitems: updatedSubitems };
         }
         if (t.subitems && t.subitems.length > 0) {
           t.subitems = t.subitems.map(s => s.id === id ? { ...s, isImportant: !s.isImportant } : s);
@@ -1869,12 +1874,14 @@
         todos = todos.map(t => {
           if (t.id === targetParentId) {
             if (!t.subitems) t.subitems = [];
+            
+            /* 상위 그룹이 중요 지정 상태이면 새로 생성되는 하위 할 일도 별표 자동 상속 */
             t.subitems.push({
               id: Date.now(),
               task: task,
               due: due,
               completed: false,
-              isImportant: false,
+              isImportant: !!t.isImportant,
               isEditing: false,
               notified: false,
               notified10m: false
@@ -2164,15 +2171,10 @@
               <div class="flex items-center justify-between gap-1.5">
                 <div class="flex items-center gap-1.5 flex-1 min-w-0">
                   <input type="checkbox" ${t.completed ? 'checked' : ''} onchange="toggleComplete(${t.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target flex-shrink-0">
-                  
-                  <!-- 중요(별표 ★) 토글 버튼 -->
-                  <button onclick="toggleImportant(${t.id})" title="${t.isImportant ? '중요 해제' : '중요 지정'}" class="p-0.5 text-base sm:text-lg flex-shrink-0 focus:outline-none transition ${t.isImportant ? 'text-amber-500 hover:text-amber-600' : 'text-slate-300 hover:text-slate-400 dark:text-slate-600'}">
-                    ${t.isImportant ? '★' : '☆'}
-                  </button>
 
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-1.5 flex-wrap">
-                      <span class="font-semibold ${t.completed ? 'line-through text-slate-400' : (t.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-800 dark:text-slate-100')} text-sm sm:text-base break-words">${t.task}</span>
+                      <span class="font-semibold ${t.completed ? 'line-through text-slate-400' : (t.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-800 dark:text-slate-100')} text-sm sm:text-base break-words">${t.isImportant ? '★ ' : ''}${t.task}</span>
                       ${currentScope === 'global' ? `<span class="text-[9px] leading-none ${colorStyle.bg} ${colorStyle.text} px-1 py-0.5 rounded font-medium">${projName}</span>` : ''}
                       ${hasSub ? `
                         <span class="text-[9px] leading-none font-semibold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-1 py-0.5 rounded">그룹</span>
@@ -2250,13 +2252,8 @@
                       <div class="flex items-center justify-between text-sm sm:text-base">
                         <div class="flex items-center gap-1.5 min-w-0 flex-1">
                           <input type="checkbox" ${s.completed ? 'checked' : ''} onchange="toggleSubitem(${t.id}, ${s.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target flex-shrink-0">
-                          
-                          <!-- 하위 할일 별표 토글 버튼 -->
-                          <button onclick="toggleImportant(${s.id})" title="${s.isImportant ? '중요 해제' : '중요 지정'}" class="p-0.5 text-sm sm:text-base flex-shrink-0 focus:outline-none transition ${s.isImportant ? 'text-amber-500 hover:text-amber-600' : 'text-slate-300 hover:text-slate-400 dark:text-slate-600'}">
-                            ${s.isImportant ? '★' : '☆'}
-                          </button>
 
-                          <span class="${s.completed ? 'line-through text-slate-400' : (s.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-700 dark:text-slate-200')} text-sm sm:text-base break-words">${s.task}</span>
+                          <span class="${s.completed ? 'line-through text-slate-400' : (s.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-700 dark:text-slate-200')} text-sm sm:text-base break-words">${s.isImportant ? '★ ' : ''}${s.task}</span>
                           ${!s.completed && s.due ? getDDayTag(s.due) : ''}
                           ${s.due ? `<span class="text-xs text-slate-400 ml-1 flex-shrink-0">${formatSimpleDue(s.due)}</span>` : ''}
                         </div>
@@ -2419,7 +2416,7 @@
       container.innerHTML = html;
     }
 
-    /* Today 탭 항목 렌더링 (동일 하이라이트 및 별표 조작 지원) */
+    /* Today 탭 항목 렌더링 */
     function renderTimelineItemHtml(item) {
       const currentProjId = item.projectId || 'default';
 
@@ -2466,13 +2463,8 @@
           <div id="item_elem_${item.id}" class="flex items-center justify-between text-sm sm:text-base ${subBgStyle} p-0.5 px-1 rounded border shadow-2xs">
             <div class="flex items-center gap-1.5 flex-1 min-w-0">
               <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleSubitem(${item.parentId}, ${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target flex-shrink-0">
-              
-              <!-- Today 탭 하위 별표 토글 -->
-              <button onclick="toggleImportant(${item.id})" title="${item.isImportant ? '중요 해제' : '중요 지정'}" class="p-0.5 text-sm sm:text-base flex-shrink-0 focus:outline-none transition ${item.isImportant ? 'text-amber-500 hover:text-amber-600' : 'text-slate-300 hover:text-slate-400 dark:text-slate-600'}">
-                ${item.isImportant ? '★' : '☆'}
-              </button>
 
-              <span class="${item.completed ? 'line-through text-slate-400' : (item.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-700 dark:text-slate-200')} text-sm sm:text-base break-words truncate">${item.task}</span>
+              <span class="${item.completed ? 'line-through text-slate-400' : (item.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-700 dark:text-slate-200')} text-sm sm:text-base break-words truncate">${item.isImportant ? '★ ' : ''}${item.task}</span>
               
               <div id="${tooltipId}" class="relative inline-block has-tooltip cursor-pointer flex-shrink-0" onclick="toggleSubTooltip(event, '${tooltipId}')">
                 <span class="text-[10px] leading-none bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-1 py-0.5 rounded font-semibold border border-indigo-100 dark:border-indigo-800">하위</span>
@@ -2513,13 +2505,8 @@
           <div id="item_elem_${item.id}" class="flex items-center justify-between text-sm sm:text-base ${itemBgStyle} p-0.5 px-1 rounded border shadow-2xs">
             <div class="flex items-center gap-1.5 flex-1 min-w-0">
               <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleComplete(${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target flex-shrink-0">
-              
-              <!-- Today 탭 상위 별표 토글 -->
-              <button onclick="toggleImportant(${item.id})" title="${item.isImportant ? '중요 해제' : '중요 지정'}" class="p-0.5 text-base sm:text-lg flex-shrink-0 focus:outline-none transition ${item.isImportant ? 'text-amber-500 hover:text-amber-600' : 'text-slate-300 hover:text-slate-400 dark:text-slate-600'}">
-                ${item.isImportant ? '★' : '☆'}
-              </button>
 
-              <span class="${item.completed ? 'line-through text-slate-400' : (item.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-800 dark:text-slate-100 font-semibold')} text-sm sm:text-base break-words truncate">${item.task}</span>
+              <span class="${item.completed ? 'line-through text-slate-400' : (item.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-800 dark:text-slate-100 font-semibold')} text-sm sm:text-base break-words truncate">${item.isImportant ? '★ ' : ''}${item.task}</span>
             </div>
 
             <div class="relative flex-shrink-0">
