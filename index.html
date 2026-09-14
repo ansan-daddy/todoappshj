@@ -629,9 +629,17 @@
       }).join('');
     }
 
-    /* 중요 (별표/고정) 기능 토글 */
+    /* 중요 (별표/고정) 기능 토글 - 상위 및 하위 할일 개별 지원 */
     function toggleImportant(id) {
-      todos = todos.map(t => t.id === id ? { ...t, isImportant: !t.isImportant } : t);
+      todos = todos.map(t => {
+        if (t.id === id) {
+          return { ...t, isImportant: !t.isImportant };
+        }
+        if (t.subitems && t.subitems.length > 0) {
+          t.subitems = t.subitems.map(s => s.id === id ? { ...s, isImportant: !s.isImportant } : s);
+        }
+        return t;
+      });
       saveAndRender();
     }
 
@@ -1095,7 +1103,7 @@
       try {
         const registration = await navigator.serviceWorker.register('sw.js');
         const token = await window.getFcmToken(window.firebaseMessaging, {
-          vapidKey: 'BCAJlcTXnmq95VqAmhWCegVFYiidhHHMBs4H5C4lwMUpvGI9N_8jCnY_VufkdtuEBR3iiKaUEV7GObH3zVkcel8', // 👈 1번째 VAPID Key 입력 위치
+          vapidKey: 'BCAJlcTXnmq95VqAmhWCegVFYiidhHHMBs4H5C4lwMUpvGI9N_8jCnY_VufkdtuEBR3iiKaUEV7GObH3zVkcel8',
           serviceWorkerRegistration: registration
         });
         
@@ -1378,6 +1386,7 @@
               task: s.task || s.text || s.title || '',
               due: s.due || s.dueDate || '',
               completed: !!s.completed,
+              isImportant: !!s.isImportant,
               isEditing: false,
               notified: !!s.notified,
               notified10m: !!s.notified10m
@@ -1543,7 +1552,7 @@
               s.task,
               s.due || '',
               s.completed ? '완료' : '미완료',
-              '일반'
+              s.isImportant ? '중요' : '일반'
             ]);
           });
         }
@@ -1865,6 +1874,7 @@
               task: task,
               due: due,
               completed: false,
+              isImportant: false,
               isEditing: false,
               notified: false,
               notified10m: false
@@ -2102,7 +2112,7 @@
         filteredTodos = filteredTodos.filter(t => !t.completed);
       }
 
-      /* 중요(★) 항목 최상단 배치 후 사용자 정렬 옵션 적용 */
+      /* 중요(★) 상위 항목 최상단 정렬 */
       filteredTodos.sort((a, b) => {
         if (a.isImportant !== b.isImportant) {
           return a.isImportant ? -1 : 1;
@@ -2120,7 +2130,12 @@
 
       container.innerHTML = `<ul class="space-y-0">${filteredTodos.map(t => {
         const hasSub = t.subitems && t.subitems.length > 0;
-        const visibleSubitems = hasSub ? (hideCompleted ? t.subitems.filter(s => !s.completed) : t.subitems) : [];
+        let visibleSubitems = hasSub ? (hideCompleted ? t.subitems.filter(s => !s.completed) : t.subitems) : [];
+
+        /* 하위 할일 목록 내에서도 중요(★) 지정 항목 상단 배치 정렬 */
+        if (visibleSubitems.length > 0) {
+          visibleSubitems.sort((a, b) => (b.isImportant ? 1 : 0) - (a.isImportant ? 1 : 0));
+        }
 
         const totalSub = hasSub ? t.subitems.length : 0;
         const compSub = hasSub ? t.subitems.filter(s => s.completed).length : 0;
@@ -2130,7 +2145,6 @@
         const projName = (projects.find(p => p.id === currentProjId) || { name: '기본' }).name;
         const colorStyle = getProjectColor(projName);
 
-        /* 중요(★) 항목 하이라이트 스타일 (배경 및 테두리 라인 강조) */
         const itemBgStyle = t.isImportant 
           ? 'bg-amber-50/70 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700/80 ring-1 ring-amber-200 dark:ring-amber-900' 
           : 'bg-slate-50 dark:bg-slate-800/90 border-slate-200/80 dark:border-slate-700/80';
@@ -2170,7 +2184,7 @@
                   </div>
                 </div>
                 
-                <!-- 케밥 메뉴: 수정 -> 하위할일 -> 캘린더 -> 프로젝트이동 -> 삭제 순 -->
+                <!-- 케밥 메뉴: 1.수정 -> 2.하위할일 -> 3.중요지정 -> 4.캘린더 -> 5.프로젝트이동 -> 6.삭제 순 -->
                 <div class="relative flex-shrink-0">
                   <button onclick="toggleKebabMenu(event, 'kebab_main_${t.id}')" title="더보기" class="p-1 px-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded font-bold transition text-base touch-target">
                     ⋮
@@ -2186,12 +2200,17 @@
                       하위 할일 추가
                     </button>
 
-                    <!-- 3. 캘린더 추가 -->
+                    <!-- 3. 중요 지정 (별표 ★) -->
+                    <button onclick="toggleImportant(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-semibold">
+                      ${t.isImportant ? '★ 중요 해제' : '☆ 중요 지정'}
+                    </button>
+
+                    <!-- 4. 캘린더 추가 -->
                     <button onclick="addToGoogleCalendar('${t.task.replace(/'/g, "\\'")}', '할일', '${t.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                       캘린더 추가
                     </button>
 
-                    <!-- 4. 프로젝트 이동 -->
+                    <!-- 5. 프로젝트 이동 -->
                     <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
                     <div class="px-3 py-1 text-[10px] font-bold text-slate-400">프로젝트 이동:</div>
                     ${projects.map(p => `
@@ -2201,7 +2220,7 @@
                       </button>
                     `).join('')}
 
-                    <!-- 5. 삭제 -->
+                    <!-- 6. 삭제 -->
                     <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
                     <button onclick="deleteTodo(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
                       삭제
@@ -2212,9 +2231,14 @@
             `}
 
             ${visibleSubitems.length > 0 ? `
-              <ul class="mt-0.5 pl-2 sm:pl-4 border-l-2 border-indigo-100 dark:border-indigo-900 space-y-0">
-                ${visibleSubitems.map(s => `
-                  <li id="item_elem_${s.id}" class="py-0">
+              <ul class="mt-0.5 pl-2 sm:pl-4 border-l-2 border-indigo-100 dark:border-indigo-900 space-y-0.5">
+                ${visibleSubitems.map(s => {
+                  const subBgStyle = s.isImportant 
+                    ? 'bg-amber-50/80 dark:bg-amber-950/50 border-amber-300 dark:border-amber-700/80 ring-1 ring-amber-200 dark:ring-amber-900' 
+                    : 'bg-white dark:bg-slate-800 border-transparent';
+
+                  return `
+                  <li id="item_elem_${s.id}" class="py-0.5 px-1 rounded border ${subBgStyle}">
                     ${s.isEditing ? `
                       <div class="flex items-center gap-1.5 bg-white dark:bg-slate-800 p-0.5 rounded border border-indigo-200 dark:border-indigo-800">
                         <input type="text" id="editSubTask_${s.id}" value="${s.task}" class="flex-1 px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
@@ -2226,19 +2250,28 @@
                       <div class="flex items-center justify-between text-sm sm:text-base">
                         <div class="flex items-center gap-1.5 min-w-0 flex-1">
                           <input type="checkbox" ${s.completed ? 'checked' : ''} onchange="toggleSubitem(${t.id}, ${s.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target flex-shrink-0">
-                          <span class="${s.completed ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-200'} text-sm sm:text-base break-words">${s.task}</span>
+                          
+                          <!-- 하위 할일 별표 토글 버튼 -->
+                          <button onclick="toggleImportant(${s.id})" title="${s.isImportant ? '중요 해제' : '중요 지정'}" class="p-0.5 text-sm sm:text-base flex-shrink-0 focus:outline-none transition ${s.isImportant ? 'text-amber-500 hover:text-amber-600' : 'text-slate-300 hover:text-slate-400 dark:text-slate-600'}">
+                            ${s.isImportant ? '★' : '☆'}
+                          </button>
+
+                          <span class="${s.completed ? 'line-through text-slate-400' : (s.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-700 dark:text-slate-200')} text-sm sm:text-base break-words">${s.task}</span>
                           ${!s.completed && s.due ? getDDayTag(s.due) : ''}
                           ${s.due ? `<span class="text-xs text-slate-400 ml-1 flex-shrink-0">${formatSimpleDue(s.due)}</span>` : ''}
                         </div>
                         
-                        <!-- 하위 할일 케밥 메뉴: 수정 -> 캘린더 -> 삭제 순 -->
+                        <!-- 하위 할일 케밥 메뉴: 1.수정 -> 3.중요지정 -> 4.캘린더 -> 6.삭제 순 -->
                         <div class="relative flex-shrink-0">
                           <button onclick="toggleKebabMenu(event, 'kebab_sub_${s.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">
                             ⋮
                           </button>
-                          <div id="kebab_sub_${s.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-32 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs">
+                          <div id="kebab_sub_${s.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs">
                             <button onclick="toggleEditSub(${t.id}, ${s.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                               수정
+                            </button>
+                            <button onclick="toggleImportant(${s.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-semibold">
+                              ${s.isImportant ? '★ 중요 해제' : '☆ 중요 지정'}
                             </button>
                             <button onclick="addToGoogleCalendar('${s.task.replace(/'/g, "\\'")}', '하위할일', '${s.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                               캘린더 추가
@@ -2252,7 +2285,8 @@
                       </div>
                     `}
                   </li>
-                `).join('')}
+                `;
+                }).join('')}
               </ul>
             ` : ''}
           </li>
@@ -2345,12 +2379,11 @@
       let html = `<div class="space-y-0.5">`;
 
       if (noTimeItems.length > 0) {
-        /* 미지정 항목 내에서도 중요(★) 항목 상단 정렬 */
         noTimeItems.sort((a, b) => (b.isImportant ? 1 : 0) - (a.isImportant ? 1 : 0));
         html += `
           <div class="bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900 rounded-xl p-1 mb-1">
             <h3 class="text-xs font-bold text-indigo-700 dark:text-indigo-300 mb-0.5">오늘 시간 미지정</h3>
-            <div class="space-y-0 pl-0.5">
+            <div class="space-y-0.5 pl-0.5">
               ${noTimeItems.map(item => renderTimelineItemHtml(item)).join('')}
             </div>
           </div>
@@ -2373,7 +2406,7 @@
                   <span>${timeLabel}</span>
                   ${isCurrentSlot ? `<span class="text-[8px] leading-tight bg-blue-600 text-white px-1 py-0.5 rounded mt-0.5">LIVE</span>` : ''}
                 </div>
-                <div class="flex-1 min-h-[22px] space-y-0">
+                <div class="flex-1 min-h-[22px] space-y-0.5">
                   ${items.length > 0 ? items.map(item => renderTimelineItemHtml(item)).join('') : `<span class="text-xs text-slate-300 dark:text-slate-600 italic leading-5">일정 없음</span>`}
                 </div>
               </div>
@@ -2386,7 +2419,7 @@
       container.innerHTML = html;
     }
 
-    /* Today 탭 항목 렌더링 (순서 보정 적용: 수정 -> 캘린더 -> 프로젝트이동 -> 삭제) */
+    /* Today 탭 항목 렌더링 (동일 하이라이트 및 별표 조작 지원) */
     function renderTimelineItemHtml(item) {
       const currentProjId = item.projectId || 'default';
 
@@ -2425,11 +2458,21 @@
         `;
       } else if (item.isSub) {
         const tooltipId = `tooltip_sub_${item.id}`;
+        const subBgStyle = item.isImportant 
+          ? 'bg-amber-50/80 dark:bg-amber-950/50 border-amber-300 dark:border-amber-700/80 ring-1 ring-amber-200 dark:ring-amber-900' 
+          : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700';
+
         return `
-          <div id="item_elem_${item.id}" class="flex items-center justify-between text-sm sm:text-base bg-white dark:bg-slate-800 p-0.5 px-1 rounded border border-slate-200 dark:border-slate-700 shadow-2xs">
+          <div id="item_elem_${item.id}" class="flex items-center justify-between text-sm sm:text-base ${subBgStyle} p-0.5 px-1 rounded border shadow-2xs">
             <div class="flex items-center gap-1.5 flex-1 min-w-0">
               <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleSubitem(${item.parentId}, ${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target flex-shrink-0">
-              <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-200 font-medium'} text-sm sm:text-base break-words truncate">${item.task}</span>
+              
+              <!-- Today 탭 하위 별표 토글 -->
+              <button onclick="toggleImportant(${item.id})" title="${item.isImportant ? '중요 해제' : '중요 지정'}" class="p-0.5 text-sm sm:text-base flex-shrink-0 focus:outline-none transition ${item.isImportant ? 'text-amber-500 hover:text-amber-600' : 'text-slate-300 hover:text-slate-400 dark:text-slate-600'}">
+                ${item.isImportant ? '★' : '☆'}
+              </button>
+
+              <span class="${item.completed ? 'line-through text-slate-400' : (item.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-700 dark:text-slate-200')} text-sm sm:text-base break-words truncate">${item.task}</span>
               
               <div id="${tooltipId}" class="relative inline-block has-tooltip cursor-pointer flex-shrink-0" onclick="toggleSubTooltip(event, '${tooltipId}')">
                 <span class="text-[10px] leading-none bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-1 py-0.5 rounded font-semibold border border-indigo-100 dark:border-indigo-800">하위</span>
@@ -2446,6 +2489,9 @@
               <div id="kebab_today_sub_${item.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs font-normal">
                 <button onclick="toggleEditSub(${item.parentId}, ${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                   수정
+                </button>
+                <button onclick="toggleImportant(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-semibold">
+                  ${item.isImportant ? '★ 중요 해제' : '☆ 중요 지정'}
                 </button>
                 <button onclick="addToGoogleCalendar('${item.task.replace(/'/g, "\\'")}', '하위할일', '${item.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                   캘린더 추가
@@ -2468,7 +2514,7 @@
             <div class="flex items-center gap-1.5 flex-1 min-w-0">
               <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleComplete(${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target flex-shrink-0">
               
-              <!-- 중요(별표 ★) 토글 버튼 -->
+              <!-- Today 탭 상위 별표 토글 -->
               <button onclick="toggleImportant(${item.id})" title="${item.isImportant ? '중요 해제' : '중요 지정'}" class="p-0.5 text-base sm:text-lg flex-shrink-0 focus:outline-none transition ${item.isImportant ? 'text-amber-500 hover:text-amber-600' : 'text-slate-300 hover:text-slate-400 dark:text-slate-600'}">
                 ${item.isImportant ? '★' : '☆'}
               </button>
@@ -2485,13 +2531,18 @@
                 <button onclick="toggleEditMain(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                   수정
                 </button>
+
+                <!-- 3. 중요 지정 (별표 ★) -->
+                <button onclick="toggleImportant(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-semibold">
+                  ${item.isImportant ? '★ 중요 해제' : '☆ 중요 지정'}
+                </button>
                 
-                <!-- 2. 캘린더 추가 -->
+                <!-- 4. 캘린더 추가 -->
                 <button onclick="addToGoogleCalendar('${item.task.replace(/'/g, "\\'")}', '할일', '${item.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
                   캘린더 추가
                 </button>
 
-                <!-- 3. 프로젝트 이동 -->
+                <!-- 5. 프로젝트 이동 -->
                 <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
                 <div class="px-3 py-1 text-[10px] font-bold text-slate-400">프로젝트 이동:</div>
                 ${projects.map(p => `
@@ -2501,7 +2552,7 @@
                   </button>
                 `).join('')}
 
-                <!-- 4. 삭제 -->
+                <!-- 6. 삭제 -->
                 <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
                 <button onclick="deleteTodo(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
                   삭제
@@ -2644,7 +2695,7 @@
       try {
         const registration = await navigator.serviceWorker.register('sw.js');
         const token = await window.getFcmToken(window.firebaseMessaging, {
-          vapidKey: 'BCAJlcTXnmq95VqAmhWCegVFYiidhHHMBs4H5C4lwMUpvGI9N_8jCnY_VufkdtuEBR3iiKaUEV7GObH3zVkcel8', // 👈 2번째 VAPID Key 입력 위치
+          vapidKey: 'BCAJlcTXnmq95VqAmhWCegVFYiidhHHMBs4H5C4lwMUpvGI9N_8jCnY_VufkdtuEBR3iiKaUEV7GObH3zVkcel8',
           serviceWorkerRegistration: registration
         });
         
