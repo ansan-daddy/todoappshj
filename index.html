@@ -402,6 +402,24 @@
       document.documentElement.classList.remove('dark');
     }
 
+    /* 한국 시간대(+09:00) 명시적 파싱 함수 */
+    function parseKstDate(dateStr) {
+      if (!dateStr) return null;
+      if (typeof dateStr !== 'string') return new Date(dateStr);
+      
+      // YYYY-MM-DDTHH:mm 또는 YYYY-MM-DDTHH:mm:ss 형태 처리
+      if (dateStr.includes('T') && !dateStr.includes('+') && !dateStr.endsWith('Z')) {
+        const parts = dateStr.split('T');
+        const datePart = parts[0];
+        let timePart = parts[1];
+        if (timePart.split(':').length === 2) {
+          timePart += ':00';
+        }
+        return new Date(`${datePart}T${timePart}+09:00`);
+      }
+      return new Date(dateStr);
+    }
+
     /* 프로젝트별 자동 색상 배지 생성 */
     const colorPalette = [
       { bg: 'bg-indigo-100 dark:bg-indigo-950', text: 'text-indigo-700 dark:text-indigo-300', border: 'border-indigo-200 dark:border-indigo-800' },
@@ -1042,7 +1060,7 @@
       let startDateStr, endDateStr;
 
       if (dueString && dueString.includes('T')) {
-        const start = new Date(dueString);
+        const start = parseKstDate(dueString);
         const end = new Date(start.getTime() + 30 * 60 * 1000);
         
         startDateStr = start.toISOString().replace(/-|:|\.\d{3}/g, "");
@@ -1146,6 +1164,7 @@
       }
     }
 
+    /* 알림 감지 로직 (KST 타임존 적용) */
     function checkDueNotifications() {
       if (Notification.permission !== 'granted') return;
 
@@ -1157,7 +1176,7 @@
         todos.forEach(t => {
           const hasSub = t.subitems && t.subitems.length > 0;
           if (!hasSub && !t.completed && t.due) {
-            const dueTime = new Date(t.due);
+            const dueTime = parseKstDate(t.due);
             const diffMinutes = (dueTime - now) / (1000 * 60);
 
             if (diffMinutes > 0 && diffMinutes <= 10 && !t.notified10m) {
@@ -1177,7 +1196,7 @@
           if (hasSub) {
             t.subitems.forEach(s => {
               if (!s.completed && s.due) {
-                const subDueTime = new Date(s.due);
+                const subDueTime = parseKstDate(s.due);
                 const subDiffMinutes = (subDueTime - now) / (1000 * 60);
 
                 if (subDiffMinutes > 0 && subDiffMinutes <= 10 && !s.notified10m) {
@@ -1201,8 +1220,8 @@
       if (routines.length) {
         routines.forEach(r => {
           if (isRoutineDueToday(r) && r.lastCompletedDate !== todayStr && r.dueTime && r.dueTime.includes(':')) {
-            const routineDueTime = new Date(`${todayStr}T${r.dueTime}`);
-            if (!isNaN(routineDueTime.getTime())) {
+            const routineDueTime = parseKstDate(`${todayStr}T${r.dueTime}`);
+            if (routineDueTime && !isNaN(routineDueTime.getTime())) {
               const diffMinutes = (routineDueTime - now) / (1000 * 60);
 
               if (diffMinutes > 0 && diffMinutes <= 10 && !r.notified10m) {
@@ -1578,14 +1597,12 @@
       const now = new Date();
       now.setHours(0,0,0,0);
       
-      const parts = dateString.split('T')[0].split('-');
-      if (parts.length !== 3) return '';
-      
-      const targetDay = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      const targetDay = parseKstDate(dateString);
+      if (!targetDay || isNaN(targetDay.getTime())) return '';
       targetDay.setHours(0,0,0,0);
 
       const diffDays = Math.round((targetDay - now) / (1000 * 60 * 60 * 24));
-      const fullTarget = new Date(dateString);
+      const fullTarget = parseKstDate(dateString);
 
       if (new Date() > fullTarget && diffDays <= 0) {
         return `<span title="기한 초과" class="inline-block w-2.5 h-2.5 rounded-full bg-rose-500 flex-shrink-0"></span>`;
@@ -2056,8 +2073,8 @@
 
     function formatSimpleDue(dueStr) {
       if (!dueStr) return '';
-      const d = new Date(dueStr);
-      if (isNaN(d.getTime())) return '';
+      const d = parseKstDate(dueStr);
+      if (!d || isNaN(d.getTime())) return '';
       const month = d.getMonth() + 1;
       const date = d.getDate();
       const hours = String(d.getHours()).padStart(2, '0');
