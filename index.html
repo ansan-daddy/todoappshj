@@ -406,18 +406,18 @@
     function parseKstDate(dateStr) {
       if (!dateStr) return null;
       if (typeof dateStr !== 'string') return new Date(dateStr);
-      
-      if (dateStr.includes('T') && !dateStr.includes('+') && !dateStr.endsWith('Z')) {
-        const parts = dateStr.split('T');
-        const datePart = parts[0];
-        let timePart = parts[1];
-        if (timePart.split(':').length === 2) {
-          timePart += ':00';
-        }
-        return new Date(`${datePart}T${timePart}+09:00`);
-      }
-      return new Date(dateStr);
+  
+      // "YYYY-MM-DDTHH:mm" 또는 "YYYY-MM-DD HH:mm" 형태 분해
+      const [datePart, timePart] = dateStr.includes('T') ? dateStr.split('T') : dateStr.split(' ');
+      if (!datePart || !timePart) return new Date(dateStr);
+
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hours, minutes] = timePart.split(':').map(Number);
+
+      // 숫자로 직접 지정하여 로컬 타임존 시각으로 정확하게 생성
+      return new Date(year, month - 1, day, hours, minutes, 0);
     }
+
 
     /* 프로젝트별 자동 색상 배지 생성 */
     const colorPalette = [
