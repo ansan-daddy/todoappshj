@@ -23,4 +23,5 @@ jobs:
       - name: Run notification script
         env:
           FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
+          TZ: 'Asia/Seoul'
         run: node scripts/send-notifications.js
