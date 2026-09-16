@@ -1,7 +1,9 @@
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging-compat.js');
 
-// Firebase 앱 초기화
+const CACHE_NAME = 'todoapp-v20260916-force';
+
+// 1. Firebase 앱 초기화
 firebase.initializeApp({
   apiKey: "AIzaSyDYTzXhT0nEBFGaKy_RylkGJ28rmhsPqoc",
   authDomain: "sunhong-todo.firebaseapp.com",
@@ -14,14 +16,40 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// 1. 백그라운드 메시지 수신 핸들러
-// 브라우저/OS가 notification 객체를 보고 자동으로 알림 1개를 표시하므로, 
-// 여기서 showNotification을 중복 호출하지 않습니다. (중복 방지 핵심)
+// 2. 서비스 워커 설치 및 기존 캐시 전면 삭제 (캐시 문제 해결 핵심)
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => caches.delete(cache))
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
+// 3. index.html 요청 시 항상 네트워크에서 최신 코드 로드
+self.addEventListener('fetch', (event) => {
+  if (event.request.mode === 'navigate' || event.request.url.includes('index.html')) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
+  );
+});
+
+// 4. FCM 백그라운드 메시지 수신 핸들러
 messaging.onBackgroundMessage((payload) => {
   console.log('[sw.js] 백그라운드 FCM 메시지 수신:', payload);
 });
 
-// 2. index.html 등 클라이언트에서 직접 알림 요청을 보냈을 때 수신 (SHOW_NOTIFICATION)
+// 5. 클라이언트 요청 알림 수신 (SHOW_NOTIFICATION)
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
     const title = event.data.title || '알림';
@@ -35,7 +63,7 @@ self.addEventListener('message', (event) => {
   }
 });
 
-// 3. 알림 클릭(터치) 시 해당 항목 이동 및 앱 포커스 처리
+// 6. 알림 클릭 시 해당 항목 이동 및 앱 포커스 처리
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
@@ -50,7 +78,6 @@ self.addEventListener('notificationclick', (event) => {
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // 1) 이미 서비스 앱 창이 열려 있는 경우 포커스 후 URL 이동
       for (const client of clientList) {
         if ('focus' in client) {
           client.focus();
@@ -60,7 +87,6 @@ self.addEventListener('notificationclick', (event) => {
           return;
         }
       }
-      // 2) 앱이 완전히 닫혀 있었던 경우 새 창(탭)으로 열기
       if (clients.openWindow) {
         return clients.openWindow(targetUrl);
       }
