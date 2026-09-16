@@ -313,49 +313,53 @@
         </button>
       </div>
 
-      <form id="todoFormMobile" onsubmit="addUnifiedItem(event, 'mobile')" class="space-y-2.5">
-        <div id="mobileMoreOptions" class="hidden space-y-2.5 pt-1 border-b border-slate-100 dark:border-slate-700 pb-2.5">
+      <form id="todoFormMobile" onsubmit="addUnifiedItem(event, 'mobile')" class="space-y-2">
+        <div id="mobileMoreOptions" class="hidden space-y-2 pt-1 border-b border-slate-100 dark:border-slate-700 pb-2">
           <div id="mobileQuickChipsContainer" class="flex items-center gap-1.5 overflow-x-auto pb-1 text-sm font-medium">
             <span class="text-slate-400 flex-shrink-0">빠른 마감:</span>
-            <button type="button" id="btnMobile_today11" onclick="setQuickTime('today11', 'mobile')" class="quick-chip-mobile px-3 py-1.5 rounded-full text-sm flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">오늘 11시</button>
-            <button type="button" id="btnMobile_today17" onclick="setQuickTime('today17', 'mobile')" class="quick-chip-mobile px-3 py-1.5 rounded-full text-sm flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">오늘 17시</button>
-            <button type="button" id="btnMobile_tomorrow11" onclick="setQuickTime('tomorrow11', 'mobile')" class="quick-chip-mobile px-3 py-1.5 rounded-full text-sm flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">내일 11시</button>
-            <button type="button" id="btnMobile_tomorrow17" onclick="setQuickTime('tomorrow17', 'mobile')" class="quick-chip-mobile px-3 py-1.5 rounded-full text-sm flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">내일 17시</button>
-            <button type="button" id="btnMobile_1h" onclick="setQuickTime('1h', 'mobile')" class="quick-chip-mobile px-3 py-1.5 rounded-full text-sm flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">+1시간</button>
+            <button type="button" id="btnMobile_today11" onclick="setQuickTime('today11', 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full text-xs flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">오늘 11시</button>
+            <button type="button" id="btnMobile_today17" onclick="setQuickTime('today17', 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full text-xs flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">오늘 17시</button>
+            <button type="button" id="btnMobile_tomorrow11" onclick="setQuickTime('tomorrow11', 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full text-xs flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">내일 11시</button>
+            <button type="button" id="btnMobile_tomorrow17" onclick="setQuickTime('tomorrow17', 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full text-xs flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">내일 17시</button>
+            <button type="button" id="btnMobile_1h" onclick="setQuickTime('1h', 'mobile')" class="quick-chip-mobile px-3 py-1 rounded-full text-xs flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300">+1시간</button>
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            <select id="categoryInputMobile" onchange="handleCategoryChange(this.value, 'mobile')" class="px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 font-bold text-indigo-600 dark:text-indigo-400 touch-target">
+            <select id="categoryInputMobile" onchange="handleCategoryChange(this.value, 'mobile')" class="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-700 font-bold text-indigo-600 dark:text-indigo-400 touch-target">
               <option value="할일">할 일</option>
               <option value="routine">루틴</option>
             </select>
 
-            <select id="projectTargetSelectMobile" class="px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 font-semibold text-slate-700 dark:text-slate-200 touch-target"></select>
+            <select id="projectTargetSelectMobile" class="px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-700 font-semibold text-slate-700 dark:text-slate-200 touch-target"></select>
 
-            <input type="datetime-local" id="timeInputMobile" step="60" class="flex-1 px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 touch-target">
+            <input type="datetime-local" id="timeInputMobile" step="60" class="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-700 touch-target">
 
             <div id="mobileRoutineOptions" class="hidden flex items-center gap-2 flex-1">
-              <select id="mobileRoutineFreq" onchange="handleRoutineFreqChange(this.value, 'mobile')" class="px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-700 touch-target">
+              <select id="mobileRoutineFreq" onchange="handleRoutineFreqChange(this.value, 'mobile')" class="px-3 py-2 text-xs sm:text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-700 touch-target">
                 <option value="매일">매일</option>
                 <option value="매주">매주</option>
                 <option value="매월">매월</option>
               </select>
-              <select id="mobileRoutineDay" class="hidden px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-700 touch-target">
+              <select id="mobileRoutineDay" class="hidden px-3 py-2 text-xs sm:text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-700 touch-target">
                 <option value="all">전체 요일</option>
                 <option value="1">월</option><option value="2">화</option><option value="3">수</option><option value="4">목</option><option value="5">금</option><option value="6">토</option><option value="0">일</option>
               </select>
-              <select id="mobileRoutineMonth" class="hidden px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-700 touch-target"></select>
-              <input type="time" id="mobileRoutineTime" step="60" class="px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-700 touch-target">
+              <select id="mobileRoutineMonth" class="hidden px-3 py-2 text-xs sm:text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-700 touch-target"></select>
+              <input type="time" id="mobileRoutineTime" step="60" class="px-3 py-2 text-xs sm:text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-700 touch-target">
             </div>
-          </div>
-          
-          <!-- 메모/노트 입력창 -->
-          <div>
-            <input type="text" id="noteInputMobile" placeholder="메모/노트 입력 (선택사항)..." class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-700">
           </div>
         </div>
 
+        <!-- 메모 영역: 펼치기 전용 가벼운 토글 창 -->
+        <div id="noteInputContainer" class="hidden pt-1">
+          <input type="text" id="noteInputMobile" placeholder="📝 메모/노트 작성 (선택사항)..." class="w-full px-3 py-2 border border-indigo-200 dark:border-indigo-800 rounded-lg text-xs sm:text-sm bg-indigo-50/50 dark:bg-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        </div>
+
         <div class="flex items-center gap-2">
+          <button type="button" onclick="toggleNoteField()" title="메모 작성 토글" class="px-2.5 py-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl text-slate-500 dark:text-slate-400 font-bold text-sm touch-target flex-shrink-0 flex items-center justify-center">
+            📝
+          </button>
+          
           <input type="text" id="taskInputMobile" placeholder="할 일 또는 루틴 입력 (예: '내일 오후 3시 보고서')..." required onfocus="toggleMobileOptions(true)" oninput="handleNaturalLanguageInput('mobile')"
                  class="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50 dark:bg-slate-700 touch-target">
           
@@ -424,6 +428,17 @@
       }
       const index = Math.abs(hash) % colorPalette.length;
       return colorPalette[index];
+    }
+
+    function toggleNoteField() {
+      const noteBox = document.getElementById('noteInputContainer');
+      const noteInput = document.getElementById('noteInputMobile');
+      if (noteBox) {
+        noteBox.classList.toggle('hidden');
+        if (!noteBox.classList.contains('hidden') && noteInput) {
+          noteInput.focus();
+        }
+      }
     }
 
     function applyFontSize(size) {
@@ -1303,12 +1318,12 @@
 
     function updateChipHighlight(activeKey, mode) {
       document.querySelectorAll('.quick-chip-mobile').forEach(btn => {
-        btn.className = "quick-chip-mobile px-3 py-1.5 rounded-full text-sm flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300";
+        btn.className = "quick-chip-mobile px-3 py-1 rounded-full text-xs flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300";
       });
 
       const activeBtn = document.getElementById('btnMobile_' + activeKey);
       if (activeBtn) {
-        activeBtn.className = "quick-chip-mobile px-3 py-1.5 rounded-full font-bold text-sm flex-shrink-0 transition bg-indigo-600 text-white shadow-2xs border border-indigo-600 dark:bg-indigo-500 dark:border-indigo-400";
+        activeBtn.className = "quick-chip-mobile px-3 py-1 rounded-full font-bold text-xs flex-shrink-0 transition bg-indigo-600 text-white shadow-2xs border border-indigo-600 dark:bg-indigo-500 dark:border-indigo-400";
       }
     }
 
@@ -1327,7 +1342,6 @@
 
     setInterval(updateClock, 10000);
 
-    /* 메모 및 마감시간 파싱 유지 수정 */
     function extractAllTodos(rawData) {
       if (!rawData) return [];
       let extracted = [];
@@ -1744,7 +1758,7 @@
       }
     }
 
-    /* 하위 할일 추가 모드 설정 로직 완전 수정 */
+    /* 하위 할일 타겟 모드 UX 설정 */
     function setSubTaskTargetMode(parentId, parentTaskTitle) {
       targetParentId = parentId;
       const targetBar = document.getElementById('subTaskTargetBar');
@@ -1754,6 +1768,7 @@
       const timeInput = document.getElementById('timeInputMobile');
       const chipsContainer = document.getElementById('mobileQuickChipsContainer');
       const opts = document.getElementById('mobileMoreOptions');
+      const noteBox = document.getElementById('noteInputContainer');
 
       if (targetBar && targetTitleElem) {
         targetTitleElem.innerText = parentTaskTitle;
@@ -1766,6 +1781,7 @@
       }
 
       if (opts) opts.classList.remove('hidden');
+      if (noteBox) noteBox.classList.remove('hidden');
       if (timeInput) timeInput.classList.remove('hidden');
       if (chipsContainer) chipsContainer.classList.remove('hidden');
 
@@ -1779,9 +1795,13 @@
       targetParentId = null;
       const targetBar = document.getElementById('subTaskTargetBar');
       const taskInput = document.getElementById('taskInputMobile');
+      const noteBox = document.getElementById('noteInputContainer');
 
       if (targetBar) {
         targetBar.classList.add('hidden');
+      }
+      if (noteBox) {
+        noteBox.classList.add('hidden');
       }
 
       if (taskInput) {
@@ -1789,13 +1809,14 @@
       }
     }
 
-    /* 통합 등록 로직 수정 (등록 후 상태 및 데이터 정제) */
+    /* 등록 로직 */
     function addUnifiedItem(e, mode) {
       if (e) e.preventDefault();
       const taskInput = document.getElementById('taskInputMobile');
       const categorySelect = document.getElementById('categoryInputMobile');
       const targetProjSelect = document.getElementById('projectTargetSelectMobile');
       const noteInput = document.getElementById('noteInputMobile');
+      const noteBox = document.getElementById('noteInputContainer');
       
       const task = taskInput.value.trim();
       const category = categorySelect.value;
@@ -1857,6 +1878,7 @@
 
       taskInput.value = '';
       if (noteInput) noteInput.value = '';
+      if (noteBox) noteBox.classList.add('hidden');
       categorySelect.value = '할일';
       handleCategoryChange('할일', 'mobile');
       toggleMobileOptions(false);
