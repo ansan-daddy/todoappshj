@@ -91,14 +91,12 @@
           </button>
         </div>
         
-        <!-- 전체 프로젝트 버튼 -->
         <button id="sideNav_global_all" onclick="selectGlobalView()" class="w-full text-left px-3 py-2.5 rounded-lg font-semibold text-sm transition flex items-center justify-between mb-1.5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700">
           <span>전체</span>
         </button>
 
         <hr class="border-slate-100 dark:border-slate-700 my-2">
 
-        <!-- 프로젝트 리스트 -->
         <div id="projectList" class="space-y-1"></div>
       </div>
 
@@ -188,8 +186,7 @@
         </button>
       </div>
 
-      <div id="archiveListContainer" class="flex-1 overflow-y-auto p-4 space-y-2">
-      </div>
+      <div id="archiveListContainer" class="flex-1 overflow-y-auto p-4 space-y-2"></div>
     </div>
   </div>
 
@@ -274,18 +271,15 @@
             <th class="p-2.5 text-right">관리</th>
           </tr>
         </thead>
-        <tbody id="adminUserList" class="text-sm sm:text-base divide-y divide-slate-100 dark:divide-slate-700">
-        </tbody>
+        <tbody id="adminUserList" class="text-sm sm:text-base divide-y divide-slate-100 dark:divide-slate-700"></tbody>
       </table>
     </div>
   </div>
 
   <!-- 2. 메인 서비스 화면 -->
   <div id="mainScreen" class="hidden max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-md p-4 sm:p-6 border border-slate-200/80 dark:border-slate-700/80 flex flex-col h-[calc(100vh-160px)] min-h-[400px]">
-    <!-- 헤더 영역 -->
     <div class="flex items-center justify-between pb-1.5 border-b border-slate-100 dark:border-slate-700 mb-1.5 gap-2 flex-shrink-0">
       <div class="flex items-center gap-2.5 flex-wrap min-w-0">
-        <!-- 햄버거 메뉴 버튼 -->
         <button onclick="openSidebar()" title="메뉴 및 범위 선택 열기" class="p-1 px-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg font-bold transition text-lg touch-target flex items-center justify-center">
           ☰
         </button>
@@ -312,8 +306,6 @@
   <!-- 통합 하단 입력 바 -->
   <div id="mobileAddTodoContainer" class="hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 shadow-2xl p-3 z-40">
     <div class="max-w-4xl mx-auto">
-      
-      <!-- 하위 할일 타겟 모드 가이드 바 -->
       <div id="subTaskTargetBar" class="hidden flex items-center justify-between bg-indigo-50 dark:bg-indigo-950/80 border border-indigo-200 dark:border-indigo-800 px-3 py-1.5 rounded-lg mb-2 text-xs sm:text-sm">
         <div class="flex items-center gap-1.5 min-w-0">
           <span class="font-bold text-indigo-600 dark:text-indigo-400 flex-shrink-0">하위 할일 작성:</span>
@@ -341,8 +333,7 @@
               <option value="routine">루틴</option>
             </select>
 
-            <select id="projectTargetSelectMobile" class="px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 font-semibold text-slate-700 dark:text-slate-200 touch-target">
-            </select>
+            <select id="projectTargetSelectMobile" class="px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 font-semibold text-slate-700 dark:text-slate-200 touch-target"></select>
 
             <input type="datetime-local" id="timeInputMobile" step="60" class="flex-1 px-3 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg text-sm bg-slate-50 dark:bg-slate-700 touch-target">
 
@@ -356,10 +347,13 @@
                 <option value="all">전체 요일</option>
                 <option value="1">월</option><option value="2">화</option><option value="3">수</option><option value="4">목</option><option value="5">금</option><option value="6">토</option><option value="0">일</option>
               </select>
-              <select id="mobileRoutineMonth" class="hidden px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-700 touch-target">
-              </select>
+              <select id="mobileRoutineMonth" class="hidden px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-700 touch-target"></select>
               <input type="time" id="mobileRoutineTime" step="60" class="px-3 py-2.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-700 touch-target">
             </div>
+          </div>
+          
+          <div>
+            <input type="text" id="noteInputMobile" placeholder="메모/노트 (선택사항)..." class="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-xs sm:text-sm bg-slate-50 dark:bg-slate-700">
           </div>
         </div>
 
@@ -402,7 +396,6 @@
       document.documentElement.classList.remove('dark');
     }
 
-    /* KST 로컬 시각 기준 숫자로 안전 파싱 (모바일 13시간 차이 오차 원천 수정) */
     function parseKstDate(dateStr) {
       if (!dateStr) return null;
       if (typeof dateStr !== 'string') return new Date(dateStr);
@@ -416,7 +409,6 @@
       return new Date(year, month - 1, day, hours, minutes, 0);
     }
 
-    /* 프로젝트별 자동 색상 배지 생성 */
     const colorPalette = [
       { bg: 'bg-indigo-100 dark:bg-indigo-950', text: 'text-indigo-700 dark:text-indigo-300', border: 'border-indigo-200 dark:border-indigo-800' },
       { bg: 'bg-emerald-100 dark:bg-emerald-950', text: 'text-emerald-700 dark:text-emerald-300', border: 'border-emerald-200 dark:border-emerald-800' },
@@ -462,14 +454,9 @@
     function updateDarkModeBtnUI() {
       const icon = document.getElementById('darkModeIcon');
       if (!icon) return;
-      if (document.documentElement.classList.contains('dark')) {
-        icon.innerText = "주간";
-      } else {
-        icon.innerText = "야간";
-      }
+      icon.innerText = document.documentElement.classList.contains('dark') ? "주간" : "야간";
     }
 
-    /* 사이드바 제어 */
     function openSidebar() {
       document.getElementById('sidebar').classList.remove('-translate-x-full');
       document.getElementById('sidebarOverlay').classList.remove('hidden');
@@ -483,7 +470,6 @@
 
     function updateSidebarHighlightUI() {
       const globalAll = document.getElementById('sideNav_global_all');
-
       const activeClass = "w-full text-left px-3 py-2.5 rounded-lg font-bold text-sm transition flex items-center justify-between mb-1.5 bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800";
       const inactiveClass = "w-full text-left px-3 py-2.5 rounded-lg font-semibold text-sm transition flex items-center justify-between mb-1.5 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700";
 
@@ -533,7 +519,6 @@
       }
     }
 
-    /* 보관소 기능 */
     function updateArchiveBadge() {
       const badge = document.getElementById('archiveCountBadge');
       if (badge) badge.innerText = archivedTodos.length;
@@ -592,11 +577,7 @@
       if (!container) return;
 
       if (archivedTodos.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-12 text-slate-400 text-sm">
-            보관된 완료 항목이 없습니다.
-          </div>
-        `;
+        container.innerHTML = `<div class="text-center py-12 text-slate-400 text-sm">보관된 완료 항목이 없습니다.</div>`;
         return;
       }
 
@@ -612,21 +593,17 @@
                 <span class="font-semibold text-slate-700 dark:text-slate-200 text-sm line-through truncate">${item.task}</span>
               </div>
               ${item.due ? `<span class="text-xs text-slate-400 mt-0.5">마감일: ${formatSimpleDue(item.due)}</span>` : ''}
+              ${item.note ? `<span class="text-xs text-slate-500 dark:text-slate-400 italic mt-0.5">📝 ${item.note}</span>` : ''}
             </div>
             <div class="flex items-center gap-1.5 flex-shrink-0">
-              <button onclick="restoreFromArchive(${item.id})" class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 rounded-lg text-xs font-bold hover:bg-indigo-100 transition">
-                복원
-              </button>
-              <button onclick="deleteFromArchive(${item.id})" class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-bold hover:bg-rose-100 transition">
-                삭제
-              </button>
+              <button onclick="restoreFromArchive(${item.id})" class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 rounded-lg text-xs font-bold hover:bg-indigo-100 transition">복원</button>
+              <button onclick="deleteFromArchive(${item.id})" class="px-2.5 py-1 bg-rose-50 dark:bg-rose-950 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-bold hover:bg-rose-100 transition">삭제</button>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    /* 중요 (별표/고정) 기능 토글 - 그룹 및 하위 연동 처리 */
     function toggleImportant(id) {
       todos = todos.map(t => {
         if (t.id === id) {
@@ -645,7 +622,6 @@
       saveAndRender();
     }
 
-    /* 프로젝트 이동 */
     function moveTodoToProjectDirect(todoId, targetProjId) {
       todos = todos.map(t => t.id === todoId ? { ...t, projectId: targetProjId } : t);
       saveAndRender();
@@ -673,18 +649,10 @@
               <span class="truncate">${p.name}</span>
             </button>
             <div class="relative flex-shrink-0">
-              <button onclick="toggleKebabMenu(event, 'kebab_proj_${p.id}')" class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold text-xs">
-                ⋮
-              </button>
+              <button onclick="toggleKebabMenu(event, 'kebab_proj_${p.id}')" class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold text-xs">⋮</button>
               <div id="kebab_proj_${p.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-28 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs font-normal">
-                <button onclick="editProjectName('${p.id}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
-                  이름 수정
-                </button>
-                ${!isDefault ? `
-                  <button onclick="deleteProject('${p.id}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
-                    삭제
-                  </button>
-                ` : ''}
+                <button onclick="editProjectName('${p.id}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">이름 수정</button>
+                ${!isDefault ? `<button onclick="deleteProject('${p.id}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">삭제</button>` : ''}
               </div>
             </div>
           </div>
@@ -754,8 +722,7 @@
 
     function toggleKebabMenu(event, menuId) {
       event.stopPropagation();
-      const allMenus = document.querySelectorAll('.kebab-dropdown');
-      allMenus.forEach(m => {
+      document.querySelectorAll('.kebab-dropdown').forEach(m => {
         if (m.id !== menuId) m.classList.add('hidden');
       });
       const targetMenu = document.getElementById(menuId);
@@ -764,7 +731,6 @@
       }
     }
 
-    /* 화면 외부 클릭/터치 시 팝업 및 드롭다운 닫기 */
     document.addEventListener('click', (e) => {
       document.querySelectorAll('.kebab-dropdown').forEach(m => m.classList.add('hidden'));
 
@@ -830,8 +796,7 @@
         const hours = String(targetDate.getHours()).padStart(2, '0');
         const minutes = String(targetDate.getMinutes()).padStart(2, '0');
 
-        const timeStr = `${year}-${month}-${day}T${hours}:${minutes}`;
-        document.getElementById('timeInputMobile').value = timeStr;
+        document.getElementById('timeInputMobile').value = `${year}-${month}-${day}T${hours}:${minutes}`;
       }
     }
 
@@ -845,8 +810,7 @@
 
     function toggleSubTooltip(event, elemId) {
       event.stopPropagation();
-      const allTooltips = document.querySelectorAll('.has-tooltip');
-      allTooltips.forEach(el => {
+      document.querySelectorAll('.has-tooltip').forEach(el => {
         if (el.id !== elemId) el.classList.remove('active-tooltip');
       });
       const target = document.getElementById(elemId);
@@ -1085,22 +1049,18 @@
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
-        const dateFormatted = `${year}${month}${day}`;
-        startDateStr = dateFormatted;
-        endDateStr = dateFormatted;
+        startDateStr = `${year}${month}${day}`;
+        endDateStr = `${year}${month}${day}`;
       }
 
       const titleParam = encodeURIComponent(`[${category || '할일'}] ${taskTitle}`);
       const detailsParam = encodeURIComponent(`할 일 웹 앱에서 추가된 일정입니다.`);
       
-      const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titleParam}&dates=${startDateStr}/${endDateStr}&details=${detailsParam}`;
-      window.open(gcalUrl, '_blank');
+      window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titleParam}&dates=${startDateStr}/${endDateStr}&details=${detailsParam}`, '_blank');
     }
 
     async function registerFcmToken() {
-      if (!window.firebaseMessaging || !currentUser) {
-        return;
-      }
+      if (!window.firebaseMessaging || !currentUser) return;
 
       try {
         const registration = await navigator.serviceWorker.register('sw.js');
@@ -1111,14 +1071,10 @@
         
         if (token) {
           await window.dbSet(window.dbRef(window.firebaseDb, `users/${currentUser}/fcmToken`), token);
-          alert("🎉 FCM 토큰이 DB에 성공적으로 등록되었습니다!\n토큰: " + token.slice(0, 15) + "...");
           updateNotificationUI();
-        } else {
-          alert("토큰 발급에 실패했습니다. 권한 설정을 확인해 주세요.");
         }
       } catch (err) {
         console.error('FCM 토큰 발급 오류:', err);
-        alert("❌ 토큰 발급 실패 에러:\n" + err.message);
       }
     }
 
@@ -1179,7 +1135,6 @@
       }
     }
 
-    /* 알림 감지 로직 (최적화: 30초 주기 동작) */
     function checkDueNotifications() {
       if (Notification.permission !== 'granted') return;
 
@@ -1261,7 +1216,6 @@
       }
     }
 
-    // ⚡ 리소스 최적화: 3초 -> 30초 주기 완화
     setInterval(checkDueNotifications, 30000);
 
     function getTodayString() {
@@ -1348,14 +1302,11 @@
     }
 
     function updateChipHighlight(activeKey, mode) {
-      const prefix = 'btnMobile_';
-      const classGroup = '.quick-chip-mobile';
-
-      document.querySelectorAll(classGroup).forEach(btn => {
+      document.querySelectorAll('.quick-chip-mobile').forEach(btn => {
         btn.className = "quick-chip-mobile px-3 py-1.5 rounded-full text-sm flex-shrink-0 transition border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300";
       });
 
-      const activeBtn = document.getElementById(prefix + activeKey);
+      const activeBtn = document.getElementById('btnMobile_' + activeKey);
       if (activeBtn) {
         activeBtn.className = "quick-chip-mobile px-3 py-1.5 rounded-full font-bold text-sm flex-shrink-0 transition bg-indigo-600 text-white shadow-2xs border border-indigo-600 dark:bg-indigo-500 dark:border-indigo-400";
       }
@@ -1374,7 +1325,6 @@
       }
     }
 
-    // ⚡ 리소스 최적화: 시계 갱신 주기 10초 완화 (DOM 점유 최소화)
     setInterval(updateClock, 10000);
 
     function extractAllTodos(rawData) {
@@ -1391,6 +1341,7 @@
               id: s.id || Date.now() + Math.random(),
               task: s.task || s.text || s.title || '',
               due: s.due || s.dueDate || '',
+              note: s.note || '',
               completed: !!s.completed,
               isImportant: !!s.isImportant,
               isEditing: false,
@@ -1403,6 +1354,7 @@
               projectId: val.projectId || 'default',
               task: val.task || val.text || val.title || '내용 없음',
               due: subList.length > 0 ? '' : (val.due || val.dueDate || val.date || ''),
+              note: val.note || '',
               category: val.category || '할일',
               completed: !!val.completed,
               isImportant: !!val.isImportant,
@@ -1438,6 +1390,7 @@
               freq: val.freq || '매일',
               dayVal: val.dayVal || '',
               dueTime: val.dueTime || val.time || '',
+              note: val.note || '',
               lastCompletedDate: val.lastCompletedDate || null,
               notified: !!val.notified,
               notified10m: !!val.notified10m,
@@ -1459,11 +1412,7 @@
       const userProjectsRef = window.dbRef(window.firebaseDb, `projects/${currentUser}`);
       window.dbOnValue(userProjectsRef, (snapshot) => {
         const data = snapshot.val();
-        if (data && Array.isArray(data) && data.length > 0) {
-          projects = data;
-        } else {
-          projects = [{ id: 'default', name: '기본' }];
-        }
+        projects = (data && Array.isArray(data) && data.length > 0) ? data : [{ id: 'default', name: '기본' }];
         localStorage.setItem(`sunhong_projects_${currentUser}`, JSON.stringify(projects));
         updateSidebarHighlightUI();
         updateScopeTitleUI();
@@ -1471,24 +1420,21 @@
 
       const userTodosRef = window.dbRef(window.firebaseDb, `todos/${currentUser}`);
       window.dbOnValue(userTodosRef, (snapshot) => {
-        const data = snapshot.val();
-        todos = extractAllTodos(data);
+        todos = extractAllTodos(snapshot.val());
         localStorage.setItem(`sunhong_todos_${currentUser}`, JSON.stringify(todos));
         render();
       });
 
       const userRoutinesRef = window.dbRef(window.firebaseDb, `routines/${currentUser}`);
       window.dbOnValue(userRoutinesRef, (snapshot) => {
-        const data = snapshot.val();
-        routines = extractAllRoutines(data);
+        routines = extractAllRoutines(snapshot.val());
         localStorage.setItem(`sunhong_routines_${currentUser}`, JSON.stringify(routines));
         render();
       });
 
       const userArchiveRef = window.dbRef(window.firebaseDb, `archive/${currentUser}`);
       window.dbOnValue(userArchiveRef, (snapshot) => {
-        const data = snapshot.val();
-        archivedTodos = extractAllTodos(data);
+        archivedTodos = extractAllTodos(snapshot.val());
         localStorage.setItem(`sunhong_archive_${currentUser}`, JSON.stringify(archivedTodos));
         updateArchiveBadge();
       });
@@ -1532,9 +1478,7 @@
         return; 
       }
 
-      const rows = [
-        ['유형', '프로젝트', '상위/그룹명', '항목명', '마감일시/주기', '완료여부', '중요여부']
-      ];
+      const rows = [['유형', '프로젝트', '상위/그룹명', '항목명', '마감일시/주기', '노트/메모', '완료여부', '중요여부']];
 
       todos.forEach(t => {
         const hasSub = t.subitems && t.subitems.length > 0;
@@ -1545,6 +1489,7 @@
           '',
           t.task,
           t.due || '',
+          t.note || '',
           t.completed ? '완료' : '미완료',
           t.isImportant ? '중요' : '일반'
         ]);
@@ -1557,6 +1502,7 @@
               t.task,
               s.task,
               s.due || '',
+              s.note || '',
               s.completed ? '완료' : '미완료',
               s.isImportant ? '중요' : '일반'
             ]);
@@ -1573,6 +1519,7 @@
           '',
           r.task,
           freqDetail,
+          r.note || '',
           r.lastCompletedDate === getTodayString() ? '오늘 완료' : '미완료',
           '일반'
         ]);
@@ -1802,6 +1749,8 @@
       const targetTitleElem = document.getElementById('subTaskTargetTitle');
       const categorySelect = document.getElementById('categoryInputMobile');
       const taskInput = document.getElementById('taskInputMobile');
+      const timeInput = document.getElementById('timeInputMobile');
+      const chipsContainer = document.getElementById('mobileQuickChipsContainer');
 
       if (targetBar && targetTitleElem) {
         targetTitleElem.innerText = parentTaskTitle;
@@ -1812,6 +1761,10 @@
         categorySelect.value = '할일';
         handleCategoryChange('할일', 'mobile');
       }
+
+      // 하위 할일 모드에서도 시간 선택창과 퀵 칩이 정상 보이도록 수정
+      if (timeInput) timeInput.classList.remove('hidden');
+      if (chipsContainer) chipsContainer.classList.remove('hidden');
 
       toggleMobileOptions(true);
 
@@ -1840,9 +1793,11 @@
       const taskInput = document.getElementById('taskInputMobile');
       const categorySelect = document.getElementById('categoryInputMobile');
       const targetProjSelect = document.getElementById('projectTargetSelectMobile');
+      const noteInput = document.getElementById('noteInputMobile');
       
       const task = taskInput.value.trim();
       const category = categorySelect.value;
+      const note = noteInput ? noteInput.value.trim() : '';
       const selectedProjId = targetProjSelect ? targetProjSelect.value : (currentScope === 'project' ? currentProjectId : 'default');
 
       if (!task) return;
@@ -1865,6 +1820,7 @@
           freq: freq,
           dayVal: dayVal,
           dueTime: dueTime,
+          note: note,
           lastCompletedDate: null,
           notified: false,
           notified10m: false
@@ -1880,6 +1836,7 @@
               id: Date.now(),
               task: task,
               due: due,
+              note: note,
               completed: false,
               isImportant: !!t.isImportant,
               isEditing: false,
@@ -1894,10 +1851,11 @@
         cancelSubTaskTargetMode();
       } else {
         const due = document.getElementById('timeInputMobile').value;
-        todos.unshift({ id: Date.now(), projectId: selectedProjId, task, due, category: '할일', completed: false, isImportant: false, isEditing: false, notified: false, notified10m: false, subitems: [] });
+        todos.unshift({ id: Date.now(), projectId: selectedProjId, task, due, note, category: '할일', completed: false, isImportant: false, isEditing: false, notified: false, notified10m: false, subitems: [] });
       }
 
       taskInput.value = '';
+      if (noteInput) noteInput.value = '';
       categorySelect.value = '할일';
       handleCategoryChange('할일', 'mobile');
       toggleMobileOptions(false);
@@ -1926,6 +1884,7 @@
       const taskInput = document.getElementById(`editRoutineTask_${id}`).value.trim();
       const freqInput = document.getElementById(`editRoutineFreq_${id}`).value;
       const dueTimeInput = document.getElementById(`editRoutineTime_${id}`).value;
+      const noteInput = document.getElementById(`editRoutineNote_${id}`).value.trim();
       let dayVal = '';
 
       if (freqInput === '매주') {
@@ -1942,6 +1901,7 @@
         freq: freqInput,
         dayVal: dayVal,
         dueTime: dueTimeInput,
+        note: noteInput,
         notified: false,
         notified10m: false,
         isEditing: false
@@ -1986,10 +1946,12 @@
     function saveEditMain(id) {
       const taskInput = document.getElementById(`editTask_${id}`).value.trim();
       const dueInputElem = document.getElementById(`editDue_${id}`);
+      const noteInputElem = document.getElementById(`editNote_${id}`);
       const dueInput = dueInputElem ? dueInputElem.value : '';
+      const noteInput = noteInputElem ? noteInputElem.value.trim() : '';
 
       if (!taskInput) return;
-      todos = todos.map(t => t.id === id ? { ...t, task: taskInput, due: (t.subitems && t.subitems.length > 0) ? '' : dueInput, notified: false, notified10m: false, isEditing: false } : t);
+      todos = todos.map(t => t.id === id ? { ...t, task: taskInput, due: (t.subitems && t.subitems.length > 0) ? '' : dueInput, note: noteInput, notified: false, notified10m: false, isEditing: false } : t);
       saveAndRender();
     }
 
@@ -2004,9 +1966,10 @@
     function saveEditSub(parentId, subId) {
       const taskInput = document.getElementById(`editSubTask_${subId}`).value.trim();
       const dueInput = document.getElementById(`editSubDue_${subId}`).value;
+      const noteInput = document.getElementById(`editSubNote_${subId}`).value.trim();
       if (!taskInput) return;
       todos = todos.map(t => {
-        if (t.id === parentId && t.subitems) t.subitems = t.subitems.map(s => s.id === subId ? { ...s, task: taskInput, due: dueInput, notified: false, notified10m: false, isEditing: false } : s);
+        if (t.id === parentId && t.subitems) t.subitems = t.subitems.map(s => s.id === subId ? { ...s, task: taskInput, due: dueInput, note: noteInput, notified: false, notified10m: false, isEditing: false } : s);
         return t;
       });
       saveAndRender();
@@ -2159,6 +2122,7 @@
             ${t.isEditing ? `
               <div class="space-y-1 bg-white dark:bg-slate-800 p-1 rounded border border-indigo-200 dark:border-indigo-800">
                 <input type="text" id="editTask_${t.id}" value="${t.task}" class="w-full px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                <input type="text" id="editNote_${t.id}" value="${t.note || ''}" placeholder="메모/노트" class="w-full px-2 py-1 text-xs sm:text-sm border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
                 <div class="flex flex-wrap items-center gap-1.5">
                   ${!hasSub ? `<input type="datetime-local" id="editDue_${t.id}" step="60" value="${t.due || ''}" class="flex-1 px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">` : `<span class="text-xs text-indigo-600 dark:text-indigo-400 font-medium">그룹 할 일 (하위 마감 기준)</span>`}
                   <button onclick="saveEditMain(${t.id})" class="px-2.5 py-1 bg-indigo-600 text-white text-xs sm:text-sm rounded touch-target">저장</button>
@@ -2181,26 +2145,17 @@
                       ${!t.completed && !hasSub && t.due ? getDDayTag(t.due) : ''}
                       ${!hasSub && t.due ? `<span class="text-xs text-slate-400 ml-1">${formatSimpleDue(t.due)}</span>` : ''}
                     </div>
+                    ${t.note ? `<div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 italic flex items-center gap-1"><span>📝</span><span>${t.note}</span></div>` : ''}
                   </div>
                 </div>
                 
                 <div class="relative flex-shrink-0">
-                  <button onclick="toggleKebabMenu(event, 'kebab_main_${t.id}')" title="더보기" class="p-1 px-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded font-bold transition text-base touch-target">
-                    ⋮
-                  </button>
+                  <button onclick="toggleKebabMenu(event, 'kebab_main_${t.id}')" title="더보기" class="p-1 px-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded font-bold transition text-base touch-target">⋮</button>
                   <div id="kebab_main_${t.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs">
-                    <button onclick="toggleEditMain(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
-                      수정
-                    </button>
-                    <button onclick="setSubTaskTargetMode(${t.id}, '${t.task.replace(/'/g, "\\'")}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold">
-                      하위 할일 추가
-                    </button>
-                    <button onclick="toggleImportant(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-semibold">
-                      ${t.isImportant ? '★ 중요 해제' : '☆ 중요 지정'}
-                    </button>
-                    <button onclick="addToGoogleCalendar('${t.task.replace(/'/g, "\\'")}', '할일', '${t.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
-                      캘린더 추가
-                    </button>
+                    <button onclick="toggleEditMain(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">수정</button>
+                    <button onclick="setSubTaskTargetMode(${t.id}, '${t.task.replace(/'/g, "\\'")}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold">하위 할일 추가</button>
+                    <button onclick="toggleImportant(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-semibold">${t.isImportant ? '★ 중요 해제' : '☆ 중요 지정'}</button>
+                    <button onclick="addToGoogleCalendar('${t.task.replace(/'/g, "\\'")}', '할일', '${t.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">캘린더 추가</button>
                     <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
                     <div class="px-3 py-1 text-[10px] font-bold text-slate-400">프로젝트 이동:</div>
                     ${projects.map(p => `
@@ -2210,9 +2165,7 @@
                       </button>
                     `).join('')}
                     <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
-                    <button onclick="deleteTodo(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
-                      삭제
-                    </button>
+                    <button onclick="deleteTodo(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">삭제</button>
                   </div>
                 </div>
               </div>
@@ -2228,40 +2181,38 @@
                   return `
                   <li id="item_elem_${s.id}" class="py-0.5 px-1 rounded border ${subBgStyle}">
                     ${s.isEditing ? `
-                      <div class="flex items-center gap-1.5 bg-white dark:bg-slate-800 p-0.5 rounded border border-indigo-200 dark:border-indigo-800">
-                        <input type="text" id="editSubTask_${s.id}" value="${s.task}" class="flex-1 px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
-                        <input type="datetime-local" id="editSubDue_${s.id}" step="60" value="${s.due || ''}" class="px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
-                        <button onclick="saveEditSub(${t.id}, ${s.id})" class="px-2.5 py-1 bg-indigo-600 text-white text-xs rounded touch-target">저장</button>
-                        <button onclick="toggleEditSub(${t.id}, ${s.id})" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded touch-target">취소</button>
+                      <div class="space-y-1 bg-white dark:bg-slate-800 p-1 rounded border border-indigo-200 dark:border-indigo-800">
+                        <input type="text" id="editSubTask_${s.id}" value="${s.task}" class="w-full px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                        <input type="text" id="editSubNote_${s.id}" value="${s.note || ''}" placeholder="메모/노트" class="w-full px-2 py-1 text-xs sm:text-sm border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                        <div class="flex items-center gap-1.5">
+                          <input type="datetime-local" id="editSubDue_${s.id}" step="60" value="${s.due || ''}" class="flex-1 px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                          <button onclick="saveEditSub(${t.id}, ${s.id})" class="px-2.5 py-1 bg-indigo-600 text-white text-xs rounded touch-target">저장</button>
+                          <button onclick="toggleEditSub(${t.id}, ${s.id})" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded touch-target">취소</button>
+                        </div>
                       </div>
                     ` : `
                       <div class="flex items-center justify-between text-sm sm:text-base">
                         <div class="flex items-center gap-1.5 min-w-0 flex-1">
                           <input type="checkbox" ${s.completed ? 'checked' : ''} onchange="toggleSubitem(${t.id}, ${s.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target flex-shrink-0">
 
-                          <span class="${s.completed ? 'line-through text-slate-400' : (s.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-700 dark:text-slate-200')} text-sm sm:text-base break-words">${s.isImportant ? '★ ' : ''}${s.task}</span>
-                          ${!s.completed && s.due ? getDDayTag(s.due) : ''}
-                          ${s.due ? `<span class="text-xs text-slate-400 ml-1 flex-shrink-0">${formatSimpleDue(s.due)}</span>` : ''}
+                          <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                              <span class="${s.completed ? 'line-through text-slate-400' : (s.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-700 dark:text-slate-200')} text-sm sm:text-base break-words">${s.isImportant ? '★ ' : ''}${s.task}</span>
+                              ${!s.completed && s.due ? getDDayTag(s.due) : ''}
+                              ${s.due ? `<span class="text-xs text-slate-400 ml-1 flex-shrink-0">${formatSimpleDue(s.due)}</span>` : ''}
+                            </div>
+                            ${s.note ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic flex items-center gap-1"><span>📝</span><span>${s.note}</span></div>` : ''}
+                          </div>
                         </div>
                         
                         <div class="relative flex-shrink-0">
-                          <button onclick="toggleKebabMenu(event, 'kebab_sub_${s.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">
-                            ⋮
-                          </button>
+                          <button onclick="toggleKebabMenu(event, 'kebab_sub_${s.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">⋮</button>
                           <div id="kebab_sub_${s.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs">
-                            <button onclick="toggleEditSub(${t.id}, ${s.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
-                              수정
-                            </button>
-                            <button onclick="toggleImportant(${s.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-semibold">
-                              ${s.isImportant ? '★ 중요 해제' : '☆ 중요 지정'}
-                            </button>
-                            <button onclick="addToGoogleCalendar('${s.task.replace(/'/g, "\\'")}', '하위할일', '${s.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
-                              캘린더 추가
-                            </button>
+                            <button onclick="toggleEditSub(${t.id}, ${s.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">수정</button>
+                            <button onclick="toggleImportant(${s.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-semibold">${s.isImportant ? '★ 중요 해제' : '☆ 중요 지정'}</button>
+                            <button onclick="addToGoogleCalendar('${s.task.replace(/'/g, "\\'")}', '하위할일', '${s.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">캘린더 추가</button>
                             <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
-                            <button onclick="deleteSubitem(${t.id}, ${s.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
-                              삭제
-                            </button>
+                            <button onclick="deleteSubitem(${t.id}, ${s.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">삭제</button>
                           </div>
                         </div>
                       </div>
@@ -2322,7 +2273,8 @@
               completed: isDone,
               isSub: false,
               isRoutine: true,
-              freq: r.freq
+              freq: r.freq,
+              note: r.note || ''
             });
           }
         }
@@ -2401,7 +2353,6 @@
       container.innerHTML = html;
     }
 
-    /* Today 탭 항목 렌더링 */
     function renderTimelineItemHtml(item) {
       const currentProjId = item.projectId || 'default';
 
@@ -2410,18 +2361,19 @@
           <div id="item_elem_${item.id}" class="flex items-center justify-between text-sm sm:text-base bg-emerald-50/60 dark:bg-emerald-950/30 p-0.5 px-1 rounded border border-emerald-200 dark:border-emerald-800/60 shadow-2xs">
             <div class="flex items-center gap-1.5 flex-1 min-w-0">
               <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleRoutineToday(${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-emerald-600 rounded cursor-pointer touch-target flex-shrink-0">
-              <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100 font-semibold'} text-sm sm:text-base break-words truncate">${item.task}</span>
-              <span class="text-xs bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-1 py-0.5 rounded font-medium flex-shrink-0">${item.freq}</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5 truncate">
+                  <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100 font-semibold'} text-sm sm:text-base break-words truncate">${item.task}</span>
+                  <span class="text-xs bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-1 py-0.5 rounded font-medium flex-shrink-0">${item.freq}</span>
+                </div>
+                ${item.note ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">📝 ${item.note}</div>` : ''}
+              </div>
             </div>
 
             <div class="relative flex-shrink-0">
-              <button onclick="toggleKebabMenu(event, 'kebab_today_routine_${item.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">
-                ⋮
-              </button>
+              <button onclick="toggleKebabMenu(event, 'kebab_today_routine_${item.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">⋮</button>
               <div id="kebab_today_routine_${item.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs font-normal">
-                <button onclick="toggleEditRoutine(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
-                  수정
-                </button>
+                <button onclick="toggleEditRoutine(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">수정</button>
                 <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
                 <div class="px-3 py-1 text-[10px] font-bold text-slate-400">프로젝트 이동:</div>
                 ${projects.map(p => `
@@ -2431,9 +2383,7 @@
                   </button>
                 `).join('')}
                 <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
-                <button onclick="deleteRoutine(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
-                  삭제
-                </button>
+                <button onclick="deleteRoutine(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">삭제</button>
               </div>
             </div>
           </div>
@@ -2449,34 +2399,29 @@
             <div class="flex items-center gap-1.5 flex-1 min-w-0">
               <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleSubitem(${item.parentId}, ${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target flex-shrink-0">
 
-              <span class="${item.completed ? 'line-through text-slate-400' : (item.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-700 dark:text-slate-200')} text-sm sm:text-base break-words truncate">${item.isImportant ? '★ ' : ''}${item.task}</span>
-              
-              <div id="${tooltipId}" class="relative inline-block has-tooltip cursor-pointer flex-shrink-0" onclick="toggleSubTooltip(event, '${tooltipId}')">
-                <span class="text-[10px] leading-none bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-1 py-0.5 rounded font-semibold border border-indigo-100 dark:border-indigo-800">하위</span>
-                <div class="tooltip-box bg-slate-800 dark:bg-slate-900 text-white text-xs px-2 py-0.5 rounded shadow-lg border border-slate-700">
-                  그룹: ${item.parentTask || '상위 그룹'}
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="${item.completed ? 'line-through text-slate-400' : (item.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-700 dark:text-slate-200')} text-sm sm:text-base break-words truncate">${item.isImportant ? '★ ' : ''}${item.task}</span>
+                  
+                  <div id="${tooltipId}" class="relative inline-block has-tooltip cursor-pointer flex-shrink-0" onclick="toggleSubTooltip(event, '${tooltipId}')">
+                    <span class="text-[10px] leading-none bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-1 py-0.5 rounded font-semibold border border-indigo-100 dark:border-indigo-800">하위</span>
+                    <div class="tooltip-box bg-slate-800 dark:bg-slate-900 text-white text-xs px-2 py-0.5 rounded shadow-lg border border-slate-700">
+                      그룹: ${item.parentTask || '상위 그룹'}
+                    </div>
+                  </div>
                 </div>
+                ${item.note ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">📝 ${item.note}</div>` : ''}
               </div>
             </div>
 
             <div class="relative flex-shrink-0">
-              <button onclick="toggleKebabMenu(event, 'kebab_today_sub_${item.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">
-                ⋮
-              </button>
+              <button onclick="toggleKebabMenu(event, 'kebab_today_sub_${item.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">⋮</button>
               <div id="kebab_today_sub_${item.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs font-normal">
-                <button onclick="toggleEditSub(${item.parentId}, ${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
-                  수정
-                </button>
-                <button onclick="toggleImportant(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-semibold">
-                  ${item.isImportant ? '★ 중요 해제' : '☆ 중요 지정'}
-                </button>
-                <button onclick="addToGoogleCalendar('${item.task.replace(/'/g, "\\'")}', '하위할일', '${item.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
-                  캘린더 추가
-                </button>
+                <button onclick="toggleEditSub(${item.parentId}, ${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">수정</button>
+                <button onclick="toggleImportant(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-semibold">${item.isImportant ? '★ 중요 해제' : '☆ 중요 지정'}</button>
+                <button onclick="addToGoogleCalendar('${item.task.replace(/'/g, "\\'")}', '하위할일', '${item.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">캘린더 추가</button>
                 <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
-                <button onclick="deleteSubitem(${item.parentId}, ${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
-                  삭제
-                </button>
+                <button onclick="deleteSubitem(${item.parentId}, ${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">삭제</button>
               </div>
             </div>
           </div>
@@ -2491,23 +2436,18 @@
             <div class="flex items-center gap-1.5 flex-1 min-w-0">
               <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleComplete(${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target flex-shrink-0">
 
-              <span class="${item.completed ? 'line-through text-slate-400' : (item.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-800 dark:text-slate-100 font-semibold')} text-sm sm:text-base break-words truncate">${item.isImportant ? '★ ' : ''}${item.task}</span>
+              <div class="flex-1 min-w-0">
+                <span class="${item.completed ? 'line-through text-slate-400' : (item.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-800 dark:text-slate-100 font-semibold')} text-sm sm:text-base break-words truncate">${item.isImportant ? '★ ' : ''}${item.task}</span>
+                ${item.note ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">📝 ${item.note}</div>` : ''}
+              </div>
             </div>
 
             <div class="relative flex-shrink-0">
-              <button onclick="toggleKebabMenu(event, 'kebab_today_main_${item.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">
-                ⋮
-              </button>
+              <button onclick="toggleKebabMenu(event, 'kebab_today_main_${item.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">⋮</button>
               <div id="kebab_today_main_${item.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs font-normal">
-                <button onclick="toggleEditMain(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
-                  수정
-                </button>
-                <button onclick="toggleImportant(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-semibold">
-                  ${item.isImportant ? '★ 중요 해제' : '☆ 중요 지정'}
-                </button>
-                <button onclick="addToGoogleCalendar('${item.task.replace(/'/g, "\\'")}', '할일', '${item.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
-                  캘린더 추가
-                </button>
+                <button onclick="toggleEditMain(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">수정</button>
+                <button onclick="toggleImportant(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 font-semibold">${item.isImportant ? '★ 중요 해제' : '☆ 중요 지정'}</button>
+                <button onclick="addToGoogleCalendar('${item.task.replace(/'/g, "\\'")}', '할일', '${item.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">캘린더 추가</button>
                 <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
                 <div class="px-3 py-1 text-[10px] font-bold text-slate-400">프로젝트 이동:</div>
                 ${projects.map(p => `
@@ -2517,9 +2457,7 @@
                   </button>
                 `).join('')}
                 <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
-                <button onclick="deleteTodo(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
-                  삭제
-                </button>
+                <button onclick="deleteTodo(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">삭제</button>
               </div>
             </div>
           </div>
@@ -2568,6 +2506,7 @@
                     ${r.isEditing ? `
                       <div class="space-y-1 bg-white dark:bg-slate-800 p-1 rounded border border-indigo-200 dark:border-indigo-800">
                         <input type="text" id="editRoutineTask_${r.id}" value="${r.task}" class="w-full px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                        <input type="text" id="editRoutineNote_${r.id}" value="${r.note || ''}" placeholder="메모/노트" class="w-full px-2 py-1 text-xs sm:text-sm border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
                         <div class="flex flex-wrap items-center gap-1.5">
                           <select id="editRoutineFreq_${r.id}" onchange="handleRoutineFreqChange(this.value, '', 'editRoutine')" class="px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700">
                             <option value="매일" ${r.freq === '매일' ? 'selected' : ''}>매일</option>
@@ -2598,9 +2537,9 @@
                       </div>
                     ` : `
                       <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 flex-1 min-w-0">
                           <input type="checkbox" ${isDoneToday ? 'checked' : ''} onchange="toggleRoutineToday(${r.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-emerald-600 rounded cursor-pointer touch-target">
-                          <div>
+                          <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2">
                               <span class="text-sm sm:text-base font-semibold ${isDoneToday ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'} break-words">${r.task}</span>
                               ${r.dueTime ? `<span class="text-xs font-bold text-indigo-600 dark:text-indigo-400">${r.dueTime}</span>` : ''}
@@ -2611,18 +2550,14 @@
                                 ${isDoneToday ? '오늘 달성 완료!' : isDueToday ? '오늘 수행 대상' : '오늘 비대상'}
                               </span>
                             </div>
+                            ${r.note ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic mt-0.5">📝 ${r.note}</div>` : ''}
                           </div>
                         </div>
 
                         <div class="relative flex-shrink-0">
-                          <button onclick="toggleKebabMenu(event, 'kebab_routine_${r.id}')" title="더보기" class="p-1 px-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded font-bold transition text-base touch-target">
-                            ⋮
-                          </button>
+                          <button onclick="toggleKebabMenu(event, 'kebab_routine_${r.id}')" title="더보기" class="p-1 px-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded font-bold transition text-base touch-target">⋮</button>
                           <div id="kebab_routine_${r.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs">
-                            <button onclick="toggleEditRoutine(${r.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">
-                              수정
-                            </button>
-                            
+                            <button onclick="toggleEditRoutine(${r.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">수정</button>
                             <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
                             <div class="px-3 py-1 text-[10px] font-bold text-slate-400">프로젝트 이동:</div>
                             ${projects.map(p => `
@@ -2631,11 +2566,8 @@
                                 ${p.id === currentProjId ? '<span class="text-[10px]">✓</span>' : ''}
                               </button>
                             `).join('')}
-
                             <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
-                            <button onclick="deleteRoutine(${r.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">
-                              삭제
-                            </button>
+                            <button onclick="deleteRoutine(${r.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-semibold">삭제</button>
                           </div>
                         </div>
                       </div>
@@ -2647,31 +2579,6 @@
           `}
         </div>
       `;
-    }
-
-    async function registerFcmToken() {
-      if (!window.firebaseMessaging || !currentUser) {
-        return;
-      }
-
-      try {
-        const registration = await navigator.serviceWorker.register('sw.js');
-        const token = await window.getFcmToken(window.firebaseMessaging, {
-          vapidKey: 'BCAJlcTXnmq95VqAmhWCegVFYiidhHHMBs4H5C4lwMUpvGI9N_8jCnY_VufkdtuEBR3iiKaUEV7GObH3zVkcel8',
-          serviceWorkerRegistration: registration
-        });
-        
-        if (token) {
-          await window.dbSet(window.dbRef(window.firebaseDb, `users/${currentUser}/fcmToken`), token);
-          alert("🎉 FCM 토큰이 DB에 성공적으로 등록되었습니다!\n토큰: " + token.slice(0, 15) + "...");
-          updateNotificationUI();
-        } else {
-          alert("토큰 발급에 실패했습니다. 권한 설정을 확인해 주세요.");
-        }
-      } catch (err) {
-        console.error('FCM 토큰 발급 오류:', err);
-        alert("❌ 토큰 발급 실패 에러:\n" + err.message);
-      }
     }
 
     initApp();
