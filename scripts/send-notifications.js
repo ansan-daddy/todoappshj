@@ -10,9 +10,30 @@ admin.initializeApp({
 
 const db = admin.database();
 
+// KST 안전 날짜 파싱 (기기/서버 환경 타임존 독립)
+function parseKstDate(dateStr) {
+  if (!dateStr) return null;
+  const [datePart, timePart] = dateStr.includes('T') ? dateStr.split('T') : dateStr.split(' ');
+  if (!datePart || !timePart) return new Date(dateStr);
+
+  const [year, month, day] = datePart.split('-').map(Number);
+  const [hours, minutes] = timePart.split(':').map(Number);
+
+  return new Date(year, month - 1, day, hours, minutes, 0);
+}
+
+// KST 기준 YYYY-MM-DD 생성
+function getKstTodayString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 async function checkAndSendNotifications() {
   const now = new Date();
-  const todayStr = now.toISOString().slice(0, 10);
+  const todayStr = getKstTodayString();
 
   const usersSnapshot = await db.ref('users').once('value');
   const todosSnapshot = await db.ref('todos').once('value');
@@ -51,7 +72,9 @@ async function checkAndSendNotifications() {
     for (const routine of Object.values(userRoutines)) {
       if (routine.lastCompletedDate === todayStr || !routine.dueTime) continue;
 
-      const routineTime = new Date(`${todayStr}T${routine.dueTime}`);
+      const routineTime = parseKstDate(`${todayStr}T${routine.dueTime}`);
+      if (!routineTime || isNaN(routineTime.getTime())) continue;
+
       const diffMinutes = (routineTime - now) / (1000 * 60);
 
       if (diffMinutes > 0 && diffMinutes <= 15 && !routine.notified10m) {
@@ -66,7 +89,9 @@ async function checkAndSendNotifications() {
 }
 
 async function processItemDue(item, token, username, dbPath, now, isSub = false) {
-  const dueTime = new Date(item.due);
+  const dueTime = parseKstDate(item.due);
+  if (!dueTime || isNaN(dueTime.getTime())) return;
+
   const diffMinutes = (dueTime - now) / (1000 * 60);
   const prefix = isSub ? '[하위]' : `[${item.category || '할일'}]`;
 
@@ -81,14 +106,21 @@ async function processItemDue(item, token, username, dbPath, now, isSub = false)
 
 async function sendFcmNotification(token, title, body, itemId, tab) {
   try {
+    // 중복 알림 방지: notification 단일 구조 적용 및 webpush 옵션 정리
     await admin.messaging().send({
       token: token,
-      notification: { title, body },
+      notification: { 
+        title: title, 
+        body: body 
+      },
       data: {
         itemId: String(itemId),
         tab: String(tab)
       },
       webpush: {
+        fcmOptions: {
+          link: `https://sunhong-todo.web.app/index.html?itemId=${itemId}&tab=${tab}`
+        },
         notification: {
           icon: 'https://cdn-icons-png.flaticon.com/512/906/906334.png'
         }
