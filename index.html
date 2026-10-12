@@ -1666,7 +1666,6 @@
       reader.readAsText(file);
     }
 
-    /* 7번 요구사항: 마감이 지난 경우 지난 일수 표시 추가 */
     function getDDayTag(dateString) {
       if (!dateString) return '';
       const now = new Date();
@@ -2210,13 +2209,12 @@
         const projName = (projects.find(p => p.id === currentProjId) || { name: '기본' }).name;
         const colorStyle = getProjectColor(projName);
 
-        /* 3번 요구사항: 그룹별만 테두리 존재, 별 아이콘은 삭제 후 하이라이트 배경만 적용 */
         const itemBgStyle = t.isImportant 
           ? 'bg-amber-50/80 dark:bg-amber-950/40 border-amber-300 dark:border-amber-700/80 ring-1 ring-amber-200 dark:ring-amber-900' 
           : 'bg-slate-50 dark:bg-slate-800/90 border-slate-200/80 dark:border-slate-700/80';
 
         return `
-          <li id="item_elem_${t.id}" class="${itemBgStyle} border rounded-md p-0.5 shadow-2xs transition${t.completed ? 'opacity-60 bg-slate-100/50 dark:bg-slate-900/40' : ''}">
+          <li id="item_elem_${t.id}" class="${itemBgStyle} border rounded-md p-0.5 shadow-2xs transition ${t.completed ? 'opacity-60 bg-slate-100/50 dark:bg-slate-900/40' : ''}">
             ${t.isEditing ? `
               <div class="space-y-1 bg-white dark:bg-slate-800 p-1 rounded border border-indigo-200 dark:border-indigo-800">
                 <input type="text" id="editTask_${t.id}" value="${t.task}" class="w-full px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
@@ -2234,17 +2232,15 @@
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-1.5 flex-wrap">
                       <span class="font-semibold ${t.completed ? 'line-through text-slate-400' : (t.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-800 dark:text-slate-100')} text-sm sm:text-base break-words">${t.task}</span>
-                      ${currentScope === 'global' ? `<span class="text-[9px] leading-none ${colorStyle.bg}${colorStyle.text} px-1 py-0.5 rounded font-medium">${projName}</span>` : ''}
+                      ${currentScope === 'global' ? `<span class="text-[9px] leading-none ${colorStyle.bg} ${colorStyle.text} px-1 py-0.5 rounded font-medium">${projName}</span>` : ''}
                       ${hasSub ? `
                         <span class="text-[9px] leading-none font-semibold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 px-1 py-0.5 rounded">그룹</span>
                         <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400">${prog}% (${compSub}/${totalSub})</span>
                       ` : ''}
 
-                      <!-- 1번 요구사항: 상위 할 일이 되면 마감시간 및 신호등(D-Day) 숨김 -->
                       ${!hasSub && !t.completed && t.due ? getDDayTag(t.due) : ''}
                       ${!hasSub && t.due ? `<span class="text-xs text-slate-400 ml-1">${formatSimpleDue(t.due)}</span>` : ''}
                     </div>
-                    <!-- 2번 요구사항: 노트 앞 📝 아이콘 제거 -->
                     ${t.note ? `<div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 italic flex items-center gap-1"><span>${t.note}</span></div>` : ''}
                   </div>
                 </div>
@@ -2252,7 +2248,6 @@
                 <div class="relative flex-shrink-0">
                   <button onclick="toggleKebabMenu(event, 'kebab_main_${t.id}')" title="더보기" class="p-1 px-2 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 rounded font-bold transition text-base touch-target">⋮</button>
                   
-                  <!-- 4번 & 5번 & 6번 요구사항: 일반 폰트, 동일 글자크기/검정색, 노트 삭제 제거, 순서 재정렬 -->
                   <div id="kebab_main_${t.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs text-slate-700 dark:text-slate-200 font-normal">
                     <button onclick="toggleEditMain(${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">수정</button>
                     <button onclick="setSubTaskTargetMode(${t.id}, '${t.task.replace(/'/g, "\\'")}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">하위할일 추가</button>
@@ -2263,7 +2258,8 @@
                     <div class="px-3 py-1 text-[10px] text-slate-400">프로젝트 이동:</div>
                     ${projects.map(p => `
                       <button onclick="moveTodoToProjectDirect(${t.id}, '${p.id}')" class="w-full text-left px-4 py-1 hover:bg-indigo-50 dark:hover:bg-indigo-950 flex items-center justify-between ${p.id === currentProjId ? 'text-indigo-600 dark:text-indigo-400 font-medium' : ''}">
-                        <span class="truncate">${p.name}</span>${p.id === currentProjId ? '<span class="text-[10px]">선택됨</span>' : ''}
+                        <span class="truncate">${p.name}</span>
+                        ${p.id === currentProjId ? '<span class="text-[10px]">선택됨</span>' : ''}
                       </button>
                     `).join('')}
                     <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
@@ -2276,7 +2272,6 @@
             ${visibleSubitems.length > 0 ? `
               <ul class="mt-0.5 pl-2 sm:pl-4 border-l-2 border-indigo-100 dark:border-indigo-900 space-y-0.5">
                 ${visibleSubitems.map(s => {
-                  /* 3번 요구사항: 하위 할 일 중요 항목은 테두리 없이 하이라이트 배경만 적용 */
                   const subBgStyle = s.isImportant 
                     ? 'bg-amber-50/80 dark:bg-amber-950/50' 
                     : 'bg-white dark:bg-slate-800';
@@ -2303,14 +2298,12 @@
                               ${!s.completed && s.due ? getDDayTag(s.due) : ''}
                               ${s.due ? `<span class="text-xs text-slate-400 ml-1 flex-shrink-0">${formatSimpleDue(s.due)}</span>` : ''}
                             </div>
-                            <!-- 2번 요구사항: 노트 앞 아이콘 제거 -->
                             ${s.note ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic flex items-center gap-1"><span>${s.note}</span></div>` : ''}
                           </div>
                         </div>
                         
                         <div class="relative flex-shrink-0">
                           <button onclick="toggleKebabMenu(event, 'kebab_sub_${s.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">⋮</button>
-                          <!-- 하위 할 일 케밥 메뉴 -->
                           <div id="kebab_sub_${s.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs text-slate-700 dark:text-slate-200 font-normal">
                             <button onclick="toggleEditSub(${t.id}, ${s.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">수정</button>
                             <button onclick="openNoteModal('sub', ${s.id}, ${t.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">노트 작성/수정</button>
@@ -2379,7 +2372,8 @@
               isSub: false,
               isRoutine: true,
               freq: r.freq,
-              note: r.note || ''
+              note: r.note || '',
+              isEditing: !!r.isEditing
             });
           }
         }
@@ -2458,39 +2452,59 @@
       container.innerHTML = html;
     }
 
+    /* Today 탭 내 항목 렌더링 - 수정 모드(isEditing) 지원 보완 */
     function renderTimelineItemHtml(item) {
       const currentProjId = item.projectId || 'default';
 
       if (item.isRoutine) {
         return `
-          <div id="item_elem_${item.id}" class="flex items-center justify-between text-sm sm:text-base bg-emerald-50/60 dark:bg-emerald-950/30 p-0.5 px-1 rounded border border-emerald-200 dark:border-emerald-800/60 shadow-2xs">
-            <div class="flex items-center gap-1.5 flex-1 min-w-0">
-              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleRoutineToday(${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-emerald-600 rounded cursor-pointer touch-target flex-shrink-0">
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-1.5 truncate">
-                  <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100 font-semibold'} text-sm sm:text-base break-words truncate">${item.task}</span>
-                  <span class="text-xs bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-1 py-0.5 rounded font-medium flex-shrink-0">${item.freq}</span>
+          <div id="item_elem_${item.id}" class="bg-emerald-50/60 dark:bg-emerald-950/30 p-0.5 px-1 rounded border border-emerald-200 dark:border-emerald-800/60 shadow-2xs">
+            ${item.isEditing ? `
+              <div class="space-y-1 bg-white dark:bg-slate-800 p-1 rounded border border-indigo-200 dark:border-indigo-800">
+                <input type="text" id="editRoutineTask_${item.id}" value="${item.task}" class="w-full px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <select id="editRoutineFreq_${item.id}" onchange="handleRoutineFreqChange(this.value, '', 'editRoutine')" class="px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700">
+                    <option value="매일" ${item.freq === '매일' ? 'selected' : ''}>매일</option>
+                    <option value="매주" ${item.freq === '매주' ? 'selected' : ''}>매주</option>
+                    <option value="매월" ${item.freq === '매월' ? 'selected' : ''}>매월</option>
+                  </select>
+                  <input type="time" id="editRoutineTime_${item.id}" step="60" value="${item.dueTime || ''}" class="px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                  <button onclick="saveEditRoutine(${item.id})" class="px-2.5 py-1 bg-indigo-600 text-white text-xs rounded touch-target">저장</button>
+                  <button onclick="toggleEditRoutine(${item.id})" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded touch-target">취소</button>
                 </div>
-                ${item.note ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">${item.note}</div>` : ''}
               </div>
-            </div>
+            ` : `
+              <div class="flex items-center justify-between text-sm sm:text-base">
+                <div class="flex items-center gap-1.5 flex-1 min-w-0">
+                  <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleRoutineToday(${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-emerald-600 rounded cursor-pointer touch-target flex-shrink-0">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-1.5 truncate">
+                      <span class="${item.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100 font-semibold'} text-sm sm:text-base break-words truncate">${item.task}</span>
+                      <span class="text-xs bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 px-1 py-0.5 rounded font-medium flex-shrink-0">${item.freq}</span>
+                    </div>
+                    ${item.note ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">${item.note}</div>` : ''}
+                  </div>
+                </div>
 
-            <div class="relative flex-shrink-0">
-              <button onclick="toggleKebabMenu(event, 'kebab_today_routine_${item.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">⋮</button>
-              <div id="kebab_today_routine_${item.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs text-slate-700 dark:text-slate-200 font-normal">
-                <button onclick="toggleEditRoutine(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">수정</button>
-                <button onclick="openNoteModal('routine', ${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">노트 작성/수정</button>
-                <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
-                <div class="px-3 py-1 text-[10px] text-slate-400">프로젝트 이동:</div>
-                ${projects.map(p => `
-                  <button onclick="moveRoutineToProjectDirect(${item.id}, '${p.id}')" class="w-full text-left px-4 py-1 hover:bg-indigo-50 dark:hover:bg-indigo-950 flex items-center justify-between ${p.id === currentProjId ? 'text-indigo-600 dark:text-indigo-400 font-medium' : ''}">
-                    <span class="truncate">${p.name}</span>${p.id === currentProjId ? '<span class="text-[10px]">선택됨</span>' : ''}
-                  </button>
-                `).join('')}
-                <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
-                <button onclick="deleteRoutine(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-medium">삭제</button>
+                <div class="relative flex-shrink-0">
+                  <button onclick="toggleKebabMenu(event, 'kebab_today_routine_${item.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">⋮</button>
+                  <div id="kebab_today_routine_${item.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs text-slate-700 dark:text-slate-200 font-normal">
+                    <button onclick="toggleEditRoutine(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">수정</button>
+                    <button onclick="openNoteModal('routine', ${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">노트 작성/수정</button>
+                    <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                    <div class="px-3 py-1 text-[10px] text-slate-400">프로젝트 이동:</div>
+                    ${projects.map(p => `
+                      <button onclick="moveRoutineToProjectDirect(${item.id}, '${p.id}')" class="w-full text-left px-4 py-1 hover:bg-indigo-50 dark:hover:bg-indigo-950 flex items-center justify-between ${p.id === currentProjId ? 'text-indigo-600 dark:text-indigo-400 font-medium' : ''}">
+                        <span class="truncate">${p.name}</span>
+                        ${p.id === currentProjId ? '<span class="text-[10px]">선택됨</span>' : ''}
+                      </button>
+                    `).join('')}
+                    <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                    <button onclick="deleteRoutine(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-medium">삭제</button>
+                  </div>
+                </div>
               </div>
-            </div>
+            `}
           </div>
         `;
       } else if (item.isSub) {
@@ -2500,36 +2514,49 @@
           : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700';
 
         return `
-          <div id="item_elem_${item.id}" class="flex items-center justify-between text-sm sm:text-base ${subBgStyle} p-0.5 px-1 rounded border shadow-2xs">
-            <div class="flex items-center gap-1.5 flex-1 min-w-0">
-              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleSubitem(${item.parentId}, ${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target flex-shrink-0">
+          <div id="item_elem_${item.id}" class="${subBgStyle} p-0.5 px-1 rounded border shadow-2xs">
+            ${item.isEditing ? `
+              <div class="space-y-1 bg-white dark:bg-slate-800 p-1 rounded border border-indigo-200 dark:border-indigo-800">
+                <input type="text" id="editSubTask_${item.id}" value="${item.task}" class="w-full px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                <div class="flex items-center gap-1.5">
+                  <input type="datetime-local" id="editSubDue_${item.id}" step="60" value="${item.due || ''}" class="flex-1 px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                  <button onclick="saveEditSub(${item.parentId},${item.id})" class="px-2.5 py-1 bg-indigo-600 text-white text-xs rounded touch-target">저장</button>
+                  <button onclick="toggleEditSub(${item.parentId},${item.id})" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded touch-target">취소</button>
+                </div>
+              </div>
+            ` : `
+              <div class="flex items-center justify-between text-sm sm:text-base">
+                <div class="flex items-center gap-1.5 flex-1 min-w-0">
+                  <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleSubitem(${item.parentId},${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target flex-shrink-0">
 
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="${item.completed ? 'line-through text-slate-400' : (item.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-700 dark:text-slate-200')} text-sm sm:text-base break-words truncate">${item.task}</span>
-                  
-                  <div id="${tooltipId}" class="relative inline-block has-tooltip cursor-pointer flex-shrink-0" onclick="toggleSubTooltip(event, '${tooltipId}')">
-                    <span class="text-[10px] leading-none bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-1 py-0.5 rounded font-semibold border border-indigo-100 dark:border-indigo-800">하위</span>
-                    <div class="tooltip-box bg-slate-800 dark:bg-slate-900 text-white text-xs px-2 py-0.5 rounded shadow-lg border border-slate-700">
-                      그룹: ${item.parentTask || '상위 그룹'}
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="${item.completed ? 'line-through text-slate-400' : (item.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-700 dark:text-slate-200')} text-sm sm:text-base break-words truncate">${item.task}</span>
+                      
+                      <div id="${tooltipId}" class="relative inline-block has-tooltip cursor-pointer flex-shrink-0" onclick="toggleSubTooltip(event, '${tooltipId}')">
+                        <span class="text-[10px] leading-none bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 px-1 py-0.5 rounded font-semibold border border-indigo-100 dark:border-indigo-800">하위</span>
+                        <div class="tooltip-box bg-slate-800 dark:bg-slate-900 text-white text-xs px-2 py-0.5 rounded shadow-lg border border-slate-700">
+                          그룹: ${item.parentTask || '상위 그룹'}
+                        </div>
+                      </div>
                     </div>
+                    ${item.note ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">${item.note}</div>` : ''}
                   </div>
                 </div>
-                ${item.note ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">${item.note}</div>` : ''}
-              </div>
-            </div>
 
-            <div class="relative flex-shrink-0">
-              <button onclick="toggleKebabMenu(event, 'kebab_today_sub_${item.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">⋮</button>
-              <div id="kebab_today_sub_${item.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs text-slate-700 dark:text-slate-200 font-normal">
-                <button onclick="toggleEditSub(${item.parentId}, ${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">수정</button>
-                <button onclick="openNoteModal('sub', ${item.id}, ${item.parentId})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">노트 작성/수정</button>
-                <button onclick="toggleImportant(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">${item.isImportant ? '중요 해제' : '중요 지정'}</button>
-                <button onclick="addToGoogleCalendar('${item.task.replace(/'/g, "\\'")}', '하위할일', '${item.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">캘린더 추가</button>
-                <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
-                <button onclick="deleteSubitem(${item.parentId}, ${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-medium">삭제</button>
+                <div class="relative flex-shrink-0">
+                  <button onclick="toggleKebabMenu(event, 'kebab_today_sub_${item.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">⋮</button>
+                  <div id="kebab_today_sub_${item.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-36 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs text-slate-700 dark:text-slate-200 font-normal">
+                    <button onclick="toggleEditSub(${item.parentId},${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">수정</button>
+                    <button onclick="openNoteModal('sub', ${item.id},${item.parentId})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">노트 작성/수정</button>
+                    <button onclick="toggleImportant(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">${item.isImportant ? '중요 해제' : '중요 지정'}</button>
+                    <button onclick="addToGoogleCalendar('${item.task.replace(/'/g, "\\'")}', '하위할일', '${item.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">캘린더 추가</button>
+                    <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                    <button onclick="deleteSubitem(${item.parentId},${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-medium">삭제</button>
+                  </div>
+                </div>
               </div>
-            </div>
+            `}
           </div>
         `;
       } else {
@@ -2538,34 +2565,47 @@
           : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700';
 
         return `
-          <div id="item_elem_${item.id}" class="flex items-center justify-between text-sm sm:text-base ${itemBgStyle} p-0.5 px-1 rounded border shadow-2xs">
-            <div class="flex items-center gap-1.5 flex-1 min-w-0">
-              <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleComplete(${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target flex-shrink-0">
-
-              <div class="flex-1 min-w-0">
-                <span class="${item.completed ? 'line-through text-slate-400' : (item.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-800 dark:text-slate-100 font-semibold')} text-sm sm:text-base break-words truncate">${item.task}</span>
-                ${item.note ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">${item.note}</div>` : ''}
+          <div id="item_elem_${item.id}" class="${itemBgStyle} p-0.5 px-1 rounded border shadow-2xs">
+            ${item.isEditing ? `
+              <div class="space-y-1 bg-white dark:bg-slate-800 p-1 rounded border border-indigo-200 dark:border-indigo-800">
+                <input type="text" id="editTask_${item.id}" value="${item.task}" class="w-full px-2 py-1 text-sm sm:text-base border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <input type="datetime-local" id="editDue_${item.id}" step="60" value="${item.due || ''}" class="flex-1 px-2 py-1 text-xs border border-slate-300 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700">
+                  <button onclick="saveEditMain(${item.id})" class="px-2.5 py-1 bg-indigo-600 text-white text-xs rounded touch-target">저장</button>
+                  <button onclick="toggleEditMain(${item.id})" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs rounded touch-target">취소</button>
+                </div>
               </div>
-            </div>
+            ` : `
+              <div class="flex items-center justify-between text-sm sm:text-base">
+                <div class="flex items-center gap-1.5 flex-1 min-w-0">
+                  <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleComplete(${item.id})" class="w-4 h-4 sm:w-5 sm:h-5 accent-indigo-600 rounded cursor-pointer touch-target flex-shrink-0">
 
-            <div class="relative flex-shrink-0">
-              <button onclick="toggleKebabMenu(event, 'kebab_today_main_${item.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">⋮</button>
-              <div id="kebab_today_main_${item.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs text-slate-700 dark:text-slate-200 font-normal">
-                <button onclick="toggleEditMain(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">수정</button>
-                <button onclick="openNoteModal('main', ${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">노트 작성/수정</button>
-                <button onclick="toggleImportant(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">${item.isImportant ? '중요 해제' : '중요 지정'}</button>
-                <button onclick="addToGoogleCalendar('${item.task.replace(/'/g, "\\'")}', '할일', '${item.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">캘린더 추가</button>
-                <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
-                <div class="px-3 py-1 text-[10px] text-slate-400">프로젝트 이동:</div>
-                ${projects.map(p => `
-                  <button onclick="moveTodoToProjectDirect(${item.id}, '${p.id}')" class="w-full text-left px-4 py-1 hover:bg-indigo-50 dark:hover:bg-indigo-950 flex items-center justify-between ${p.id === currentProjId ? 'text-indigo-600 dark:text-indigo-400 font-medium' : ''}">
-                    <span class="truncate">${p.name}</span>${p.id === currentProjId ? '<span class="text-[10px]">선택됨</span>' : ''}
-                  </button>
-                `).join('')}
-                <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
-                <button onclick="deleteTodo(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-medium">삭제</button>
+                  <div class="flex-1 min-w-0">
+                    <span class="${item.completed ? 'line-through text-slate-400' : (item.isImportant ? 'text-amber-900 dark:text-amber-200 font-bold' : 'text-slate-800 dark:text-slate-100 font-semibold')} text-sm sm:text-base break-words truncate">${item.task}</span>${item.note ? `<div class="text-[11px] text-slate-500 dark:text-slate-400 italic">${item.note}</div>` : ''}
+                  </div>
+                </div>
+
+                <div class="relative flex-shrink-0">
+                  <button onclick="toggleKebabMenu(event, 'kebab_today_main_${item.id}')" title="더보기" class="p-0.5 px-1.5 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded transition text-xs touch-target">⋮</button>
+                  <div id="kebab_today_main_${item.id}" class="kebab-dropdown hidden absolute right-0 top-full mt-1 w-44 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg z-50 py-1 text-xs text-slate-700 dark:text-slate-200 font-normal">
+                    <button onclick="toggleEditMain(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">수정</button>
+                    <button onclick="openNoteModal('main', ${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">노트 작성/수정</button>
+                    <button onclick="toggleImportant(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">${item.isImportant ? '중요 해제' : '중요 지정'}</button>
+                    <button onclick="addToGoogleCalendar('${item.task.replace(/'/g, "\\'")}', '할일', '${item.due || ''}')" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700">캘린더 추가</button>
+                    <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                    <div class="px-3 py-1 text-[10px] text-slate-400">프로젝트 이동:</div>
+                    ${projects.map(p => `
+                      <button onclick="moveTodoToProjectDirect(${item.id}, '${p.id}')" class="w-full text-left px-4 py-1 hover:bg-indigo-50 dark:hover:bg-indigo-950 flex items-center justify-between ${p.id === currentProjId ? 'text-indigo-600 dark:text-indigo-400 font-medium' : ''}">
+                        <span class="truncate">${p.name}</span>
+                        ${p.id === currentProjId ? '<span class="text-[10px]">선택됨</span>' : ''}
+                      </button>
+                    `).join('')}
+                    <div class="border-t border-slate-100 dark:border-slate-700 my-1"></div>
+                    <button onclick="deleteTodo(${item.id})" class="w-full text-left px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 text-rose-500 font-medium">삭제</button>
+                  </div>
+                </div>
               </div>
-            </div>
+            `}
           </div>
         `;
       }
